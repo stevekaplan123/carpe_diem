@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  creator_id: 1
+  event_name: MyString
+  time_creation: 2015-02-11 11:11:29
+  time_occurrence: 2015-02-11 11:11:29
+  location: MyString
+  longitude: 9.99
+  latitude: 9.99
+  description: MyText
+
+two:
+  creator_id: 1
+  event_name: MyString
+  time_creation: 2015-02-11 11:11:29
+  time_occurrence: 2015-02-11 11:11:29
+  location: MyString
+  longitude: 9.99
+  latitude: 9.99
+  description: MyText
