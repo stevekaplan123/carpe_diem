@@ -1,6 +1,5 @@
 class WelcomeController < ApplicationController
-
-	def login
-	end
-
+  def new
+  	render text: "hello"
+  end
 end
