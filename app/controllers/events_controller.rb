@@ -12,6 +12,12 @@ class EventsController < ApplicationController
   def show
   end
 
+
+  def filter
+  #  @events = Event.all
+    #all, find, select
+  end
+
   # GET /events/new
   def new
     @event = Event.new
