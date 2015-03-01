@@ -60,14 +60,14 @@
                     document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
                 }
               }
-              xmlhttp.open("GET","/events/filter.json",true);
+              xmlhttp.open("GET","/events/",true);
               xmlhttp.send();
           }
 
         $(function(){
             var myOptions = {
-                center: new google.maps.LatLng(42.3764852, -71.2356113),
-                zoom: 10,
+                center: new google.maps.LatLng(42.3657889, -71.2601062),
+                zoom: 16,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             };
             gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);

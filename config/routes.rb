@@ -4,7 +4,7 @@ Rails.application.routes.draw do
 
   get 'sessions/new'
 
-  get 'events/filter' => 'events#filter'
+  get 'events/filter/:type/:arg' => 'events#filter'
 
   resources :attendances
 
