@@ -11,7 +11,7 @@ class Event < ActiveRecord::Base
     def valid_dates
         #now = Time.now
         temp = DateTime.now
-        now = temp.change(sec: temp.sec - 30)
+        now = temp.change(min: temp.min - 1)
 
         if time_occurrence < now
             puts "noooo"
