@@ -42,19 +42,40 @@
       <script type='text/javascript' src='//code.jquery.com/jquery-1.9.1.js'></script>
     <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script type='text/javascript'>
+        function loadXMLDoc()
+        {
+            var xmlhttp;
+            if (window.XMLHttpRequest)
+              {// code for IE7+, Firefox, Chrome, Opera, Safari
+              xmlhttp=new XMLHttpRequest();
+              }
+            else
+              {// code for IE6, IE5
+              xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+              }
+            xmlhttp.onreadystatechange=function()
+              {
+              if (xmlhttp.readyState==4 && xmlhttp.status==200)
+                {
+                    document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
+                }
+              }
+              xmlhttp.open("GET","/events/",true);
+              xmlhttp.send();
+          }
+
         $(function(){
             var myOptions = {
-                center: new google.maps.LatLng(42.3764852, -71.2356113),
-                zoom: 10,
+                center: new google.maps.LatLng(42.3657889, -71.2601062),
+                zoom: 16,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             };
             gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
 
-            //var kmlLayer = new google.maps.KmlLayer('https://maps.google.com/maps/ms?ie=UTF8&t=m&authuser=0&msa=0&output=kml&msid=212043342089249462794.00048cfeb10fb9d85b995');
-            //kmlLayer.setMap(gMap);
         });
     </script>
 <br>
-
+<button type="button" onclick="loadXMLDoc()">Request data</button>
+<div id="myDiv"></div>
 <%= link_to 'New Event', new_event_path %>
 <%= link_to 'Back', root_path %>
