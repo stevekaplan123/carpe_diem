@@ -10,7 +10,7 @@ class CreateEvents < ActiveRecord::Migration
       t.decimal :latitude
       t.text :description
 
-      t.timestamps null: false
+      t.timestamps null: false # might need to be set true to enable created_at, check later - Leifeng ,2015/3/2
     end
   end
 end
