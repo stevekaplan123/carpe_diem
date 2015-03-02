@@ -32,11 +32,18 @@ class EventsController < ApplicationController
          # @events = filterByTime(params[:arg])
        elsif whichType == "user"
           @events = filterByUser(params[:arg])
+        elsif whichType == "attendance"
+          @events = filterByAttendance(params[:arg])
        else
           respond_to do |format|
             format.html { redirect_to events_url, notice: 'INVALID FILTERING TYPE.' }
           end
        end
+  end
+
+  def filterByAttendance(username)
+    #in this case the user looked up all events attended by 'username'
+    #TO DO...
   end
 
   def calcDistance(orig_coords, end_coords)
@@ -70,28 +77,11 @@ class EventsController < ApplicationController
 
   def filterByTime(time)
       # how do we define "soon" when the maximum amount of hours is 24?
-      # we will use a reasonable definition of 4 hours
-      now_day = time.day
-      now_hour = time.hour
-      now_min = time.min
-      now_time = now_day.to_f+(now_hour.to_f/24)+(now_min.to_f/(60*24))
+      # we will use a reasonable definition of 4 hours 
+      # subtract five hours because of ETS to UTC conversion
+      @events = Event.where(time_occurrence: (Time.now-5.hours)..(Time.now-1.hours))
+      #@events = Event.where(time_occurrence: (Time.now)..(Time.now+4.hours))
 
-      filtered_events = []
-      
-      @events = Event.all
-      @events.each do |event|
-          then_hour = Time.parse(event.time_occurrence.to_s).strftime("%H")
-          then_minute = Time.parse(event.time_occurrence.to_s).strftime("%M")
-          then_day = Time.parse(event.time_occurrence.to_s).strftime("%d")
-
-          then_time = then_day.to_f+(then_hour.to_f/24)+(then_minute.to_f/(60*24))
-          diff_time = (then_time - now_time)*24
-
-          if (diff_time <= 4) #requires that events that already happened be deleted
-             filtered_events.push(event)
-          end
-      end
-      filtered_events
   end
 
   def filterByUser(user)
