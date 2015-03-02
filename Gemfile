@@ -29,6 +29,9 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
+gem 'bootstrap-sass',       '3.2.0.0'
+
+
 group :development, :test do
   # gem for generating fake data
   gem 'fabrication'
