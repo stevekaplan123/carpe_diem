@@ -42,7 +42,7 @@
       <script type='text/javascript' src='//code.jquery.com/jquery-1.9.1.js'></script>
     <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script type='text/javascript'>
-        function loadXMLDoc()
+        function loadXMLDoc(type, arg)
         {
             var xmlhttp;
             if (window.XMLHttpRequest)
@@ -60,7 +60,7 @@
                     document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
                 }
               }
-              xmlhttp.open("GET","/events/",true);
+              xmlhttp.open("GET","/events/filter/"+type+"/"+arg+".json",true);
               xmlhttp.send();
           }
 
@@ -75,7 +75,9 @@
         });
     </script>
 <br>
-<button type="button" onclick="loadXMLDoc()">Request data</button>
+<button type="button" onclick="loadXMLDoc('location', 'Shapiro Campus Center')">Request events near Shapiro Campus Center</button>
+<button type="button" onclick="loadXMLDoc('user', '1')">Request events created by user with id 1</button>
+
 <div id="myDiv"></div>
 <%= link_to 'New Event', new_event_path %>
 <%= link_to 'Back', root_path %>

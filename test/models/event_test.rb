@@ -13,8 +13,12 @@ class EventTest < ActiveSupport::TestCase
   		@some_event = MiniTest::Mock.new
   		@some_event.expect(:event_name, "Test Event")
   		@some_event.expect(:time_creation, DateTime.now)
-  		@some_event.expect(:location, "Test Place")
-  		@some_event.expect(:description, "Test Description")
+  		@some_event.expect(:location, "Shapiro Campus Center")
+      desc=""
+      for i in 0..1499  #set up maximum length description
+        desc+="h "
+      end
+  		@some_event.expect(:description, desc)
   	
   	end
    	
@@ -37,7 +41,22 @@ class EventTest < ActiveSupport::TestCase
   		@some_event.time_creation.must_be :<=, @some_event.time_occurrence
   	
   	end
-  	
+
+
+    it "should have a valid location" do
+     Geocoder.coordinates(@some_event.location).wont_be_nil
+  end
+
+    it "should not have a description of over 3000 characters" do
+      @some_event.description.length.must_be :<=, 3000
   end  
+
+    it "should have a minimum length description of over three words" do
+      desc_array = @some_event.description.split(" ")
+      desc_array.length.must_be :>=, 3
+    end
+
+  end
+
   
 end

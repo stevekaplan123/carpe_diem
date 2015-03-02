@@ -50,7 +50,7 @@ class EventsController < ApplicationController
       #  0.002 is distance from North to Usdan
       #  0.0036 is distance from Gosman Gym to Usdan 
       #  a reasonable distance to use to discern whether I am "close" to an event
-      #  is a distance of 0.003
+      #  is a distance of 0.0045
 
       loc_arr = location.split("+")
       locString = loc_arr.join(" ")
@@ -61,7 +61,7 @@ class EventsController < ApplicationController
       @events.each do |event|
           event_coords = Geocoder.coordinates(event.location)
           dist = calcDistance(my_coords, event_coords)
-          if dist <= 0.004
+          if dist <= 0.0045
             filtered_events.push(event)
           end
       end
@@ -95,15 +95,8 @@ class EventsController < ApplicationController
   end
 
   def filterByUser(user)
-      @events = Event.all
-      filtered_events = []
-
-      @events.each do |event|
-          if event.creator_id.to_s==user.to_s
-              filtered_events.push(event)
-          end
-      end
-      filtered_events
+     user = user.to_i
+     @events = Event.where(creator_id: user)
   end
 
 
