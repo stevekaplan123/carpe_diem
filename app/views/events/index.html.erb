@@ -1,3 +1,52 @@
+
+   <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script type='text/javascript'>
+        //the following function causes page to refresh
+        (function()
+        {
+          if( window.localStorage )
+          {
+            if( !localStorage.getItem( 'firstLoad' ) )
+            {
+              localStorage[ 'firstLoad' ] = true;
+              window.location.reload();
+            }  
+            else
+              localStorage.removeItem( 'firstLoad' );
+          }
+        })();
+        window.onload = function() {
+            var myOptions = {
+                center: new google.maps.LatLng(42.3654347, -71.258595),
+                zoom: 15,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
+
+       }
+      
+        function loadXMLDoc(type, arg)
+        {
+            var xmlhttp;
+            if (window.XMLHttpRequest)
+              {// code for IE7+, Firefox, Chrome, Opera, Safari
+              xmlhttp=new XMLHttpRequest();
+              }
+            else
+              {// code for IE6, IE5
+              xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+              }
+            xmlhttp.onreadystatechange=function()
+              {
+              if (xmlhttp.readyState==4 && xmlhttp.status==200)
+                {
+                    document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
+                }
+              }
+              xmlhttp.open("GET","/events/filter/"+type+"/"+arg+".json",true);
+              xmlhttp.send();
+          }
+    </script>
 <p id="notice"><%= notice %></p>
 
 <h1>Listing Events</h1>
@@ -22,7 +71,7 @@
       <tr>
         <td><%= event.creator_id %></td>
         <td><%= event.event_name %></td>
-        <td><%= event.time_creation %></td>
+        
         <td><%= event.time_occurrence %></td>
         <td><%= event.location %></td>
         <td><%= event.longitude %></td>
@@ -36,48 +85,15 @@
   </tbody>
 </table>
 
-   <div id="map_canvas" style="width: 800px; height: 400px;"></div>
+   <div id="map_canvas" onload="loadMap()" style="width: 800px; height: 400px;"></div>
 
 
-      <script type='text/javascript' src='//code.jquery.com/jquery-1.9.1.js'></script>
-    <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
-    <script type='text/javascript'>
-        function loadXMLDoc(type, arg)
-        {
-            var xmlhttp;
-            if (window.XMLHttpRequest)
-              {// code for IE7+, Firefox, Chrome, Opera, Safari
-              xmlhttp=new XMLHttpRequest();
-              }
-            else
-              {// code for IE6, IE5
-              xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-              }
-            xmlhttp.onreadystatechange=function()
-              {
-              if (xmlhttp.readyState==4 && xmlhttp.status==200)
-                {
-                    document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
-                }
-              }
-              xmlhttp.open("GET","/events/filter/"+type+"/"+arg+".json",true);
-              xmlhttp.send();
-          }
-
-        $(function(){
-            var myOptions = {
-                center: new google.maps.LatLng(42.3657889, -71.2601062),
-                zoom: 16,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            };
-            gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
-
-        });
-    </script>
 <br>
 <button type="button" onclick="loadXMLDoc('location', 'Shapiro Campus Center')">Request events near Shapiro Campus Center</button>
 <button type="button" onclick="loadXMLDoc('user', '1')">Request events created by user with id 1</button>
 
 <div id="myDiv"></div>
+
+ 
 <%= link_to 'New Event', new_event_path %>
 <%= link_to 'Back', root_path %>

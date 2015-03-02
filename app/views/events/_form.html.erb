@@ -19,13 +19,13 @@
     <%= f.label :event_name %><br>
     <%= f.text_field :event_name %>
   </div>
-  <div class="field">
-    <%= f.label :time_creation %><br>
-    <%= f.datetime_select :time_creation %>
-  </div>
+  
   <div class="field">
     <%= f.label :time_occurrence %><br>
-    <%= f.datetime_select :time_occurrence %>
+    <% Time.use_zone("Eastern Time (US & Canada)") do %>
+    	<%= f.datetime_select :time_occurrence, ampm: true %>
+    <% end %>
+    
   </div>
   <div class="field">
     <%= f.label :location %><br>
