@@ -11,7 +11,7 @@ class EventTest < ActiveSupport::TestCase
   
   	before do
   		@some_event = MiniTest::Mock.new
-  		@some_event.expect(:event_name, "Test Event")
+  		@some_event.expect(:name, "Test Event")
   		@some_event.expect(:time_creation, DateTime.now)
   		@some_event.expect(:location, "Shapiro Campus Center")
       desc=""
@@ -30,7 +30,7 @@ class EventTest < ActiveSupport::TestCase
   	end
   	
   	it "should have non-empty required fields" do
-  		@some_event.event_name.wont_be_empty
+  		@some_event.name.wont_be_empty
   		@some_event.location.wont_be_empty
   		@some_event.description.wont_be_empty
   	

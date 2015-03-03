@@ -1,6 +1,6 @@
 class Event < ActiveRecord::Base
     
-    validates :event_name, :location, :description, presence: true
+    validates :name, :location, :description, presence: true
     
     #validates event doesn't occur in the past
     validate :valid_dates
@@ -25,8 +25,5 @@ class Event < ActiveRecord::Base
             self.errors.add :start_time, 'event cannot occur more than 24 hours in the future'
         end
     end
-    
-   
-    
-    
+
 end
