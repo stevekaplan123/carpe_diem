@@ -3,7 +3,6 @@
 one:
   creator_id: 1
   event_name: MyString
-  time_creation: 2015-02-13 12:30:13
   time_occurrence: 2015-02-13 12:30:13
   location: MyString
   longitude: 9.99
@@ -13,7 +12,6 @@ one:
 two:
   creator_id: 1
   event_name: MyString
-  time_creation: 2015-02-13 12:30:13
   time_occurrence: 2015-02-13 12:30:13
   location: MyString
   longitude: 9.99

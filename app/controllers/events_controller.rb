@@ -17,10 +17,10 @@ class EventsController < ApplicationController
 
   # GET /events/filter/:type/:arg
   # 'type' is either location, time, or user
-  #   in other words, events occurring at nearby location, 
+  #   in other words, events occurring at nearby location,
   #   event occurring within a few hours, and events created by the same user
   # 'arg' is the current location of user, or current time, or name of user
-  def filter     
+  def filter
     whichType = params[:type]
        @events = []
 
@@ -55,7 +55,7 @@ class EventsController < ApplicationController
   def filterByLocation(location)
       #  0.008 is distance from North to Theater
       #  0.002 is distance from North to Usdan
-      #  0.0036 is distance from Gosman Gym to Usdan 
+      #  0.0036 is distance from Gosman Gym to Usdan
       #  a reasonable distance to use to discern whether I am "close" to an event
       #  is a distance of 0.0045
 
@@ -77,7 +77,7 @@ class EventsController < ApplicationController
 
   def filterByTime(time)
       # how do we define "soon" when the maximum amount of hours is 24?
-      # we will use a reasonable definition of 4 hours 
+      # we will use a reasonable definition of 4 hours
       # subtract five hours because of ETS to UTC conversion
       @events = Event.where(time_occurrence: (Time.now-5.hours)..(Time.now-1.hours))
       #@events = Event.where(time_occurrence: (Time.now)..(Time.now+4.hours))
@@ -147,6 +147,6 @@ class EventsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def event_params
-      params.require(:event).permit(:creator_id, :event_name, :time_creation, :time_occurrence, :location, :longitude, :latitude, :description)
+      params.require(:event).permit(:creator_id, :event_name, :time_occurrence, :location, :longitude, :latitude, :description)
     end
 end
