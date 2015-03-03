@@ -1,34 +1,24 @@
 Rails.application.routes.draw do
-
-  get 'sessions/new'
-
-  get 'sessions/create'
-
-  get 'sessions/destroy'
-
-  get 'admin/index'
-
-  get 'session/new'
-
-  get 'session/create'
-
-  get 'session/destroy'
+  get 'admin' => 'admin#index'
+  controller :sessions do
+    get 'login' => :new
+    post 'login' => :create
+    delete 'logout' => :destroy
+  end
 
   resources :accounts
+  resources :attendances
+  resources :events
+  resources :users
 
-    root 'static_pages#home'
-    get 'help'    => 'static_pages#help'
-    get 'about'   => 'static_pages#about'
-    get 'contact' => 'static_pages#contact'
-    get 'signup' => 'users#new'
+  root 'static_pages#home'
+  get 'help'    => 'static_pages#help'
+  get 'about'   => 'static_pages#about'
+  get 'contact' => 'static_pages#contact'
+  get 'signup' => 'users#new'
 
   get 'events/filter/:type/:arg' => 'events#filter'
 
-  resources :attendances
-
-  resources :events
-
-  resources :users
 
   # get 'login' => 'sessions#new'
   # post 'login' => 'sessions#create'
