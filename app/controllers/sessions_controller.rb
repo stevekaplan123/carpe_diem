@@ -3,9 +3,9 @@ class SessionsController < ApplicationController
   end
 
   def create
-    account = Account.find_by(name: params[:name])
-    if account and account.authenticate(params[:password])
-      session[:account_id] = account.id
+    user = Account.find_by(name: params[:name])
+    if user and user.authenticate(params[:password])
+      session[:user_id] = user.id
       redirect_to admin_url
     else
       redirect_to login_url, alert: "Invalid user/password"
