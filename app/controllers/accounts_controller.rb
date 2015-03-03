@@ -1,4 +1,5 @@
 class AccountsController < ApplicationController
+  skip_before_action :authorize
   before_action :set_account, only: [:show, :edit, :update, :destroy]
 
   # GET /accounts
@@ -56,7 +57,12 @@ class AccountsController < ApplicationController
   # DELETE /accounts/1
   # DELETE /accounts/1.json
   def destroy
-    @account.destroy
+    begin
+      @account.destroy
+      flash[:notice] = "Account #{@account.name} deleted"
+    rescue StandardError => e
+      flash[:notice] = e.message
+    end
     respond_to do |format|
       format.html { redirect_to accounts_url, notice: 'Account was successfully destroyed.' }
       format.json { head :no_content }

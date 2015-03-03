@@ -1,4 +1,5 @@
 class AttendancesController < ApplicationController
+  skip_before_action :authorize
   before_action :set_attendance, only: [:show, :edit, :update, :destroy]
 
   # GET /attendances
