@@ -6,6 +6,10 @@ Rails.application.routes.draw do
       post 'login' => :create
       delete 'logout' => :destroy
     end
+    
+  # get 'login' => 'sessions#new'
+  # post 'login' => 'sessions#create'
+  # delete 'logout' => 'sessions#destroy'
 
 
   root 'static_pages#home'
@@ -20,11 +24,6 @@ Rails.application.routes.draw do
   resources :attendances
   resources :events
   resources :users
-
-  # get 'login' => 'sessions#new'
-  # post 'login' => 'sessions#create'
-  # delete 'logout' => 'sessions#destroy'
-
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
