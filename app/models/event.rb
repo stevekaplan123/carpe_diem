@@ -9,9 +9,11 @@ class Event < ActiveRecord::Base
     #the increment to day will automatically increment the month
     #the default in the form hour does not follow EST -- keep in mind when testing
     def valid_dates
-        #now = Time.now
         temp = DateTime.now
-        now = temp.change(min: temp.min - 1)
+        #now = temp.change(min: temp.min - 1)
+        now = DateTime.new(temp.year, temp.month, temp.day, temp.hour, temp.min - 1, temp.sec)
+        puts now
+        puts time_occurrence
 
         if time_occurrence < now
             puts "noooo"
