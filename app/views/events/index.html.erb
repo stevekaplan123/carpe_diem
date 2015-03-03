@@ -1,5 +1,4 @@
-
-   <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script type='text/javascript'>
         //the following function causes page to refresh
         (function()
@@ -24,7 +23,8 @@
             gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
 
        }
-      
+        var markers = []
+
         function loadXMLDoc(type, arg)
         {
             var xmlhttp;
@@ -40,7 +40,27 @@
               {
               if (xmlhttp.readyState==4 && xmlhttp.status==200)
                 {
-                    document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
+                  //first clear old event markers
+                  for (var i = 0; i < markers.length; i++) {
+                      markers[i].setMap(null);
+                  }
+                    //now show the filtered events
+                    result = JSON.parse(xmlhttp.responseText);
+                    length = result.length;
+                    for (i=0; i<length; i++)
+                    {
+                        latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
+                        longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
+                        event_name=JSON.parse(xmlhttp.responseText)[i]["event_name"];
+                        var temp_latlng = new google.maps.LatLng(latitude, longitude);
+
+                         var marker = new google.maps.Marker({
+                            position: temp_latlng,
+                            map: gMap,
+                            title: event_name
+                        });
+                        markers.push(marker)
+                    }            
                 }
               }
               xmlhttp.open("GET","/events/filter/"+type+"/"+arg+".json",true);
