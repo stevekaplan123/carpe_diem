@@ -1,15 +1,12 @@
 Rails.application.routes.draw do
-  get 'admin' => 'admin#index'
-  controller :sessions do
-    get 'login' => :new
-    post 'login' => :create
-    delete 'logout' => :destroy
-  end
+    get 'admin' => 'admin#index'
+    
+    controller :sessions do
+      get 'login' => :new
+      post 'login' => :create
+      delete 'logout' => :destroy
+    end
 
-  resources :accounts
-  resources :attendances
-  resources :events
-  resources :users
 
   root 'static_pages#home'
   get 'help'    => 'static_pages#help'
@@ -19,6 +16,10 @@ Rails.application.routes.draw do
 
   get 'events/filter/:type/:arg' => 'events#filter'
 
+  resources :accounts
+  resources :attendances
+  resources :events
+  resources :users
 
   # get 'login' => 'sessions#new'
   # post 'login' => 'sessions#create'
