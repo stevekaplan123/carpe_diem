@@ -13,7 +13,9 @@ Rails.application.routes.draw do
   get 'contact' => 'static_pages#contact'
   get 'signup' => 'users#new'
 
-  get 'events/filter/:type/:arg' => 'events#filter'
+  get 'events/filter' => 'events#filter'
+
+
 
   resources :accounts
   resources :attendances

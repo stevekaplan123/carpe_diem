@@ -1,5 +1,59 @@
 <h1>New Event</h1>
 
 <%= render 'form' %>
+     <div id="map_canvas" style="width: 800px; height: 400px;"></div>
 
 <%= link_to 'Back', events_path %>
+
+    <script type='text/javascript' src='//code.jquery.com/jquery-1.9.1.js'></script>
+    <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script type='text/javascript'>
+    (function()
+    {
+      if( window.localStorage )
+      {
+        if( !localStorage.getItem( 'firstLoad' ) )
+        {
+          localStorage[ 'firstLoad' ] = true;
+          window.location.reload();
+        }  
+        else
+          localStorage.removeItem( 'firstLoad' );
+      }
+    })();
+    var marker = null;
+    var map = null;
+    $(function(){
+        document.getElementById("event_latitude").style.visibility = "hidden";
+        document.getElementById("event_longitude").style.visibility = "hidden";
+        document.getElementById("event_location").style.visibility="hidden";
+
+        var myOptions = {
+            center: new google.maps.LatLng(42.3654347, -71.258595),
+            zoom: 15,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
+
+
+        google.maps.event.addListener(gMap, 'click', function(event) {
+            if (marker != null)
+            {
+              marker.setMap(null);
+            }
+
+            marker = new google.maps.Marker({
+                position: event.latLng,
+                map: gMap
+            });
+            document.getElementById("event_latitude").value = event.latLng.lat()
+            document.getElementById("event_longitude").value = event.latLng.lng()
+
+
+        });
+
+    });
+
+    
+
+    </script>

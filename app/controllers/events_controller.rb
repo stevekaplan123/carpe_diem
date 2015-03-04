@@ -21,15 +21,13 @@ class EventsController < ApplicationController
   #   event occurring within a few hours, and events created by the same user
   # 'arg' is the current location of user, or current time, or name of user
   def filter
-    whichType = params[:type]
+       whichType = params[:type]
        @events = []
 
        if whichType == "location"
-          @events = filterByLocation(params[:arg])
+          @events = filterByLocation(params[:arg], params[:arg2])
        elsif whichType == "time"
           @events = filterByTime(Time.now)
-          #should be the following, but for now Time.now will work:
-         # @events = filterByTime(params[:arg])
        elsif whichType == "user"
           @events = filterByUser(params[:arg])
         elsif whichType == "attendance"
@@ -38,8 +36,13 @@ class EventsController < ApplicationController
           respond_to do |format|
             format.html { redirect_to events_url, notice: 'INVALID FILTERING TYPE.' }
           end
-       end
-  end
+
+      end
+
+      respond_to do |format|
+          format.json { render :json => @events}
+      end
+  end 
 
   def filterByAttendance(username)
     #in this case the user looked up all events attended by 'username'
@@ -52,21 +55,18 @@ class EventsController < ApplicationController
     Math.sqrt(x*x + y*y)
   end
 
-  def filterByLocation(location)
+  def filterByLocation(lat, lng)
       #  0.008 is distance from North to Theater
       #  0.002 is distance from North to Usdan
       #  0.0036 is distance from Gosman Gym to Usdan
       #  a reasonable distance to use to discern whether I am "close" to an event
       #  is a distance of 0.0045
 
-      loc_arr = location.split("+")
-      locString = loc_arr.join(" ")
-
-      my_coords = Geocoder.coordinates(locString)
+      my_coords = [lat, lng]
       @events = Event.all
       filtered_events = []
       @events.each do |event|
-          event_coords = Geocoder.coordinates(event.location)
+          event_coords = [event.latitude, event.longitude]
           dist = calcDistance(my_coords, event_coords)
           if dist <= 0.0045
             filtered_events.push(event)
