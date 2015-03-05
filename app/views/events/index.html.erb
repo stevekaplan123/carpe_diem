@@ -53,7 +53,7 @@
                         longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
                         event_name=JSON.parse(xmlhttp.responseText)[i]["event_name"];
                         var temp_latlng = new google.maps.LatLng(latitude, longitude);
-
+ 
                          var marker = new google.maps.Marker({
                             position: temp_latlng,
                             map: gMap,
@@ -63,7 +63,7 @@
                     }            
                 }
               }
-              xmlhttp.open("GET","/events/filter/"+type+"/"+arg+".json",true);
+              xmlhttp.open("GET","/events/filter.json?type="+type+"&arg="+arg,true);
               xmlhttp.send();
           }
     </script>

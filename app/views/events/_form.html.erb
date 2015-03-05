@@ -28,42 +28,28 @@
     
   </div>
   <div class="field">
-    <%= f.label :location %><br>
-    <%= f.text_field :location %>
-  </div>
-  <div class="field">
-    <%= f.label :longitude %><br>
-    <%= f.text_field :longitude %>
-  </div>
-  <div class="field">
-    <%= f.label :latitude %><br>
-    <%= f.text_field :latitude %>
-  </div>
-  <div class="field">
     <%= f.label :description %><br>
     <%= f.text_area :description %>
   </div>
   <div class="actions">
     <%= f.submit %>
   </div>
+     <div id="map_canvas" style="width: 800px; height: 400px;"></div>
+
+  <div class="field">
+    <%= f.text_field :longitude %>
+  </div>
+  <div class="field">
+
+    <%= f.text_field :latitude %>
+  </div>
+
+  <div class="field">
+    <%= f.text_field :location %>
+  </div>
   
   
-   <div id="map_canvas" style="width: 800px; height: 400px;"></div>
 
 
-      <script type='text/javascript' src='//code.jquery.com/jquery-1.9.1.js'></script>
-    <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
-    <script type='text/javascript'>
-        $(function(){
-            var myOptions = {
-                center: new google.maps.LatLng(42.3764852, -71.2356113),
-                zoom: 10,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            };
-            gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
-
-            //var kmlLayer = new google.maps.KmlLayer('https://maps.google.com/maps/ms?ie=UTF8&t=m&authuser=0&msa=0&output=kml&msid=212043342089249462794.00048cfeb10fb9d85b995');
-           // kmlLayer.setMap(gMap);
-        });
-    </script>
 <% end %>
+
