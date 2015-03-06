@@ -7,19 +7,20 @@ Rails.application.routes.draw do
     delete 'logout' => :destroy
   end
 
-  root 'static_pages#home'
-  get 'help'    => 'static_pages#help'
-  get 'about'   => 'static_pages#about'
-  get 'contact' => 'static_pages#contact'
+  controller :static_pages do
+    root 'static_pages#home'
+    get 'help'    => :help
+    get 'about'   => :about
+    get 'contact' => :contact
+  end
+
   get 'signup' => 'users#new'
+  get 'events/filter'
 
-  get 'events/filter' => 'events#filter'
-
-
-
+  resources :events do
+    resources :attendances
+  end
   resources :accounts
-  resources :attendances
-  resources :events
   resources :users
 
   # The priority is based upon order of creation: first created -> highest priority.
