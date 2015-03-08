@@ -60,11 +60,14 @@
               {
               if (xmlhttp.readyState==4 && xmlhttp.status==200)
                 {
-                  //first clear old event markers
+
+
+                  //first clear old event markers and clear out table of events
                   for (var i = 0; i < markers.length; i++) {
                       markers[i].setMap(null);
+
                   }
-                    //now show the filtered events
+                    document.getElementById("navbar").innerHTML="<br> <table><tr><td>VIEW EVENTS BY: </td></tr>"                     //now show the filtered events
                     result = JSON.parse(xmlhttp.responseText);
                     length = result.length;
                     for (i=0; i<length; i++)
@@ -81,7 +84,25 @@
                         });
 
                         markers.push(marker)
-                    }            
+
+
+
+                      document.getElementById("navbar").innerHTML += '<tr><td><span onclick="OpenWindow(&quot;' +
+                          JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
+                          JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
+                          JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
+                        'style="cursor: pointer"><b><u><font color="blue">' +
+                          JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></u></font></span>' +
+                        '</td><td><a href="/events/11">Show</a></td>' +
+                        '<td><a href="/events/11/edit">Edit</a></td>' +
+                        '<td><a data-confirm="Are you sure?" rel="nofollow"' +
+                        'data-method="delete" href="/events/11">Destroy</a></td>' +
+                       '<td> <input type="button" onclick="OpenWindow(&quot;concert&quot;, &quot;attendance&quot;)"'+
+                       'value="Get Attendance!"/></td></tr></table>'
+
+
+                    }    
+                     
                 }
               }
               xmlhttp.open("GET","/events/filter.json?type="+type+"&arg="+arg,true);
@@ -143,7 +164,7 @@
 <div id="container">
   <div id="navbar">
     <br>
-    <table><tr><td>EVENTS</td></tr>
+    <table><tr><td>VIEW EVENTS BY: </td></tr>
       <% @events.each do |event| %>
 
       <tr><td>
@@ -167,7 +188,7 @@
 
 </div>
 </div>
-
+<input type="button" onclick="loadXMLDoc('user', '1')" value="Filter by user 1"/>
 <div id="myDiv"></div>
 
  
