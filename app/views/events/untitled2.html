@@ -15,15 +15,10 @@
           }
         })();
         function showPosition(position) {
-           document.getElementById('myDiv').style.visibility="hidden"
-          document.getElementById('myDiv').innerHTML = position.coords.latitude + ", " + position.coords.longitude;  
+            //document.getElementById(myDiv).style.visibility="hidden"
+            document.getElementById('myDiv').innerHTML = position.coords.latitude + ", " + position.coords.longitude;  
 
         }
-
-        var gMap = null;
-        var attendance_window = null;
-        var desc_window = null;
-        var markers = []
 
 
         window.onload = function() {
@@ -33,15 +28,17 @@
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             };
             gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
-
+            alert("HI")
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(showPosition);
             } else { 
                 myDiv.innerHTML = "Geolocation is not supported by this browser.";
             }
+
        }
 
 
+        var markers = []
 
      
 
@@ -79,7 +76,6 @@
                             map: gMap,
                             title: event_name
                         });
-
                         markers.push(marker)
                     }            
                 }
@@ -87,92 +83,24 @@
               xmlhttp.open("GET","/events/filter.json?type="+type+"&arg="+arg,true);
               xmlhttp.send();
           }
-
-          function OpenWindow(event_info, type)
-          {
-            if (type=='attendance')
-            {
-                if (attendance_window != null)
-                  { 
-                    attendance_window.close()
-                  }
-
-                attendance_window = new google.maps.InfoWindow({
-                    content: "EVENTUALLY THIS WILL LIST THE ATTENDANCE for the event "+event_info,
-                    position: new google.maps.LatLng(42.3650, -71.258595) 
-                    //this position is on the road just outside the entrace to brandeis
-
-                 });
-               attendance_window.open(gMap);
-           }
-           else
-           {
-
-              var info=event_info.split("+")
-              var lat=Number(info[0])
-              var lng=Number(info[1])
-              var desc=info[2]
-              if (desc_window != null)
-              {
-                desc_window.close()
-              }
-
-              desc_window = new google.maps.InfoWindow({
-                    content: desc,
-                    position: new google.maps.LatLng(lat, lng)
-                 });
-               desc_window.open(gMap);
-           }
-
-
-          }
     </script>
-<body><style>
+<style>
 #content {
-  margin-left:  26%;
+  margin-left:  20%;
   padding: 4px ;
 
 }
 #navbar {
   float: left;
-  width: 26%;
+  width: 20%;
   padding: 4px ;
 
 }
 </style>
 <div id="container">
-  <div id="navbar">
-    <br>
-    <table><tr><td>EVENTS</td></tr>
-      <% @events.each do |event| %>
-
-      <tr><td>
-
-        <span onclick="OpenWindow('<%= event.latitude %>+<%= event.longitude %>+<%= event.description %>', 'desc')" style="cursor: pointer"><b><u><font color="blue">
-    <%= event.name %></b></u></font></span>
-  </td>
-<td><%= link_to 'Show', event %></td>
-        <td><%= link_to 'Edit', edit_event_path(event) %></td>
-        <td><%= link_to 'Destroy', event, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-
-    <td>
-    <input type="button" onclick="OpenWindow('<%= event.name %>', 'attendance')" value="Get Attendance!"/></td>
-  </tr>
-  <% end %>
-</table>
-
-  </div>
-  
-  <div id="content">   <div id="map_canvas" style="width: 800px; height: 400px"></div>
-
+  <div id="navbar">Navigation</div>
+  <div id="content">   <div id="map_canvas" style="width: 800px; height: 400px">Hi</div>
 </div>
 </div>
 
-<div id="myDiv"></div>
 
- 
-
-<%= link_to 'New Event', new_event_path %>
-<%= link_to 'Back', root_path %>
-</body>
-</html>

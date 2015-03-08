@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
   # check session on every page. will have to rewrite the tests
-  before_action :authorize
+  # before_action :authorize
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
