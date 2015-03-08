@@ -8,5 +8,5 @@ class User < ActiveRecord::Base
                     uniqueness: {case_sensitive: false}
 
   has_secure_password
-  # validates :password, length: { minimum: 5 }
+  validates :password, length: { minimum: 5 }
 end
