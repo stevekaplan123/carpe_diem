@@ -59,6 +59,8 @@ class EventsController < ApplicationController
   # POST /events
   # POST /events.json
   def create
+      #convert_datetimes_to_est("start_date")
+      #convert_datetimes_to_est("end_date")
     @event = Event.new(event_params)
 
     respond_to do |format|
@@ -75,6 +77,8 @@ class EventsController < ApplicationController
   # PATCH/PUT /events/1
   # PATCH/PUT /events/1.json
   def update
+      #convert_datetimes_to_pdt("start_date")
+      #convert_datetimes_to_pdt("end_date")
     respond_to do |format|
       if @event.update(event_params)
         format.html { redirect_to @event, notice: 'Event was successfully updated.' }
@@ -141,6 +145,13 @@ class EventsController < ApplicationController
   def filterByUser(user)
      user = user.to_i
      @events = Event.where(creator_id: user)
+  end
+  
+  def convert_datetimes_to_est(field)
+      datetime = (1..5).collect {|num| params[:time_occurrence].delete "#{field}(#{num}i)" }
+      if datetime[0] and datetime[1] and datetime[2] # only if a date has been set
+          params[:time_occurrence][field] = Time.find_zone!("Eastern Time (US & Canada)").local(*datetime.map(&:to_i))
+      end
   end
 
 

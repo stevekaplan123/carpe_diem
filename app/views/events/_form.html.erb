@@ -22,9 +22,9 @@
   
   <div class="field">
     <%= f.label :time_occurrence %><br>
-    <% Time.use_zone("Eastern Time (US & Canada)") do %>
+   
     	<%= f.datetime_select :time_occurrence, ampm: true %>
-    <% end %>
+   
     
   </div>
   <div class="field">
