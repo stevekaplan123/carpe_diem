@@ -60,6 +60,23 @@ class EventsController < ApplicationController
   # POST /events.json
   def create
     @event = Event.new(event_params)
+    
+    #puts "event_day in params: #{params[:event_day]}"
+    day_int = params[:event_day].to_date
+    
+    #puts "day int created: #{day_int}"
+    event_day = DateTime.new(day_int.year, day_int.month, day_int.day, 1, 1, 1)
+    
+    #puts "event_day created: #{event_day}"
+    
+    #puts "let's do a check: #{params[:usertime]}"
+    #puts "let's access it: #{params[:usertime]['hourmin(1i)']}"
+    thehour = params[:usertime]["hourmin(4i)"].to_i
+    
+    #puts "thehour created: #{thehour}"
+    themin = params[:usertime]["hourmin(5i)"].to_i
+    @event.time_occurrence = DateTime.new(event_day.year, event_day.month, event_day.day, thehour, themin, 59)
+    puts "here: #{@event.time_occurrence}"
 
     respond_to do |format|
       if @event.save
