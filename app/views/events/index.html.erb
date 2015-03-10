@@ -30,6 +30,8 @@
            var latitude = loc[0]
            var longitude = loc[1]
            markMe()
+           loadXMLDoc("user")
+
         }
 
         function markMe()
@@ -175,7 +177,6 @@
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(showPosition); 
-                loadXMLDoc("user")
 
             } else { 
                 myDiv.innerHTML = "Geolocation is not supported by this browser.";
