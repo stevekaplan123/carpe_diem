@@ -70,6 +70,8 @@ class UsersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def user_params
-      params.require(:user).permit(:name, :email, :num_events, :geo_info, :password, :password_confirmation) # need modification, num_events & geo_info won't get passed - Leifeng
+      user_params = params.require(:user).permit(:name, :email, :password, :password_confirmation)
+      user_params[:num_events] = 0
+      user_params
     end
 end

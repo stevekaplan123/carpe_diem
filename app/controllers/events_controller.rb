@@ -20,19 +20,19 @@ class EventsController < ApplicationController
   #   in other words, events occurring at nearby location,
   #   event occurring within a few hours, and events created by the same user
   # 'arg' is the current location of user, or current time, or name of user
-  def filter
+ def filter
        whichType = params[:type]
        @events = []
 
        if whichType == "location"
-          lat, lng = params[:arg].split(", ")
+          lat, lng = params[:location].split(", ")
           @events = filterByLocation(lat, lng)
        elsif whichType == "time"
           @events = filterByTime(Time.now)
        elsif whichType == "user"
-          @events = filterByUser(params[:arg])
+          @events = filterByUser(params[:user])
         elsif whichType == "attendance"
-          @events = filterByAttendance(params[:arg])
+          @events = filterByAttendance(params[:attending])
        else
           respond_to do |format|
             format.json { redirect_to events_url, notice: 'INVALID FILTERING TYPE.'}
@@ -45,6 +45,7 @@ class EventsController < ApplicationController
           format.json { render :json => @events}
       end
   end 
+
 
 
   # GET /events/new

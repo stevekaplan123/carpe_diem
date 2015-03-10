@@ -14,39 +14,48 @@
               localStorage.removeItem( 'firstLoad' );
           }
         })();
-        function showPosition(position) {
-           document.getElementById('myDiv').style.visibility="hidden"
-          document.getElementById('myDiv').innerHTML = position.coords.latitude + ", " + position.coords.longitude;  
 
-        }
 
         var gMap = null;
         var attendance_window = null;
         var desc_window = null;
-        var markers = []
+        var markers = [];
+        var me_window =  null; 
 
 
-        window.onload = function() {
-            var myOptions = {
-                center: new google.maps.LatLng(42.3654347, -71.258595),
-                zoom: 15,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            };
-            gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
+        function showPosition(position) {
+           document.getElementById("myDiv").style.visibility = "hidden"
+           document.getElementById("myDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude; 
+           var loc = document.getElementById("myDiv").innerHTML.split(", ")
+           var latitude = loc[0]
+           var longitude = loc[1]
+           markMe()
+           loadXMLDoc("user")
 
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition);
-            } else { 
-                myDiv.innerHTML = "Geolocation is not supported by this browser.";
-            }
-       }
+        }
 
-
-
-     
-
-        function loadXMLDoc(type, arg)
+        function markMe()
         {
+
+           var loc = document.getElementById("myDiv").innerHTML.split(", ")
+           var latitude = loc[0]
+           var longitude = loc[1]
+
+
+            me_window = new google.maps.InfoWindow({
+                content: "You are here",
+                position: new google.maps.LatLng(latitude, longitude),
+             });
+
+            me_window.open(gMap);
+
+
+        }
+
+
+        function loadXMLDoc(type)
+        {
+
             var xmlhttp;
             if (window.XMLHttpRequest)
               {// code for IE7+, Firefox, Chrome, Opera, Safari
@@ -67,17 +76,28 @@
                       markers[i].setMap(null);
 
                   }
-                    document.getElementById("navbar").innerHTML="<br> <table><tr><td>VIEW EVENTS BY: </td></tr>"                     //now show the filtered events
+
+                  //mark where the user is
+                    markMe();
+
+                    document.getElementById("navbar").innerHTML='<br> <table><tr><td>VIEW EVENTS BY:'+
+                                      '<select onchange="loadXMLDoc(this.value)">' +
+                                      '<option value="location">NEAR ME</option>' +
+                                        '<option value="time">HAPPENING SOON</option>' +
+                                        '<option value="user">CREATED BY ME</option>'+
+                                    '</select> </td></tr>'             
+
+                     //now show the filtered events
                     result = JSON.parse(xmlhttp.responseText);
                     length = result.length;
                     for (i=0; i<length; i++)
                     {
-                        latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
-                        longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
-                        event_name=JSON.parse(xmlhttp.responseText)[i]["event_name"];
+                         latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
+                         longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
+                        var event_name=JSON.parse(xmlhttp.responseText)[i]["event_name"];
                         var temp_latlng = new google.maps.LatLng(latitude, longitude);
  
-                         var marker = new google.maps.Marker({
+                        marker = new google.maps.Marker({
                             position: temp_latlng,
                             map: gMap,
                             title: event_name
@@ -87,7 +107,7 @@
 
 
 
-                      document.getElementById("navbar").innerHTML += '<tr><td><span onclick="OpenWindow(&quot;' +
+                     document.getElementById("navbar").innerHTML += '<tr><td><span onclick="OpenWindow(&quot;' +
                           JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
                           JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
                           JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
@@ -105,7 +125,7 @@
                      
                 }
               }
-              xmlhttp.open("GET","/events/filter.json?type="+type+"&arg="+arg,true);
+              xmlhttp.open("GET","/events/filter.json?type="+type+"&user=1&location="+document.getElementById("myDiv").innerHTML,true);
               xmlhttp.send();
           }
 
@@ -144,10 +164,29 @@
                  });
                desc_window.open(gMap);
            }
-
-
           }
+
+
+        window.onload = function() {
+            var myOptions = {
+                center: new google.maps.LatLng(42.3654347, -71.258595),
+                zoom: 15,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition); 
+
+            } else { 
+                myDiv.innerHTML = "Geolocation is not supported by this browser.";
+            }
+
+             
+       }
+
     </script>
+
 <body><style>
 #content {
   margin-left:  26%;
@@ -164,7 +203,11 @@
 <div id="container">
   <div id="navbar">
     <br>
-    <table><tr><td>VIEW EVENTS BY: </td></tr>
+    <table><tr>VIEW EVENTS <select onchange="loadXMLDoc(this.value)">
+  <option value="location">NEAR ME</option>
+  <option value="time">HAPPENING SOON</option>
+  <option value="user">CREATED BY ME</option>
+</select></tr>
       <% @events.each do |event| %>
 
       <tr><td>
