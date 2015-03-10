@@ -1,22 +1,16 @@
 class Event < ActiveRecord::Base
     
     validates :name, :description, presence: true
+    validates :latitude, :longitude, presence: true
     
     #validates user selected a spot on the brandeis map OR entered in a valid location in the location field
-    validate :valid_location
 
     #validates event doesn't occur in the past
     validate :valid_dates
     
 
-    def valid_location
-    
-
-
-    end
     
     #the increment to day will automatically increment the month
-    #the default in the form hour does not follow EST -- keep in mind when testing
     def valid_dates
         temp = DateTime.now
         #now = temp.change(min: temp.min - 1)

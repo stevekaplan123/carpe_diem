@@ -14,7 +14,7 @@
 
 <p>
   <strong>Time occurrence:</strong>
-  <%= @event.time_occurrence %>
+  <%= @event.time_occurrence.utc().to_formatted_s(:long) %>
 </p>
 
 <p>

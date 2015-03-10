@@ -14,6 +14,18 @@
               localStorage.removeItem( 'firstLoad' );
           }
         })();
+        function showPosition(position) {
+           document.getElementById('myDiv').style.visibility="hidden"
+          document.getElementById('myDiv').innerHTML = position.coords.latitude + ", " + position.coords.longitude;  
+
+        }
+
+        var gMap = null;
+        var attendance_window = null;
+        var desc_window = null;
+        var markers = []
+
+
         window.onload = function() {
             var myOptions = {
                 center: new google.maps.LatLng(42.3654347, -71.258595),
@@ -22,8 +34,16 @@
             };
             gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
 
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else { 
+                myDiv.innerHTML = "Geolocation is not supported by this browser.";
+            }
        }
-        var markers = []
+
+
+
+     
 
         function loadXMLDoc(type, arg)
         {
@@ -40,11 +60,14 @@
               {
               if (xmlhttp.readyState==4 && xmlhttp.status==200)
                 {
-                  //first clear old event markers
+
+
+                  //first clear old event markers and clear out table of events
                   for (var i = 0; i < markers.length; i++) {
                       markers[i].setMap(null);
+
                   }
-                    //now show the filtered events
+                    document.getElementById("navbar").innerHTML="<br> <table><tr><td>VIEW EVENTS BY: </td></tr>"                     //now show the filtered events
                     result = JSON.parse(xmlhttp.responseText);
                     length = result.length;
                     for (i=0; i<length; i++)
@@ -59,60 +82,118 @@
                             map: gMap,
                             title: event_name
                         });
+
                         markers.push(marker)
-                    }            
+
+
+
+                      document.getElementById("navbar").innerHTML += '<tr><td><span onclick="OpenWindow(&quot;' +
+                          JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
+                          JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
+                          JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
+                        'style="cursor: pointer"><b><u><font color="blue">' +
+                          JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></u></font></span>' +
+                        '</td><td><a href="/events/11">Show</a></td>' +
+                        '<td><a href="/events/11/edit">Edit</a></td>' +
+                        '<td><a data-confirm="Are you sure?" rel="nofollow"' +
+                        'data-method="delete" href="/events/11">Destroy</a></td>' +
+                       '<td> <input type="button" onclick="OpenWindow(&quot;concert&quot;, &quot;attendance&quot;)"'+
+                       'value="Get Attendance!"/></td></tr></table>'
+
+
+                    }    
+                     
                 }
               }
               xmlhttp.open("GET","/events/filter.json?type="+type+"&arg="+arg,true);
               xmlhttp.send();
           }
+
+          function OpenWindow(event_info, type)
+          {
+            if (type=='attendance')
+            {
+                if (attendance_window != null)
+                  { 
+                    attendance_window.close()
+                  }
+
+                attendance_window = new google.maps.InfoWindow({
+                    content: "EVENTUALLY THIS WILL LIST THE ATTENDANCE for the event "+event_info,
+                    position: new google.maps.LatLng(42.3650, -71.258595) 
+                    //this position is on the road just outside the entrace to brandeis
+
+                 });
+               attendance_window.open(gMap);
+           }
+           else
+           {
+
+              var info=event_info.split("+")
+              var lat=Number(info[0])
+              var lng=Number(info[1])
+              var desc=info[2]
+              if (desc_window != null)
+              {
+                desc_window.close()
+              }
+
+              desc_window = new google.maps.InfoWindow({
+                    content: desc,
+                    position: new google.maps.LatLng(lat, lng)
+                 });
+               desc_window.open(gMap);
+           }
+
+
+          }
     </script>
-<p id="notice"><%= notice %></p>
+<body><style>
+#content {
+  margin-left:  26%;
+  padding: 4px ;
 
-<h1>Listing Events</h1>
+}
+#navbar {
+  float: left;
+  width: 26%;
+  padding: 4px ;
 
-<table>
-  <thead>
-    <tr>
-      <th>Creator</th>
-      <th>Event name</th>
-      <th>Time occurrence</th>
-      <th>Location</th>
-      <th>Longitude</th>
-      <th>Latitude</th>
-      <th>Description</th>
-      <th colspan="3"></th>
-    </tr>
-  </thead>
+}
+</style>
+<div id="container">
+  <div id="navbar">
+    <br>
+    <table><tr><td>VIEW EVENTS BY: </td></tr>
+      <% @events.each do |event| %>
 
-  <tbody>
-    <% @events.each do |event| %>
-      <tr>
-        <td><%= event.creator_id %></td>
-        <td><%= event.name %></td>
-        
-        <td><%= event.time_occurrence %></td>
-        <td><%= event.location %></td>
-        <td><%= event.longitude %></td>
-        <td><%= event.latitude %></td>
-        <td><%= event.description %></td>
-        <td><%= link_to 'Show', event %></td>
+      <tr><td>
+
+        <span onclick="OpenWindow('<%= event.latitude %>+<%= event.longitude %>+<%= event.description %>', 'desc')" style="cursor: pointer"><b><u><font color="blue">
+    <%= event.name %></b></u></font></span>
+  </td>
+<td><%= link_to 'Show', event %></td>
         <td><%= link_to 'Edit', edit_event_path(event) %></td>
         <td><%= link_to 'Destroy', event, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
-    <% end %>
-  </tbody>
+
+    <td>
+    <input type="button" onclick="OpenWindow('<%= event.name %>', 'attendance')" value="Get Attendance!"/></td>
+  </tr>
+  <% end %>
 </table>
 
-   <div id="map_canvas" onload="loadMap()" style="width: 800px; height: 400px;"></div>
+  </div>
+  
+  <div id="content">   <div id="map_canvas" style="width: 800px; height: 400px"></div>
 
-
-<br>
-<button type="button" onclick="loadXMLDoc('location', 'Shapiro Campus Center')">Request events near Shapiro Campus Center</button>
-<button type="button" onclick="loadXMLDoc('user', '1')">Request events created by user with id 1</button>
-
+</div>
+</div>
+<input type="button" onclick="loadXMLDoc('user', '1')" value="Filter by user 1"/>
 <div id="myDiv"></div>
 
  
+
 <%= link_to 'New Event', new_event_path %>
 <%= link_to 'Back', root_path %>
+</body>
+</html>

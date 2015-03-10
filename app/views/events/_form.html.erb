@@ -16,17 +16,35 @@
     <%= f.number_field :creator_id %>
   </div>
   <div class="field">
-    <%= f.label :name %><br>
+    <%= f.label :event_name %><br>
     <%= f.text_field :name %>
   </div>
   
   <div class="field">
-    <%= f.label :time_occurrence %><br>
-    <% Time.use_zone("Eastern Time (US & Canada)") do %>
-    	<%= f.datetime_select :time_occurrence, ampm: true %>
-    <% end %>
-    
-  </div>
+    <%= f.label "Time of Event" %><br>   
+    	<!--2nd arg to radio button the value saved
+    	make first arg variable? -->
+    	<p hidden> <%= @date_today = DateTime.now %> </p>
+    	<p hidden> <%= @date_tom = DateTime.new(@date_today.year, @date_today.month, (@date_today.day + 1), @date_today.hour, @date_today.min, @date_today.sec) %> </p>
+    	<p hidden> <%= @nothing = Time.now %> </p>
+    	<%= radio_button_tag(:event_day, DateTime.now, :checked => true) %> 
+  		<%= label_tag(:choose_today, "Today, #{Date::MONTHNAMES[@date_today.month]} #{@date_today.day}") %>
+  		<%= radio_button_tag(:event_day, @date_tom) %>
+  		<%= label_tag(:choose_tomorrow, "Tomorrow, #{Date::MONTHNAMES[@date_tom.month]} #{@date_tom.day}") %>
+    	<% puts "wooo #{params[:time_occurrence]}"%>
+    	<%= time_select :usertime, :hourmin, {:ampm => true} %>
+    	<!--<%= f.datetime_select :time_occurrence, ampm: true %>  Original line-->
+    	
+    	<!-- <%= f.radio_button :time_occurrence, DateTime.now, :checked => true %> 
+  		<%= label :choose_today, "Today, #{Date::MONTHNAMES[@date_today.month]} #{@date_today.day}" %>
+  		<%= f.radio_button :time_occurrence, @date_tom %>
+  		<%= label :choose_tomorrow, "Tomorrow, #{Date::MONTHNAMES[@date_tom.month]} #{@date_tom.day}" %>
+  		-->
+    	
+    	
+    	<!--2nd Option-->
+    	<!-- <%= select_hour(@date_today.hour) %> -->
+    	
   <div class="field">
     <%= f.label :description %><br>
     <%= f.text_area :description %>
@@ -34,7 +52,6 @@
   <div class="actions">
     <%= f.submit %>
   </div>
-     <div id="map_canvas" style="width: 800px; height: 400px;"></div>
 
   <div class="field">
     <%= f.text_field :longitude %>

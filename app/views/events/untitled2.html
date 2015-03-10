@@ -1,0 +1,106 @@
+<script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script type='text/javascript'>
+        //the following function causes page to refresh
+        (function()
+        {
+          if( window.localStorage )
+          {
+            if( !localStorage.getItem( 'firstLoad' ) )
+            {
+              localStorage[ 'firstLoad' ] = true;
+              window.location.reload();
+            }  
+            else
+              localStorage.removeItem( 'firstLoad' );
+          }
+        })();
+        function showPosition(position) {
+            //document.getElementById(myDiv).style.visibility="hidden"
+            document.getElementById('myDiv').innerHTML = position.coords.latitude + ", " + position.coords.longitude;  
+
+        }
+
+
+        window.onload = function() {
+            var myOptions = {
+                center: new google.maps.LatLng(42.3654347, -71.258595),
+                zoom: 15,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
+            alert("HI")
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else { 
+                myDiv.innerHTML = "Geolocation is not supported by this browser.";
+            }
+
+       }
+
+
+        var markers = []
+
+     
+
+        function loadXMLDoc(type, arg)
+        {
+            var xmlhttp;
+            if (window.XMLHttpRequest)
+              {// code for IE7+, Firefox, Chrome, Opera, Safari
+              xmlhttp=new XMLHttpRequest();
+              }
+            else
+              {// code for IE6, IE5
+              xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+              }
+            xmlhttp.onreadystatechange=function()
+              {
+              if (xmlhttp.readyState==4 && xmlhttp.status==200)
+                {
+                  //first clear old event markers
+                  for (var i = 0; i < markers.length; i++) {
+                      markers[i].setMap(null);
+                  }
+                    //now show the filtered events
+                    result = JSON.parse(xmlhttp.responseText);
+                    length = result.length;
+                    for (i=0; i<length; i++)
+                    {
+                        latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
+                        longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
+                        event_name=JSON.parse(xmlhttp.responseText)[i]["event_name"];
+                        var temp_latlng = new google.maps.LatLng(latitude, longitude);
+ 
+                         var marker = new google.maps.Marker({
+                            position: temp_latlng,
+                            map: gMap,
+                            title: event_name
+                        });
+                        markers.push(marker)
+                    }            
+                }
+              }
+              xmlhttp.open("GET","/events/filter.json?type="+type+"&arg="+arg,true);
+              xmlhttp.send();
+          }
+    </script>
+<style>
+#content {
+  margin-left:  20%;
+  padding: 4px ;
+
+}
+#navbar {
+  float: left;
+  width: 20%;
+  padding: 4px ;
+
+}
+</style>
+<div id="container">
+  <div id="navbar">Navigation</div>
+  <div id="content">   <div id="map_canvas" style="width: 800px; height: 400px">Hi</div>
+</div>
+</div>
+
+

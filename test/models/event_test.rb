@@ -14,6 +14,7 @@ class EventTest < ActiveSupport::TestCase
   		@some_event.expect(:name, "Test Event")
   		@some_event.expect(:time_creation, DateTime.now)
   		@some_event.expect(:location, "Shapiro Campus Center")
+        @some_event.expect(:check_dst, Time.now)
       desc=""
       for i in 0..1499  #set up maximum length description
         desc+="h "
@@ -24,8 +25,12 @@ class EventTest < ActiveSupport::TestCase
    	
   	it "stores time in EST" do
   		@some_event.expect(:time_occurrence, DateTime.now)
-  		@some_event.time_creation.zone.must_equal "-05:00"
-  		@some_event.time_occurrence.zone.must_equal "-05:00"
+        #@some_event.time_creation.zone.must_equal "-05:00"
+        if (@some_event.check_dst.dst?)
+            @some_event.time_occurrence.zone.must_equal "-04:00"
+        else
+            @some_event.time_occurrence.zone.must_equal "-05:00"
+        end
   	  	
   	end
   	
