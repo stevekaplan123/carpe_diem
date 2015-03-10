@@ -19,58 +19,41 @@
         var gMap = null;
         var attendance_window = null;
         var desc_window = null;
-        var markers = []
-        var my_location = null;
+        var markers = [];
+        var me_window =  null; 
 
 
         function showPosition(position) {
-           my_location = position.coords.latitude + ", " + position.coords.longitude;  
-           markMe();
-
+           document.getElementById("myDiv").style.visibility = "hidden"
+           document.getElementById("myDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude; 
+           var loc = document.getElementById("myDiv").innerHTML.split(", ")
+           var latitude = loc[0]
+           var longitude = loc[1]
+           markMe()
         }
 
         function markMe()
         {
 
-           var loc = my_location.split(", ")
+           var loc = document.getElementById("myDiv").innerHTML.split(", ")
            var latitude = loc[0]
            var longitude = loc[1]
 
-           var marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(latitude, longitude),
-                    map: gMap,
-                    title: "You are here."
-                });
 
-            markers.push(marker)
+            me_window = new google.maps.InfoWindow({
+                content: "You are here",
+                position: new google.maps.LatLng(latitude, longitude),
+             });
+
+            me_window.open(gMap);
+
+
         }
 
-        window.onload = function() {
-            var myOptions = {
-                center: new google.maps.LatLng(42.3654347, -71.258595),
-                zoom: 15,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            };
-            gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition);
-
-
-            } else { 
-                myDiv.innerHTML = "Geolocation is not supported by this browser.";
-            }
-
-            //mark where user is
-             
-       }
-
-
-
-     
 
         function loadXMLDoc(type)
         {
+
             var xmlhttp;
             if (window.XMLHttpRequest)
               {// code for IE7+, Firefox, Chrome, Opera, Safari
@@ -140,7 +123,7 @@
                      
                 }
               }
-              xmlhttp.open("GET","/events/filter.json?type="+type+"&user=1&location="+my_location,true);
+              xmlhttp.open("GET","/events/filter.json?type="+type+"&user=1&location="+document.getElementById("myDiv").innerHTML,true);
               xmlhttp.send();
           }
 
@@ -179,9 +162,28 @@
                  });
                desc_window.open(gMap);
            }
-
-
           }
+
+
+        window.onload = function() {
+            var myOptions = {
+                center: new google.maps.LatLng(42.3654347, -71.258595),
+                zoom: 15,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition); 
+                loadXMLDoc("user")
+
+            } else { 
+                myDiv.innerHTML = "Geolocation is not supported by this browser.";
+            }
+
+             
+       }
+
     </script>
 
 <body><style>
