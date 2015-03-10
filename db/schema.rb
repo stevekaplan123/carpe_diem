@@ -11,14 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150303040439) do
-
-  create_table "accounts", force: :cascade do |t|
-    t.string   "name"
-    t.string   "password_digest"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
-  end
+ActiveRecord::Schema.define(version: 20150310154817) do
 
   create_table "attendances", force: :cascade do |t|
     t.integer  "event_id"
@@ -43,7 +36,6 @@ ActiveRecord::Schema.define(version: 20150303040439) do
     t.string   "name"
     t.string   "email"
     t.integer  "num_events"
-    t.string   "geo_info"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
     t.string   "password_digest"

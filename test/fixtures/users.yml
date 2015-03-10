@@ -4,10 +4,8 @@ one:
   name: MyString
   email: MyString
   num_events: 1
-  geo_info: MyString
 
 two:
   name: MyString
   email: MyString
   num_events: 1
-  geo_info: MyString
