@@ -6,6 +6,22 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
-100.times { Fabricate(:user) }
-100.times { Fabricate(:attendance) }
-100.times { Fabricate(:event) }
+# Create an admin
+User.create(name: 'admin', email: 'random@brandeis.edu',
+            num_events: 0, admin: true,
+            password: '123456',
+            password_confirmation: '123456')
+
+# Create 100 random users
+100.times do
+  pw = Faker::Internet.password(8)
+  user = Faker::Internet.user_name
+
+  Fabricate(:user,
+            name: user,
+            email: user + Faker::Number.number(3) + "@brandeis.edu",
+            password: pw, password_confirmation: pw)
+end
+
+# 100.times { Fabricate(:attendance) }
+# 100.times { Fabricate(:event) }
