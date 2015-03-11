@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
   protected
     def authorize
       unless logged_in?
-        redirect_to login_url
+        redirect_to login_path
       end
     end
 end
