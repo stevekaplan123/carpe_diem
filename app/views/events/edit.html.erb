@@ -9,6 +9,7 @@
     <script type='text/javascript' src='//code.jquery.com/jquery-1.9.1.js'></script>
     <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script type='text/javascript'>
+    //function that automatically refreshes page
      (function()
     {
       if( window.localStorage )
@@ -22,12 +23,37 @@
           localStorage.removeItem( 'firstLoad' );
       }
     })();
+
     var marker = null;
     var map = null;
+
+    function markMe(latitude, longitude)
+    {
+        me_window = new google.maps.InfoWindow({
+            content: "You are here",
+            position: new google.maps.LatLng(latitude, longitude),
+         });
+
+        me_window.open(gMap);
+    }
+
+
+    //gets called by geolocation attempt with position of user
+    function showPosition(position) {
+           var str_loc = position.coords.latitude + ", " + position.coords.longitude;
+           var loc = str_loc.split(", "); 
+           var latitude = loc[0]
+           var longitude = loc[1]
+           markMe(latitude, longitude)
+    }
+
+
     $(function(){
         document.getElementById("event_latitude").style.visibility = "hidden";
         document.getElementById("event_longitude").style.visibility = "hidden";
         document.getElementById("event_location").style.visibility="hidden";
+
+        //set up map centered at brandeis
         var myOptions = {
             center: new google.maps.LatLng(42.3654347, -71.258595),
             zoom: 15,
@@ -35,13 +61,23 @@
         };
         gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
   	   
-  		var orig_lat=Number(document.getElementById("event_latitude").value);
+        //find geolocation of user
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition); 
+
+        } else { 
+            myDiv.innerHTML = "Geolocation is not supported by this browser.";
+        }
+
+        //mark the position on map of event
+    		var orig_lat=Number(document.getElementById("event_latitude").value);
         var orig_lng=Number(document.getElementById("event_longitude").value);
-    	marker = new google.maps.Marker({
+      	marker = new google.maps.Marker({
                 position: { lat: orig_lat, lng: orig_lng },
                 map: gMap
          });
 
+        //allow for user to click a different spot on map, thus changing event's lat and lng
         google.maps.event.addListener(gMap, 'click', function(event) {
             if (marker != null)
             {
