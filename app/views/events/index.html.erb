@@ -69,7 +69,6 @@
                     //now show the filtered events
                     result = JSON.parse(xmlhttp.responseText);
                     length = result.length;
-                    alert(length)
                     for (i=0; i<length; i++)
                     {
                         latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
@@ -86,7 +85,6 @@
                     }    
                 }
               }
-              alert(type)
               xmlhttp.open("GET","/events/filter.json?type="+type+"&user=1&location="+loc,true);
               xmlhttp.send();
           }
@@ -124,23 +122,22 @@
         function eventHTML(event_id, xmlhttp)
         {
           return '<tr><td><span onclick="OpenWindow(&quot;' +
-                     document.getElementById("navbar").innerHTML += '<tr><td><span onclick="OpenWindow(&quot;' +
-                          JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
-                          JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
-                          JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
-                        'style="cursor: pointer"><b><u><font color="blue">' +
-                          JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></u></font></span>' +
-                        '</td><td><a href="/events/'+event_id+
-                        '">Show</a></td>' +
-                        '<td><a href="/events/'+event_id+
-                        '/edit">Edit</a></td>' +
-                        '<td><a data-confirm="Are you sure?" rel="nofollow"' +
-                        'data-method="delete" href="/events/'+event_id+
-                        '">Destroy</a></td>' +
-                       '<td> <input type="button" onclick="OpenWindow(&quot;'+
-                        JSON.parse(xmlhttp.responseText)[i]["name"]+
-                        '&quot;, &quot;attendance&quot;)"'+
-                       'value="Get Attendance!"/></td></tr></table>'
+                JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
+                JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
+                JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
+              'style="cursor: pointer"><b><u><font color="blue">' +
+                JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></u></font></span>' +
+              '</td><td><a href="/events/'+event_id+
+              '">Show</a></td>' +
+              '<td><a href="/events/'+event_id+
+              '/edit">Edit</a></td>' +
+              '<td><a data-confirm="Are you sure?" rel="nofollow"' +
+              'data-method="delete" href="/events/'+event_id+
+              '">Destroy</a></td>' +
+             '<td> <input type="button" onclick="OpenWindow(&quot;'+
+              JSON.parse(xmlhttp.responseText)[i]["name"]+
+              '&quot;, &quot;attendance&quot;)"'+
+             'value="Get Attendance!"/></td></tr></table>'
         }
 
         function preEventHTML(type)
@@ -152,11 +149,7 @@
                                       '<option selected="selected" value="location">NEAR ME</option>' +
                                         '<option value="time">HAPPENING SOON</option>' +
                                         '<option value="user">CREATED BY ME</option>'+
-                                    '</select> </td></tr>'     
-
-                    }    
-                     
-                }
+                                    '</select> </td></tr>'  
               }
               else if (type=='user')
               {
