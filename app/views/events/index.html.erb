@@ -90,8 +90,10 @@
                     length = result.length;
                     for (i=0; i<length; i++)
                     {
-                         latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
-                         longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
+                        latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
+                        longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
+                        var event_id = JSON.parse(xmlhttp.responseText)[i]["id"].toString();
+
                         var event_name=JSON.parse(xmlhttp.responseText)[i]["event_name"];
                         var temp_latlng = new google.maps.LatLng(latitude, longitude);
  
@@ -104,19 +106,22 @@
                         markers.push(marker)
 
 
-
                      document.getElementById("navbar").innerHTML += '<tr><td><span onclick="OpenWindow(&quot;' +
                           JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
                           JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
                           JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
                         'style="cursor: pointer"><b><u><font color="blue">' +
                           JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></u></font></span>' +
-                        '</td><td><a href="/events/11">Show</a></td>' +
-                        '<td><a href="/events/11/edit">Edit</a></td>' +
+                        '</td><td><a href="/events/'+event_id+
+                        '">Show</a></td>' +
+                        '<td><a href="/events/'+event_id+
+                        '/edit">Edit</a></td>' +
                         '<td><a data-confirm="Are you sure?" rel="nofollow"' +
-                        'data-method="delete" href="/events/11">Destroy</a></td>' +
+                        'data-method="delete" href="/events/'+event_id+
+                        '">Destroy</a></td>' +
                        '<td> <input type="button" onclick="OpenWindow(&quot;concert&quot;, &quot;attendance&quot;)"'+
                        'value="Get Attendance!"/></td></tr></table>'
+
 
 
                     }    
