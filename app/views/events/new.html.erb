@@ -23,6 +23,29 @@
     })();
     var marker = null;
     var map = null;
+
+
+    function markMe(latitude, longitude)
+    {
+        me_window = new google.maps.InfoWindow({
+            content: "You are here",
+            position: new google.maps.LatLng(latitude, longitude),
+         });
+
+        me_window.open(gMap);
+    }
+
+    //gets called by geolocation attempt with position of user
+    function showPosition(position) {
+           var str_loc = position.coords.latitude + ", " + position.coords.longitude;
+           var loc = str_loc.split(", "); 
+           var latitude = loc[0]
+           var longitude = loc[1]
+           markMe(latitude, longitude)
+    }
+
+
+
     $(function(){
         document.getElementById("event_latitude").style.visibility = "hidden";
         document.getElementById("event_longitude").style.visibility = "hidden";
@@ -35,6 +58,13 @@
         };
         gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
 
+        //find geolocation of user
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition); 
+
+        } else { 
+            myDiv.innerHTML = "Geolocation is not supported by this browser.";
+        }
 
         google.maps.event.addListener(gMap, 'click', function(event) {
             if (marker != null)
