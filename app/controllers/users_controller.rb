@@ -70,6 +70,7 @@ class UsersController < ApplicationController
     def user_params
       user_params = params.require(:user).permit(:name, :email, :password, :password_confirmation)
       user_params[:num_events] = 0
+      user_params[:admin] = false
       user_params
     end
 end
