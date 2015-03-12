@@ -25,29 +25,25 @@
         var windows = [];
 
 
-        function showPosition(position) {
-           document.getElementById("myDiv").style.visibility = "hidden"
-           document.getElementById("myDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude; 
-           loc = document.getElementById("myDiv").innerHTML.split(", ")
-           var latitude = loc[0]
-           var longitude = loc[1]
-           markMe(latitude, longitude)
-           loadXMLDoc("location")  //by default load events near user's locaton
+        
+        window.onload = function(){
+           
+            var myOptions = {
+                center: new google.maps.LatLng(42.3654347, -71.258595),
+                zoom: 15,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
 
-        }
-        function loadXMLHTTP()
-        {
-          var xmlhttp;
-           if (window.XMLHttpRequest)
-              {// code for IE7+, Firefox, Chrome, Opera, Safari
-              xmlhttp=new XMLHttpRequest();
-              }
-            else
-              {// code for IE6, IE5
-              xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-              }
-          return xmlhttp;
-        }
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition); 
+
+            } else { 
+                myDiv.innerHTML = "Geolocation is not supported by this browser.";
+            }
+            
+       }
+
         function loadXMLDoc(type)
         {
           //first just gets the right xmlhttp based on browser
@@ -89,6 +85,30 @@
               xmlhttp.send();
           }
 
+
+        function showPosition(position) {
+           document.getElementById("myDiv").style.visibility = "hidden"
+           document.getElementById("myDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude; 
+           loc = document.getElementById("myDiv").innerHTML.split(", ")
+           var latitude = loc[0]
+           var longitude = loc[1]
+           markMe(latitude, longitude)
+           loadXMLDoc("location")  //by default load events near user's locaton
+
+        }
+        function loadXMLHTTP()
+        {
+          var xmlhttp;
+           if (window.XMLHttpRequest)
+              {// code for IE7+, Firefox, Chrome, Opera, Safari
+              xmlhttp=new XMLHttpRequest();
+              }
+            else
+              {// code for IE6, IE5
+              xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+              }
+          return xmlhttp;
+        }
 
         function markMe(latitude, longitude)
         {
@@ -231,24 +251,6 @@
           }
 
 
-        
-        window.onload = function(){
-           
-            var myOptions = {
-                center: new google.maps.LatLng(42.3654347, -71.258595),
-                zoom: 15,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            };
-            gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition); 
-
-            } else { 
-                myDiv.innerHTML = "Geolocation is not supported by this browser.";
-            }
-            
-       }
 
     </script>
 
@@ -267,28 +269,6 @@
 </style>
 <div id="container">
   <div id="navbar">
-    <br>
-    <table><tr>VIEW EVENTS <select onchange="loadXMLDoc(this.value)">
-  <option value="location">NEAR ME</option>
-  <option value="time">HAPPENING SOON</option>
-  <option value="user">CREATED BY ME</option>
-</select></tr>
-      <% @events.each do |event| %>
-
-      <tr><td>
-
-        <span onclick="OpenWindow('<%= event.latitude %>+<%= event.longitude %>+<%= event.description %>', 'desc')" style="cursor: pointer"><b><u><font color="blue">
-    <%= event.name %></b></u></font></span>
-  </td>
-<td><%= link_to 'Show', event %></td>
-        <td><%= link_to 'Edit', edit_event_path(event) %></td>
-        <td><%= link_to 'Destroy', event, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-
-    <td>
-    <input type="button" onclick="OpenWindow('<%= event.name %>', 'attendance')" value="Get Attendance!"/></td>
-  </tr>
-  <% end %>
-</table>
 
   </div>
   
