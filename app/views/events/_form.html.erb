@@ -11,14 +11,15 @@ div#main_form {
 
 }
 
-div#radio1 {
+div#radio1, div#radio2 {
  float: left;
-  width: 35%;
+  width: 15%;
   padding: 4px ;
+  
 
 }
-div#radio2 {
-margin-left:  35%;
+div#label1, div#label2 {
+margin-left:  15%;
   padding: 4px ;
 
 }
@@ -60,15 +61,25 @@ margin-left:  35%;
     	<p hidden> <%= @date_today = DateTime.now %> </p>
     	<p hidden> <%= @date_tom = DateTime.new(@date_today.year, @date_today.month, (@date_today.day + 1), @date_today.hour, @date_today.min, @date_today.sec) %> </p>
     	<p hidden> <%= @nothing = Time.now %> </p>
-    	<div id="radio1">
-    	<%= radio_button_tag(:event_day, DateTime.now, :checked => true) %> 
-    	<%= radio_button_tag(:event_day, @date_tom) %>
+    	<div id="radio_buttons">
+    	
+    	
+    		<div id="radio1">
+    			<%= radio_button_tag(:event_day, DateTime.now, :checked => true) %> 
+    		</div>
+    		<div id="label1">
+    			<%= label_tag(:choose_today, "Today, #{Date::MONTHNAMES[@date_today.month]} #{@date_today.day}") %>
+    		</div>
+    	
+    	
+    		<div id="radio2">	
+    			<%= radio_button_tag(:event_day, @date_tom) %>
+    		</div>
+    		<div id="label2">
+    			<%= label_tag(:choose_tomorrow, "Tomorrow, #{Date::MONTHNAMES[@date_tom.month]} #{@date_tom.day}") %>
+			</div>    	
     	</div>
-    	<div id="label1">
-  		<%= label_tag(:choose_today, "Today, #{Date::MONTHNAMES[@date_today.month]} #{@date_today.day}") %>
-  		
-  		<%= label_tag(:choose_tomorrow, "Tomorrow, #{Date::MONTHNAMES[@date_tom.month]} #{@date_tom.day}") %>
-  		</div>
+    	
     	<% puts "wooo #{params[:time_occurrence]}"%>
     	<%= time_select :usertime, :hourmin, {:ampm => true} %>
     	<!--<%= f.datetime_select :time_occurrence, ampm: true %>  Original line-->
