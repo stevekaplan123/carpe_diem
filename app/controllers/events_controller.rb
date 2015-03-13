@@ -23,7 +23,6 @@ class EventsController < ApplicationController
  def filter
        whichType = params[:type]
        @events = []
-       puts params[:location]+"**************"
 
        if whichType == "location"
           lat, lng = params[:location].split(",")

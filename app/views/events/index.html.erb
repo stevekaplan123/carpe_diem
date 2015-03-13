@@ -35,20 +35,24 @@
             };
             gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
 
+
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition); 
+                navigator.geolocation.getCurrentPosition(showPosition, error); 
 
             } else { 
-                myDiv.innerHTML = "Geolocation is not supported by this browser.";
+                error();
             }
             
        }
 
         function loadXMLDoc(type)
         {
+          if (loc=="error") //if loc error and no value set on map
+          {
+              alert("In order to see events near you, either allow geolocation on your browser or select your position on the map.")
+          }
           //first just gets the right xmlhttp based on browser
             var xmlhttp = loadXMLHTTP()
-           
             //each time state changes, from 0 to 1 to 2 to 3 to 4, check if it finished (finished means state of 4)
             //and check status is 200, if status != 200, then the server failed to respond correctly (404 or 500)  
             xmlhttp.onreadystatechange=function()
@@ -70,7 +74,6 @@
                         latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
                         longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
                         var event_id = JSON.parse(xmlhttp.responseText)[i]["id"].toString();
-
                         var event_name=JSON.parse(xmlhttp.responseText)[i]["event_name"];
  
                         //mark events on map that were result of filtering by 'type'
@@ -95,7 +98,23 @@
            markMe(latitude, longitude)
            loadXMLDoc("location")  //by default load events near user's locaton
 
-        }
+         }
+         function error()
+         {
+            document.getElementById("myDiv").style.visibility = "hidden"
+            document.getElementById("myDiv").innerHTML = "error"
+            loc = "error"
+
+            //user needs to be able to click on map
+            google.maps.event.addListener(gMap, 'click', function(event) {
+                var lat = event.latLng.lat()
+                var lng = event.latLng.lng()
+                loc = lat.toString() + ", " + lng.toString()
+                markMe(lat, lng)
+            });
+            loadXMLDoc("user")
+         }
+
         function loadXMLHTTP()
         {
           var xmlhttp;
@@ -112,6 +131,10 @@
 
         function markMe(latitude, longitude)
         {
+            if (me_window != null)
+            {
+                me_window.close()
+            }
             me_window = new google.maps.InfoWindow({
                 content: "You are here",
                 position: new google.maps.LatLng(latitude, longitude),
