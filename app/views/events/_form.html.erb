@@ -1,28 +1,43 @@
 <style>
 div#map_section {
-  margin-left:  35%;
-  padding: 4px ;
+	margin-left:  35%;
+	padding: 4px ;
 
 }
 div#main_form {
-  float: left;
-  width: 35%;
-  padding: 4px ;
+	float: left;
+	width: 35%;
+	padding: 4px ;
 
 }
 
 div#radio1, div#radio2 {
- float: left;
-  width: 15%;
-  padding: 4px ;
+	float: left;
+	width: 15%;
+	padding: 4px ;
   
 
 }
 div#label1, div#label2 {
-margin-left:  15%;
-  padding: 4px ;
+	margin-left:  15%;
+	padding: 4px ;
 
 }
+
+select#usertime_hourmin_4i{
+	float: left;
+	width: 20%;
+	
+
+}
+
+select#usertime_hourmin_5i{
+	width: 20%;
+	
+
+}
+
+
 </style>
 
 
@@ -77,7 +92,7 @@ margin-left:  15%;
     			<%= label_tag(:choose_tomorrow, "Tomorrow, #{Date::MONTHNAMES[@date_tom.month]} #{@date_tom.day}") %>
 			</div>    	
     	</div>
-    	
+
     	<% puts "wooo #{params[:time_occurrence]}"%>
     	<%= time_select :usertime, :hourmin, {:ampm => true, :minute_step => 5} %>
     	<!--<%= f.datetime_select :time_occurrence, ampm: true %>  Original line-->
