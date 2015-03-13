@@ -1,4 +1,34 @@
+<style>
+div#map_section {
+  margin-left:  35%;
+  padding: 4px ;
+
+}
+div#main_form {
+  float: left;
+  width: 35%;
+  padding: 4px ;
+
+}
+
+div#radio1 {
+ float: left;
+  width: 35%;
+  padding: 4px ;
+
+}
+div#radio2 {
+margin-left:  35%;
+  padding: 4px ;
+
+}
+</style>
+
+
+
+
 <%= form_for(@event) do |f| %>
+<div id="main_form">
   <% if @event.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@event.errors.count, "error") %> prohibited this event from being saved:</h2>
@@ -15,22 +45,30 @@
     <%= f.label :creator_id %><br>
     <%= f.number_field :creator_id %>
   </div>
+
   <div class="field">
     <%= f.label :event_name %><br>
     <%= f.text_field :name %>
   </div>
+
   
   <div class="field">
+  
     <%= f.label "Time of Event" %><br>   
     	<!--2nd arg to radio button the value saved
     	make first arg variable? -->
     	<p hidden> <%= @date_today = DateTime.now %> </p>
     	<p hidden> <%= @date_tom = DateTime.new(@date_today.year, @date_today.month, (@date_today.day + 1), @date_today.hour, @date_today.min, @date_today.sec) %> </p>
     	<p hidden> <%= @nothing = Time.now %> </p>
+    	<div id="radio1">
     	<%= radio_button_tag(:event_day, DateTime.now, :checked => true) %> 
+    	<%= radio_button_tag(:event_day, @date_tom) %>
+    	</div>
+    	<div id="label1">
   		<%= label_tag(:choose_today, "Today, #{Date::MONTHNAMES[@date_today.month]} #{@date_today.day}") %>
-  		<%= radio_button_tag(:event_day, @date_tom) %>
+  		
   		<%= label_tag(:choose_tomorrow, "Tomorrow, #{Date::MONTHNAMES[@date_tom.month]} #{@date_tom.day}") %>
+  		</div>
     	<% puts "wooo #{params[:time_occurrence]}"%>
     	<%= time_select :usertime, :hourmin, {:ampm => true} %>
     	<!--<%= f.datetime_select :time_occurrence, ampm: true %>  Original line-->
@@ -45,14 +83,23 @@
     	<!--2nd Option-->
     	<!-- <%= select_hour(@date_today.hour) %> -->
     	
+  </div>	
+  
   <div class="field">
     <%= f.label :description %><br>
     <%= f.text_area :description %>
   </div>
+
+</div>
+    <div id="map_section">
+  <div id="map_canvas" style="width: 800px; height: 400px;"></div>
+</div>
+
   <div class="actions">
     <%= f.submit %>
   </div>
 
+<div hidden>
   <div class="field">
     <%= f.text_field :longitude %>
   </div>
@@ -64,8 +111,10 @@
   <div class="field">
     <%= f.text_field :location %>
   </div>
+</div>
   
-  
+    
+
 
 
 <% end %>
