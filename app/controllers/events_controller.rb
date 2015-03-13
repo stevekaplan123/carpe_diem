@@ -25,7 +25,7 @@ class EventsController < ApplicationController
        @events = []
 
        if whichType == "location"
-          lat, lng = params[:location].split(", ")
+          lat, lng = params[:location].split(",")
           @events = filterByLocation(lat, lng)
        elsif whichType == "time"
           @events = filterByTime(Time.now)

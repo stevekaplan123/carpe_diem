@@ -21,43 +21,104 @@
         var desc_window = null;
         var markers = [];
         var me_window =  null; 
+        var loc = null;
+        var windows = [];
+
+
+        
+        window.onload = function(){
+           
+            var myOptions = {
+                center: new google.maps.LatLng(42.3654347, -71.258595),
+                zoom: 15,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
+
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, error); 
+
+            } else { 
+                error();
+            }
+            
+       }
+
+        function loadXMLDoc(type)
+        {
+          if (loc=="error") //if loc error and no value set on map
+          {
+              alert("In order to see events near you, either allow geolocation on your browser or select your position on the map.")
+          }
+          //first just gets the right xmlhttp based on browser
+            var xmlhttp = loadXMLHTTP()
+            //each time state changes, from 0 to 1 to 2 to 3 to 4, check if it finished (finished means state of 4)
+            //and check status is 200, if status != 200, then the server failed to respond correctly (404 or 500)  
+            xmlhttp.onreadystatechange=function()
+              {
+              if (xmlhttp.readyState==4 && xmlhttp.status==200)
+                {
+                  //first clear old event markers and clear out table of events
+                  clearMarkers()
+                  clearWindows()
+
+                  //start re-setting the menu on top of the navigation bar with preEventHTML() 
+                  document.getElementById("navbar").innerHTML=preEventHTML(type)
+
+                    //now show the filtered events
+                    result = JSON.parse(xmlhttp.responseText);
+                    length = result.length;
+                    for (i=0; i<length; i++)
+                    {
+                        latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
+                        longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
+                        var event_id = JSON.parse(xmlhttp.responseText)[i]["id"].toString();
+                        var event_name=JSON.parse(xmlhttp.responseText)[i]["event_name"];
+ 
+                        //mark events on map that were result of filtering by 'type'
+                        markEvents(latitude, longitude, event_name)
+
+                        //repopulate the navigation bar with the events filtered by 'type'
+                        document.getElementById("navbar").innerHTML += eventHTML(event_id, xmlhttp) 
+                    }    
+                }
+              }
+              xmlhttp.open("GET","/events/filter.json?type="+type+"&user=1&location="+loc,true);
+              xmlhttp.send();
+          }
 
 
         function showPosition(position) {
            document.getElementById("myDiv").style.visibility = "hidden"
            document.getElementById("myDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude; 
-           var loc = document.getElementById("myDiv").innerHTML.split(", ")
+           loc = document.getElementById("myDiv").innerHTML.split(", ")
            var latitude = loc[0]
            var longitude = loc[1]
-           markMe()
-           loadXMLDoc("user")
+           markMe(latitude, longitude)
+           loadXMLDoc("location")  //by default load events near user's locaton
 
-        }
+         }
+         function error()
+         {
+            document.getElementById("myDiv").style.visibility = "hidden"
+            document.getElementById("myDiv").innerHTML = "error"
+            loc = "error"
 
-        function markMe()
+            //user needs to be able to click on map
+            google.maps.event.addListener(gMap, 'click', function(event) {
+                var lat = event.latLng.lat()
+                var lng = event.latLng.lng()
+                loc = lat.toString() + ", " + lng.toString()
+                markMe(lat, lng)
+            });
+            loadXMLDoc("user")
+         }
+
+        function loadXMLHTTP()
         {
-
-           var loc = document.getElementById("myDiv").innerHTML.split(", ")
-           var latitude = loc[0]
-           var longitude = loc[1]
-
-
-            me_window = new google.maps.InfoWindow({
-                content: "You are here",
-                position: new google.maps.LatLng(latitude, longitude),
-             });
-
-            me_window.open(gMap);
-
-
-        }
-
-
-        function loadXMLDoc(type)
-        {
-
-            var xmlhttp;
-            if (window.XMLHttpRequest)
+          var xmlhttp;
+           if (window.XMLHttpRequest)
               {// code for IE7+, Firefox, Chrome, Opera, Safari
               xmlhttp=new XMLHttpRequest();
               }
@@ -65,68 +126,106 @@
               {// code for IE6, IE5
               xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
               }
-            xmlhttp.onreadystatechange=function()
+          return xmlhttp;
+        }
+
+        function markMe(latitude, longitude)
+        {
+            if (me_window != null)
+            {
+                me_window.close()
+            }
+            me_window = new google.maps.InfoWindow({
+                content: "You are here",
+                position: new google.maps.LatLng(latitude, longitude),
+             });
+
+            me_window.open(gMap);
+        }
+
+        function markEvents(latitude, longitude, event_name)
+        {
+              var temp_latlng = new google.maps.LatLng(latitude, longitude);
+              marker = new google.maps.Marker({
+                  position: temp_latlng,
+                  map: gMap,
+                  title: event_name
+              });
+
+              markers.push(marker) 
+        }
+
+        function clearMarkers()
+        {
+            for (var i = 0; i < markers.length; i++) {
+              markers[i].setMap(null);
+          }
+        }
+
+        function eventHTML(event_id, xmlhttp)
+        {
+          return '<tr><td><span onclick="OpenWindow(&quot;' +
+                JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
+                JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
+                JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
+              'style="cursor: pointer"><b><u><font color="blue">' +
+                JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></u></font></span>' +
+              '</td><td><a href="/events/'+event_id+
+              '">Show</a></td>' +
+              '<td><a href="/events/'+event_id+
+              '/edit">Edit</a></td>' +
+              '<td><a data-confirm="Are you sure?" rel="nofollow"' +
+              'data-method="delete" href="/events/'+event_id+
+              '">Destroy</a></td>' +
+             '<td> <input type="button" onclick="OpenWindow(&quot;'+
+              JSON.parse(xmlhttp.responseText)[i]["name"]+
+              '&quot;, &quot;attendance&quot;)"'+
+             'value="Get Attendance!"/></td></tr></table>'
+        }
+
+        function preEventHTML(type)
+        {
+              if (type=='location')
               {
-              if (xmlhttp.readyState==4 && xmlhttp.status==200)
-                {
+                       return '<br> <table><tr><td>VIEW EVENTS BY:'+
+                                      '<select onchange="loadXMLDoc(this.value)">' +
+                                      '<option selected="selected" value="location">NEAR ME</option>' +
+                                        '<option value="time">HAPPENING SOON</option>' +
+                                        '<option value="user">CREATED BY ME</option>'+
+                                    '</select> </td></tr>'  
+              }
+              else if (type=='user')
+              {
+                       return '<br> <table><tr><td>VIEW EVENTS BY:'+
+                                      '<select onchange="loadXMLDoc(this.value)">' +
+                                      '<option value="location">NEAR ME</option>' +
+                                        '<option value="time">HAPPENING SOON</option>' +
+                                        '<option selected="selected" value="user">CREATED BY ME</option>'+
+                                    '</select> </td></tr>'  
+              } 
+              else if (type=='time')
+              {
+                       return '<br> <table><tr><td>VIEW EVENTS BY:'+
+                                      '<select onchange="loadXMLDoc(this.value)">' +
+                                      '<option value="location">NEAR ME</option>' +
+                                        '<option selected="selected" value="time">HAPPENING SOON</option>' +
+                                        '<option value="user">CREATED BY ME</option>'+
+                                    '</select> </td></tr>'  
+              } 
+              else if (type=='all')
+              {
 
-
-                  //first clear old event markers and clear out table of events
-                  for (var i = 0; i < markers.length; i++) {
-                      markers[i].setMap(null);
-
-                  }
-
-
-                    document.getElementById("navbar").innerHTML='<br> <table><tr><td>VIEW EVENTS BY:'+
+                        return '<br> <table><tr><td>VIEW EVENTS BY:'+
                                       '<select onchange="loadXMLDoc(this.value)">' +
                                       '<option value="location">NEAR ME</option>' +
                                         '<option value="time">HAPPENING SOON</option>' +
                                         '<option value="user">CREATED BY ME</option>'+
-                                    '</select> </td></tr>'             
+                                    '</select> </td></tr>'  
+              }      
 
-                     //now show the filtered events
-                    result = JSON.parse(xmlhttp.responseText);
-                    length = result.length;
-                    for (i=0; i<length; i++)
-                    {
-                         latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
-                         longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
-                        var event_name=JSON.parse(xmlhttp.responseText)[i]["event_name"];
-                        var temp_latlng = new google.maps.LatLng(latitude, longitude);
- 
-                        marker = new google.maps.Marker({
-                            position: temp_latlng,
-                            map: gMap,
-                            title: event_name
-                        });
+        }
 
-                        markers.push(marker)
-
-
-
-                     document.getElementById("navbar").innerHTML += '<tr><td><span onclick="OpenWindow(&quot;' +
-                          JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
-                          JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
-                          JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
-                        'style="cursor: pointer"><b><u><font color="blue">' +
-                          JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></u></font></span>' +
-                        '</td><td><a href="/events/11">Show</a></td>' +
-                        '<td><a href="/events/11/edit">Edit</a></td>' +
-                        '<td><a data-confirm="Are you sure?" rel="nofollow"' +
-                        'data-method="delete" href="/events/11">Destroy</a></td>' +
-                       '<td> <input type="button" onclick="OpenWindow(&quot;concert&quot;, &quot;attendance&quot;)"'+
-                       'value="Get Attendance!"/></td></tr></table>'
-
-
-                    }    
-                     
-                }
-              }
-              xmlhttp.open("GET","/events/filter.json?type="+type+"&user=1&location="+document.getElementById("myDiv").innerHTML,true);
-              xmlhttp.send();
-          }
-
+       
           function OpenWindow(event_info, type)
           {
             if (type=='attendance')
@@ -143,6 +242,7 @@
 
                  });
                attendance_window.open(gMap);
+               windows.push(attendance_window)
            }
            else
            {
@@ -161,27 +261,19 @@
                     position: new google.maps.LatLng(lat, lng)
                  });
                desc_window.open(gMap);
+               windows.push(desc_window)
            }
           }
 
+          function clearWindows()
+          { 
+              for (var i=0; i<windows.length; i++)
+              {
+                windows[i].close()
+              }
+          }
 
-        window.onload = function() {
-            var myOptions = {
-                center: new google.maps.LatLng(42.3654347, -71.258595),
-                zoom: 15,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            };
-            gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
 
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition); 
-
-            } else { 
-                myDiv.innerHTML = "Geolocation is not supported by this browser.";
-            }
-
-             
-       }
 
     </script>
 
@@ -200,28 +292,6 @@
 </style>
 <div id="container">
   <div id="navbar">
-    <br>
-    <table><tr>VIEW EVENTS <select onchange="loadXMLDoc(this.value)">
-  <option value="location">NEAR ME</option>
-  <option value="time">HAPPENING SOON</option>
-  <option value="user">CREATED BY ME</option>
-</select></tr>
-      <% @events.each do |event| %>
-
-      <tr><td>
-
-        <span onclick="OpenWindow('<%= event.latitude %>+<%= event.longitude %>+<%= event.description %>', 'desc')" style="cursor: pointer"><b><u><font color="blue">
-    <%= event.name %></b></u></font></span>
-  </td>
-<td><%= link_to 'Show', event %></td>
-        <td><%= link_to 'Edit', edit_event_path(event) %></td>
-        <td><%= link_to 'Destroy', event, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-
-    <td>
-    <input type="button" onclick="OpenWindow('<%= event.name %>', 'attendance')" value="Get Attendance!"/></td>
-  </tr>
-  <% end %>
-</table>
 
   </div>
   
@@ -229,7 +299,6 @@
 
 </div>
 </div>
-<input type="button" onclick="loadXMLDoc('user', '1')" value="Filter by user 1"/>
 <div id="myDiv"></div>
 
  
