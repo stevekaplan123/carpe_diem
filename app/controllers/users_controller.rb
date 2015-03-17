@@ -31,6 +31,7 @@ class UsersController < ApplicationController
 
     if @user.save
       log_in @user
+      flash.now[:success] = "Welcome to Carpe Diem"
       redirect_to @user
     else
       render 'new'
