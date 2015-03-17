@@ -14,11 +14,11 @@ class EventsController < ApplicationController
   # GET /events/1.json
   # Low efficiency, will have to check the database every time - Leifeng, 03/17
   def show
+    @creator = User.find(@event.creator_id).name
     @attendees = []
-    Attendance.where(event_id: params[:id]).each do |a|
+    @event.attendances.each do |a|
       @attendees.push(User.find(a.user_id).name)
     end
-    @creator = User.find(@event.creator_id).name
   end
 
 
@@ -69,7 +69,7 @@ class EventsController < ApplicationController
   def create
     @event = Event.new(event_params)
     #assign current user's id to created event
-    @event.creator_id = session[:user_id]
+    @event.attendances.build(user_id: session[:user_id])
     
     #puts "event_day in params: #{params[:event_day]}"
     day_int = params[:event_day].to_date
