@@ -1,16 +1,15 @@
+<% require 'byebug' %>
 <p id="notice"><%= notice %></p>
 
 <p>
   <strong>Creator:</strong>
-  <%= @event.creator_id %>
+  <%= @creator %>
 </p>
 
 <p>
   <strong>Event name:</strong>
   <%= @event.name %>
 </p>
-
-
 
 <p>
   <strong>Time occurrence:</strong>
@@ -35,6 +34,12 @@
 <p>
   <strong>Description:</strong>
   <%= @event.description %>
+</p>
+
+<p>
+  <strong>Attendance:</strong>
+  <% binding.byebug %>
+  <%= @attendees %>
 </p>
 
 <%= link_to 'Edit', edit_event_path(@event) %> |

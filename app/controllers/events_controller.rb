@@ -1,4 +1,5 @@
 require 'time'
+require 'byebug'
 class EventsController < ApplicationController
 
   before_action :set_event, only: [:show, :edit, :update, :destroy]
@@ -11,7 +12,13 @@ class EventsController < ApplicationController
 
   # GET /events/1
   # GET /events/1.json
+  # Low efficiency, will have to check the database every time - Leifeng, 03/17
   def show
+    @attendees = []
+    Attendance.where(event_id: params[:id]).each do |a|
+      @attendees.push(User.find(a.user_id).name)
+    end
+    @creator = User.find(@event.creator_id).name
   end
 
 
@@ -61,6 +68,8 @@ class EventsController < ApplicationController
   # POST /events.json
   def create
     @event = Event.new(event_params)
+    #assign current user's id to created event
+    @event.creator_id = session[:user_id]
     
     #puts "event_day in params: #{params[:event_day]}"
     day_int = params[:event_day].to_date
@@ -81,6 +90,8 @@ class EventsController < ApplicationController
 
     respond_to do |format|
       if @event.save
+        #link attendance to created event
+        Attendance.create(event_id: @event.id, user_id: session[:user_id])
         format.html { redirect_to @event, notice: 'Event was successfully created.' }
         format.json { render :show, status: :created, location: @event }
       else
