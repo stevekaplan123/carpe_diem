@@ -70,7 +70,7 @@ class EventsController < ApplicationController
     @event = Event.new(event_params)
 
     #assign current user's id to created event
-    @event.attendances.create(user_id: session[:user_id])
+    @event.attendances.build(user_id: session[:user_id])
 
     #puts "event_day in params: #{params[:event_day]}"
     day_int = params[:event_day].to_date
