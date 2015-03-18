@@ -1,6 +1,7 @@
 class Event < ActiveRecord::Base
     has_many :attendances
     has_many :users, through: :attendances
+    has_many :event_tags
 
     
     validates :name, :description, presence: true
