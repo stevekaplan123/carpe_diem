@@ -22,7 +22,7 @@ class User < ActiveRecord::Base
     end
 
     def default_options
-      self.admin = false
-      self.num_events = 0
+      self.admin = false unless self.admin
+      self.num_events = 0 unless self.num_events
     end
 end
