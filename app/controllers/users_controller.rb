@@ -21,6 +21,7 @@ class UsersController < ApplicationController
 
   # GET /users/1/edit
   def edit
+    @user = User.find(params[:id])
   end
 
   # POST /users
@@ -30,6 +31,7 @@ class UsersController < ApplicationController
 
     if @user.save
       log_in @user
+      flash.now[:success] = "Welcome to Carpe Diem"
       redirect_to @user
     else
       render 'new'
