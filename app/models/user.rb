@@ -1,7 +1,9 @@
 class User < ActiveRecord::Base
   has_many :attendances
   has_many :events, through: :attendances
-  before_save :downcase_fields
+
+  before_save :downcase_fields, :default_options
+
   validates :name, presence: true, length: { maximum: 50 }
 
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@brandeis.edu/i
@@ -17,5 +19,10 @@ class User < ActiveRecord::Base
     def downcase_fields
       self.name.downcase!
       self.email.downcase!
+    end
+
+    def default_options
+      self.admin = false
+      self.num_events = 0
     end
 end
