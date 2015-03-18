@@ -1,3 +1,4 @@
+
 <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script type='text/javascript'>
         //the following function causes page to refresh
@@ -168,8 +169,8 @@
                 JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
                 JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
                 JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
-              'style="cursor: pointer"><b><u><font color="blue">' +
-                JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></u></font></span>' +
+              'style="cursor: pointer"><b><font color="blue">' +
+                JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></font></span>' +
               '</td><td><a href="/events/'+event_id+
               '">Show</a></td>' +
               '<td><a href="/events/'+event_id+
