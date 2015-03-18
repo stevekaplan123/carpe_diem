@@ -1,4 +1,7 @@
 class Event < ActiveRecord::Base
+    has_many :attendances
+    has_many :users, through: :attendances
+
     
     validates :name, :description, presence: true
     validates :latitude, :longitude, presence: true

@@ -1,4 +1,5 @@
 require 'time'
+require 'byebug'
 class EventsController < ApplicationController
 
   before_action :set_event, only: [:show, :edit, :update, :destroy]
@@ -11,7 +12,13 @@ class EventsController < ApplicationController
 
   # GET /events/1
   # GET /events/1.json
+  # Low efficiency, will have to check the database every time - Leifeng, 03/17
   def show
+    @creator = User.find(@event.creator_id).name
+    @attendees = []
+    @event.attendances.each do |a|
+      @attendees.push(User.find(a.user_id).name)
+    end
   end
 
 
@@ -44,7 +51,7 @@ class EventsController < ApplicationController
       respond_to do |format|
           format.json { render :json => @events}
       end
-  end 
+  end
 
 
 
@@ -61,19 +68,22 @@ class EventsController < ApplicationController
   # POST /events.json
   def create
     @event = Event.new(event_params)
-    
+
+    #assign current user's id to created event
+    @event.attendances.create(user_id: session[:user_id])
+
     #puts "event_day in params: #{params[:event_day]}"
     day_int = params[:event_day].to_date
-    
+
     #puts "day int created: #{day_int}"
     event_day = DateTime.new(day_int.year, day_int.month, day_int.day, 1, 1, 1)
-    
+
     #puts "event_day created: #{event_day}"
-    
+
     #puts "let's do a check: #{params[:usertime]}"
     #puts "let's access it: #{params[:usertime]['hourmin(1i)']}"
     thehour = params[:usertime]["hourmin(4i)"].to_i
-    
+
     #puts "thehour created: #{thehour}"
     themin = params[:usertime]["hourmin(5i)"].to_i
     @event.time_occurrence = DateTime.new(event_day.year, event_day.month, event_day.day, thehour, themin, 59)
@@ -81,6 +91,9 @@ class EventsController < ApplicationController
 
     respond_to do |format|
       if @event.save
+        increase_num_events(current_user)
+        #link attendance to created event
+        Attendance.create(event_id: @event.id, user_id: session[:user_id])
         format.html { redirect_to @event, notice: 'Event was successfully created.' }
         format.json { render :show, status: :created, location: @event }
       else
@@ -115,7 +128,7 @@ class EventsController < ApplicationController
   end
 
   ##Filtering functions start here
-  
+
   def filterByAttendance(username)
     #in this case the user looked up all events attended by 'username'
     #TO DO...
@@ -160,7 +173,7 @@ class EventsController < ApplicationController
      user = user.to_i
      @events = Event.where(creator_id: user)
   end
-  
+
 
   private
     # Use callbacks to share common setup or constraints between actions.
@@ -170,6 +183,14 @@ class EventsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def event_params
-      params.require(:event).permit(:creator_id, :name, :time_occurrence, :location, :longitude, :latitude, :description)
+      event_params = params.require(:event).permit(:name, :time_occurrence, :location, :longitude, :latitude, :description)
+      event_params[:creator_id] = current_user.id
+      event_params
+    end
+
+    # when an event is created,
+    # increase the num_events in current user by 1
+    def increase_num_events(user)
+      user.update_attribute(:num_events, user.num_events + 1)
     end
 end
