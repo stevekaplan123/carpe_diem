@@ -25,15 +25,15 @@ end
 
 
 #make tags
-Tag.create(title: 'academic')
-Tag.create(title: 'competition')
-Tag.create(title: 'entertainment')
-Tag.create(title: 'food')
-Tag.create(title: 'game')
-Tag.create(title: 'off-campus')
-Tag.create(title: 'music')
-Tag.create(title: 'party')
-Tag.create(title: 'sports')
+Tag.create(name: 'academic')
+Tag.create(name: 'competition')
+Tag.create(name: 'entertainment')
+Tag.create(name: 'food')
+Tag.create(name: 'game')
+Tag.create(name: 'off-campus')
+Tag.create(name: 'music')
+Tag.create(name: 'party')
+Tag.create(name: 'sports')
 
 
 

@@ -72,6 +72,10 @@ class EventsController < ApplicationController
     #assign current user's id to created event
     @event.attendances.build(user_id: session[:user_id])
 
+
+	#######important
+	#@event.event_tags.build(event_id: params[:tags][:event_id], tag_id: params[:tags][:tag_id])
+
     #puts "event_day in params: #{params[:event_day]}"
     day_int = params[:event_day].to_date
 
@@ -94,6 +98,11 @@ class EventsController < ApplicationController
         increase_num_events(current_user)
         #link attendance to created event
         Attendance.create(event_id: @event.id, user_id: session[:user_id])
+        
+        
+        #######important
+        #EventTag.create(event_id: params[:tags][:event_id], tag_id: params[:tags][:tag_id])
+        
         format.html { redirect_to @event, notice: 'Event was successfully created.' }
         format.json { render :show, status: :created, location: @event }
       else
