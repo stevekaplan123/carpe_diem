@@ -38,7 +38,7 @@
 
 
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, error); 
+                navigator.geolocation.getCurrentPosition(success, error); 
 
             } else { 
                 error();
@@ -76,24 +76,24 @@
                         longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
                         var event_id = JSON.parse(xmlhttp.responseText)[i]["id"].toString();
                         var event_name=JSON.parse(xmlhttp.responseText)[i]["event_name"];
+                        var creator_id=JSON.parse(xmlhttp.responseText)[i]["creator_id"];
  
                         //mark events on map that were result of filtering by 'type'
                         markEvents(latitude, longitude, event_name)
 
                         //repopulate the navigation bar with the events filtered by 'type'
-                        document.getElementById("navbar").innerHTML += eventHTML(event_id, xmlhttp) 
+                        document.getElementById("navbar").innerHTML += eventHTML(event_id, creator_id, xmlhttp) 
                     }    
                 }
               }
-              xmlhttp.open("GET","/events/filter.json?type="+type+"&user=1&location="+loc,true);
+              xmlhttp.open("GET","/events/filter.json?type="+type+"&location="+loc,true);
               xmlhttp.send();
           }
 
 
-        function showPosition(position) {
-           document.getElementById("myDiv").style.visibility = "hidden"
-           document.getElementById("myDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude; 
-           loc = document.getElementById("myDiv").innerHTML.split(", ")
+        function success(position) {
+           document.getElementById("locationDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude; 
+           loc = document.getElementById("locationDiv").innerHTML.split(", ")
            var latitude = loc[0]
            var longitude = loc[1]
            markMe(latitude, longitude)
@@ -102,8 +102,7 @@
          }
          function error()
          {
-            document.getElementById("myDiv").style.visibility = "hidden"
-            document.getElementById("myDiv").innerHTML = "error"
+            document.getElementById("locationDiv").innerHTML = "error"
             loc = "error"
 
             //user needs to be able to click on map
@@ -163,65 +162,88 @@
           }
         }
 
-        function eventHTML(event_id, xmlhttp)
+        function eventHTML(event_id, creator_id, xmlhttp)
         {
-          return '<tr><td><span onclick="OpenWindow(&quot;' +
-                JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
-                JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
-                JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
-              'style="cursor: pointer"><b><font color="blue">' +
-                JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></font></span>' +
-              '</td><td><a href="/events/'+event_id+
-              '">Show</a></td>' +
-              '<td><a href="/events/'+event_id+
-              '/edit">Edit</a></td>' +
-              '<td><a data-confirm="Are you sure?" rel="nofollow"' +
-              'data-method="delete" href="/events/'+event_id+
-              '">Destroy</a></td>' +
-             '<td> <input type="button" onclick="OpenWindow(&quot;'+
-              JSON.parse(xmlhttp.responseText)[i]["name"]+
-              '&quot;, &quot;attendance&quot;)"'+
-             'value="Get Attendance!"/></td></tr></table>'
+          var append_to="";
+          var current_name = '<%= current_user.name %>';
+          var current_id = <%= current_user.id %>
+          if (current_name=="admin" || current_id==creator_id)
+          {
+            append_to= '<a href="/events/'+event_id+
+                        '">Show</a> | ' +
+                        '<a href="/events/'+event_id+
+                        '/edit">Edit</a> | ' +
+                        '<a data-confirm="Are you sure?" rel="nofollow"' +
+                        'data-method="delete" href="/events/'+event_id+
+                        '">Destroy</a>'
+          }
+          else 
+          {
+             append_to = '<a href="/events/'+event_id+
+                        '">Show</a>'
+          }
+
+          return '<span onclick="OpenWindow(&quot;' +
+                    JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
+                    JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
+                    JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
+                  'style="cursor: pointer"><b><font color="blue">' +
+                    JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></font></span>' +
+                   '<input type="button" onclick="OpenWindow(&quot;'+
+                    JSON.parse(xmlhttp.responseText)[i]["name"]+
+                    '&quot;, &quot;attendance&quot;)"'+
+                   'value="Get Attendance!"/>'+
+                   append_to;
+
         }
 
         function preEventHTML(type)
         {
               if (type=='location')
               {
-                       return '<br> <table><tr><td>VIEW EVENTS BY:'+
+                       return '<br>VIEW EVENTS BY:'+
                                       '<select onchange="loadXMLDoc(this.value)">' +
                                       '<option selected="selected" value="location">NEAR ME</option>' +
                                         '<option value="time">HAPPENING SOON</option>' +
                                         '<option value="user">CREATED BY ME</option>'+
-                                    '</select> </td></tr>'  
+                                    '</select><br> '  
               }
               else if (type=='user')
               {
-                       return '<br> <table><tr><td>VIEW EVENTS BY:'+
+                       return '<br> VIEW EVENTS BY:'+
                                       '<select onchange="loadXMLDoc(this.value)">' +
                                       '<option value="location">NEAR ME</option>' +
                                         '<option value="time">HAPPENING SOON</option>' +
                                         '<option selected="selected" value="user">CREATED BY ME</option>'+
-                                    '</select> </td></tr>'  
+                                    '</select><br> '  
               } 
               else if (type=='time')
               {
-                       return '<br> <table><tr><td>VIEW EVENTS BY:'+
+                       return '<br> VIEW EVENTS BY:'+
                                       '<select onchange="loadXMLDoc(this.value)">' +
                                       '<option value="location">NEAR ME</option>' +
                                         '<option selected="selected" value="time">HAPPENING SOON</option>' +
                                         '<option value="user">CREATED BY ME</option>'+
-                                    '</select> </td></tr>'  
+                                    '</select><br>'  
               } 
-              else if (type=='all')
+              else if (type=='attendance')
               {
-
-                        return '<br> <table><tr><td>VIEW EVENTS BY:'+
+                        return '<br> VIEW EVENTS BY:'+
                                       '<select onchange="loadXMLDoc(this.value)">' +
                                       '<option value="location">NEAR ME</option>' +
                                         '<option value="time">HAPPENING SOON</option>' +
                                         '<option value="user">CREATED BY ME</option>'+
-                                    '</select> </td></tr>'  
+                                    '</select><br>'  
+              }
+              else if (type=='all')
+              {
+
+                        return '<br> VIEW EVENTS BY:'+
+                                      '<select onchange="loadXMLDoc(this.value)">' +
+                                      '<option value="location">NEAR ME</option>' +
+                                        '<option value="time">HAPPENING SOON</option>' +
+                                        '<option value="user">CREATED BY ME</option>'+
+                                    '</select> <br>'  
               }      
 
         }
@@ -300,8 +322,7 @@
 
 </div>
 </div>
-<div id="myDiv"></div>
-
+<div id="locationDiv" style="visibility:hidden"></div>
  
 
 <%= link_to 'New Event', new_event_path %>
