@@ -23,5 +23,21 @@ User.create(name: 'admin', email: 'random@brandeis.edu',
             password: pw, password_confirmation: pw)
 end
 
+
+#make tags
+Tag.create(title: 'academic')
+Tag.create(title: 'competition')
+Tag.create(title: 'entertainment')
+Tag.create(title: 'food')
+Tag.create(title: 'game')
+Tag.create(title: 'off-campus')
+Tag.create(title: 'music')
+Tag.create(title: 'party')
+Tag.create(title: 'sports')
+
+
+
+
+
 # 100.times { Fabricate(:attendance) }
 # 100.times { Fabricate(:event) }
