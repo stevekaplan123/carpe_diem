@@ -37,9 +37,9 @@ class EventsController < ApplicationController
        elsif whichType == "time"
           @events = filterByTime(Time.now)
        elsif whichType == "user"
-          @events = filterByUser(params[:user])
+          @events = filterByUser(current_user.id)
         elsif whichType == "attendance"
-          @events = filterByAttendance(params[:attending])
+          @events = filterByAttendance(params[:attendant])
        else
           respond_to do |format|
             format.json { redirect_to events_url, notice: 'INVALID FILTERING TYPE.'}
@@ -145,9 +145,27 @@ class EventsController < ApplicationController
 
   ##Filtering functions start here
 
+  def filterByTime(time)
+      # how do we define "soon" when the maximum amount of hours is 24?
+      # we will use a reasonable definition of 4 hours
+      # subtract five hours because of ETS to UTC conversion
+      @events = Event.where(time_occurrence: (Time.now-5.hours)..(Time.now-1.hours))
+      #@events = Event.where(time_occurrence: (Time.now)..(Time.now+4.hours))
+
+  end
+
+  def filterByUser(user)
+     @events = Event.where(creator_id: user)
+  end
+
+  
   def filterByAttendance(username)
-    #in this case the user looked up all events attended by 'username'
-    #TO DO...
+    user = User.where(name: username)
+    unless user.empty?
+      user.first.events
+    else
+      return []
+    end
   end
 
   def calcDistance(orig_coords, end_coords)
@@ -176,19 +194,6 @@ class EventsController < ApplicationController
       filtered_events
   end
 
-  def filterByTime(time)
-      # how do we define "soon" when the maximum amount of hours is 24?
-      # we will use a reasonable definition of 4 hours
-      # subtract five hours because of ETS to UTC conversion
-      @events = Event.where(time_occurrence: (Time.now-5.hours)..(Time.now-1.hours))
-      #@events = Event.where(time_occurrence: (Time.now)..(Time.now+4.hours))
-
-  end
-
-  def filterByUser(user)
-     user = user.to_i
-     @events = Event.where(creator_id: user)
-  end
 
 
   private
