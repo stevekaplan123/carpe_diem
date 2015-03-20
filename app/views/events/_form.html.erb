@@ -111,6 +111,7 @@ select#usertime_hourmin_5i{
   
   <div class="field">
   	
+  	<label for="tag_ids_">Select up to 3 Tags</label><br>
   	<% @tags.each do |tag| %>
   		<li>
   	  	<%= check_box_tag 'tag_ids[]', tag.id %>
