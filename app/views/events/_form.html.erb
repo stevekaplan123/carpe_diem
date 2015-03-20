@@ -109,7 +109,17 @@ select#usertime_hourmin_5i{
   </div>
   
   
+  <div class="field">
+  	
+  	<% @tags.each do |tag| %>
+  		<li>
+  	  	<%= check_box_tag 'tag_ids[]', tag.id %>
+  	  	<%= h tag.name %>
   
+  		</li>
+  	<% end %>
+
+  </div>
   
 
 </div>
