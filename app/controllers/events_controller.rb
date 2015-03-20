@@ -69,7 +69,7 @@ class EventsController < ApplicationController
   # POST /events.json
   def create
   
-  
+  	@tags = Tag.all
     @event = Event.new(event_params)
     
 
@@ -77,8 +77,8 @@ class EventsController < ApplicationController
     @event.attendances.build(user_id: session[:user_id])
 
 
-	#######important
-	@event.event_tags.build(event_id: params[:id], tag_id: params[:tags][:tag_id])
+	#######important; 
+	#@event.event_tags.build(event_id: params[:id], tag_id: params[:tag_ids][0])
 
 
 	#steps to put data into time_occurrence field
@@ -107,7 +107,8 @@ class EventsController < ApplicationController
         
         
         #######important
-        EventTag.create(event_id: params[:id], tag_id: params[:tags][:tag_id])
+        #add validation for amount of event_tags to event model?
+        #EventTag.create(event_id: params[:id], tag_id: params[:tags][:tag_id])
         
         format.html { redirect_to @event, notice: 'Event was successfully created.' }
         format.json { render :show, status: :created, location: @event }

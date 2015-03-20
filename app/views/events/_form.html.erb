@@ -37,6 +37,18 @@ select#usertime_hourmin_5i{
 
 }
 
+div#checkboxes {
+	float: left;
+	width: 15%;
+	padding: 4px ;
+  
+
+}
+div#checkboxes_labels {
+	margin-left:  15%;
+	padding: 4px ;
+
+}
 
 </style>
 
@@ -113,11 +125,14 @@ select#usertime_hourmin_5i{
   	
   	<label for="tag_ids_">Select up to 3 Tags</label><br>
   	<% @tags.each do |tag| %>
-  		<li>
+  		
+  		<div id="checkboxes">
   	  	<%= check_box_tag 'tag_ids[]', tag.id %>
+  	  	</div>
+  	  	<div id="checkboxes_labels">
   	  	<%= h tag.name %>
-  
-  		</li>
+  		</div>
+  		<br>
   	<% end %>
 
   </div>
