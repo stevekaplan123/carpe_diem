@@ -19,6 +19,11 @@ class EventsController < ApplicationController
     @event.attendances.each do |a|
       @attendees.push(User.find(a.user_id).name)
     end
+    
+    @tags_fromtable = []
+    current_event_id = params[:id]
+    @tags = EventTag.where(event_id: current_event_id)
+        
   end
 
 

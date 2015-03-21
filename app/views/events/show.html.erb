@@ -41,5 +41,18 @@
   <%= @attendees %>
 </p>
 
+<p>
+	<strong>Tags:</strong>
+	<% if @tags.nil? %>
+		None	
+	<% else %>
+		<% puts @tags.column_names %>
+		<% @tags.each do |tag| %>
+			<%= tag.tag_name %>, 		
+		<% end %>
+	<% end %>
+	
+</p>
+
 <%= link_to 'Edit', edit_event_path(@event) %> |
 <%= link_to 'Back', events_path %>
