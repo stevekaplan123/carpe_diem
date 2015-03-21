@@ -67,6 +67,7 @@ class EventsController < ApplicationController
 
   # GET /events/1/edit
   def edit
+  	@tags = Tag.all
   end
 
   # POST /events
@@ -133,6 +134,7 @@ class EventsController < ApplicationController
   # PATCH/PUT /events/1
   # PATCH/PUT /events/1.json
   def update
+  	@tags = Tag.all
     respond_to do |format|
       if @event.update(event_params)
         format.html { redirect_to @event, notice: 'Event was successfully updated.' }
