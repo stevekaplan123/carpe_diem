@@ -50,20 +50,15 @@
 		<% @tags.each do |tag| %>
 			<%= tag.tag_name %>, 		
 		<% end %>
-	<% end %>
-	
+	<% end %>	
 </p>
 
 <p>
 	<strong>Tags (Event Field):</strong>
 	<% tags_array = @event.tags.split(",") %>
-	<% tags_array.each do |tag_id| %>
-		<%= Tag.find(tag_id).name %>, 
-			
-	<% end %>
-	
-
-	
+	<% name_array = [] %>
+	<% tags_array.each { |tag_id| name_array.push(Tag.find(tag_id).name) } %>
+	<%= name_array.join(", ") %>	
 </p>
 
 <%= link_to 'Edit', edit_event_path(@event) %> |

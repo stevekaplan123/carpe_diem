@@ -6,12 +6,14 @@ class Event < ActiveRecord::Base
     
     validates :name, :description, presence: true
     validates :latitude, :longitude, presence: true
-    validates :tags, presence: true
     
     #validates user selected a spot on the brandeis map OR entered in a valid location in the location field
 
     #validates event doesn't occur in the past
     validate :valid_dates
+    
+    #validates there are not more than 3 tags selected
+    validate :num_tags
     
 
     
@@ -33,5 +35,20 @@ class Event < ActiveRecord::Base
             self.errors.add :start_time, 'event cannot occur more than 24 hours in the future'
         end
     end
+    
+    def num_tags
+    	
+    	if tags.nil? 
+    		self.errors.add :tag_error, ": must select at least 1 tag"
+    	else	 	
+    		max = 3
+			array_of_tags = tags.split(",")
+			if array_of_tags.length > max
+				self.errors.add :tag_error, ": cannot select more than #{max} tags"
+			end    
+		end
+    end
+    
+    
 
 end
