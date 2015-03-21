@@ -42,7 +42,7 @@
 </p>
 
 <p>
-	<strong>Tags:</strong>
+	<strong>Tags (Table Lookup):</strong>
 	<% if @tags.nil? %>
 		None	
 	<% else %>
@@ -51,6 +51,12 @@
 			<%= tag.tag_name %>, 		
 		<% end %>
 	<% end %>
+	
+</p>
+
+<p>
+	<strong>Tags (Event Field):</strong>
+	<%= @event.tags %>
 	
 </p>
 
