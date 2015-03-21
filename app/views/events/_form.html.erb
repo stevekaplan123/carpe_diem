@@ -11,6 +11,8 @@ div#main_form {
 
 }
 
+
+
 div#radio1, div#radio2 {
 	float: left;
 	width: 15%;
@@ -40,15 +42,33 @@ select#usertime_hourmin_5i{
 div#checkboxes {
 	float: left;
 	width: 15%;
-	padding: 4px ;
-  
+	padding: 3px ;
 
 }
 div#checkboxes_labels {
 	margin-left:  15%;
-	padding: 4px ;
+	padding: 3px ;
+	
+}
+
+
+div#checkboxcol1 {
+	float: left;
+	width: 30%;
 
 }
+div#checkboxcol2 {
+	float: left;
+	width: 30%
+
+}
+div#checkboxcol3 {
+	float: left;
+	width: 30%
+
+}
+
+
 
 </style>
 
@@ -124,23 +144,40 @@ div#checkboxes_labels {
   <div class="field">
   	
   	<label for="tag_ids_">Select up to 3 Tags</label><br>
+  	<div id="all_checkboxes">
+  	<% col = 1 %>
+  	<% iter = 1 %>
+  	
   	<% @tags.each do |tag| %>
   		
-  		<div id="checkboxes">
-  	  	<%= check_box_tag 'tag_ids[]', tag.id %>
-  	  	</div>
-  	  	<div id="checkboxes_labels">
-  	  	<%= h tag.name %>
+  		
+  		<% if iter == 4 %>
+  			<% col = 1 %>
+  			<% iter = 1 %>
+  		<% end %>
+  		<% ckbox_id = "checkboxcol#{col}"%>
+  		
+  		<div id="<%= ckbox_id %>" >
+  			<div id="checkboxes">
+  	  			<%= check_box_tag 'tag_ids[]', tag.id %>
+  	  		</div>
+  	  		<div id="checkboxes_labels">
+  	  			<%= h tag.name %>
+  			</div>
+  			
   		</div>
-  		<br>
+  		<% col += 1 %>
+  		<% iter += 1 %>
   	<% end %>
 
+  </div>
   </div>
   
 
 </div>
-    <div id="map_section">
-  <div id="map_canvas" style="width: 800px; height: 400px;"></div>
+
+<div id="map_section">
+  <div id="map_canvas" style="width: 750px; height: 400px;"></div>
 </div>
 
   <div class="actions">
