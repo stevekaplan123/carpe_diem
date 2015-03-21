@@ -6,6 +6,7 @@ class Event < ActiveRecord::Base
     
     validates :name, :description, presence: true
     validates :latitude, :longitude, presence: true
+    validates :tags, presence: true
     
     #validates user selected a spot on the brandeis map OR entered in a valid location in the location field
 

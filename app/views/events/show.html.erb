@@ -58,7 +58,7 @@
 	<strong>Tags (Event Field):</strong>
 	<% tags_array = @event.tags.split(",") %>
 	<% tags_array.each do |tag_id| %>
-		<%= Tag.find(tag_id).name %>
+		<%= Tag.find(tag_id).name %>, 
 			
 	<% end %>
 	

@@ -77,47 +77,33 @@ class EventsController < ApplicationController
   	@tags = Tag.all
     @event = Event.new(event_params)
     
-
     #assign current user's id to created event
     @event.attendances.build(user_id: session[:user_id])
-
 
 	#######important; 
 	#@event.event_tags.build(event_id: params[:id], tag_id: params[:tag_ids][0])
 
-
 	#steps to put data into time_occurrence field
-    #puts "event_day in params: #{params[:event_day]}"
     day_int = params[:event_day].to_date
-
-    #puts "day int created: #{day_int}"
     event_day = DateTime.new(day_int.year, day_int.month, day_int.day, 1, 1, 1)
-
-    #puts "event_day created: #{event_day}"
-
-    #puts "let's do a check: #{params[:usertime]}"
-    #puts "let's access it: #{params[:usertime]['hourmin(1i)']}"
     thehour = params[:usertime]["hourmin(4i)"].to_i
-
-    #puts "thehour created: #{thehour}"
     themin = params[:usertime]["hourmin(5i)"].to_i
     @event.time_occurrence = DateTime.new(event_day.year, event_day.month, event_day.day, thehour, themin, 59)
-    puts "here: #{@event.time_occurrence}"
 
-	#tag field is comma separated
+	#steps to put data into :tags field. tag field is comma separated
 	puts "all params: #{params}"
 	tag_array = params[:tag_ids]
-	tag_string = tag_array.join(",")
-	@event.tags = tag_string
+	if !tag_array.nil?
+		tag_string = tag_array.join(",")
+		@event.tags = tag_string
+	end
 	
-
     respond_to do |format|
       if @event.save
         increase_num_events(current_user)
         #link attendance to created event
         Attendance.create(event_id: @event.id, user_id: session[:user_id])
-        
-        
+                
         #######important
         #add validation for amount of event_tags to event model?
         #EventTag.create(event_id: params[:id], tag_id: params[:tags][:tag_id])
