@@ -56,7 +56,13 @@
 
 <p>
 	<strong>Tags (Event Field):</strong>
-	<%= @event.tags %>
+	<% tags_array = @event.tags.split(",") %>
+	<% tags_array.each do |tag_id| %>
+		<%= Tag.find(tag_id).name %>
+			
+	<% end %>
+	
+
 	
 </p>
 
