@@ -21,7 +21,7 @@ class EventsController < ApplicationController
     end
     
     current_event_id = params[:id]
-    @tags = EventTag.where(event_id: current_event_id)
+    @event_tags = EventTag.where(event_id: current_event_id)
         
   end
 
@@ -78,9 +78,6 @@ class EventsController < ApplicationController
     @event = Event.new(event_params)
     
 
-	#######important; 
-	#@event.event_tags.build(event_id: params[:id], tag_id: params[:tag_ids][0])
-
 	#steps to put data into time_occurrence field
     day_int = params[:event_day].to_date
     event_day = DateTime.new(day_int.year, day_int.month, day_int.day, 1, 1, 1)
@@ -103,10 +100,8 @@ class EventsController < ApplicationController
         #assign current user's id to created event
         @event.attendances.create(user_id: session[:user_id])
 
-        #######important
-        #add validation for amount of event_tags to event model?
+        #adds tags to event_tags table
         tag_array.each do |chosen_tag|
-        	puts "do a loop"
         	@event.event_tags.create(event_id: params[:id], event_name: params[:event][:name], tag_id: chosen_tag.to_i, tag_name: Tag.find(chosen_tag).name)
         end
         

@@ -43,11 +43,11 @@
 
 <p>
 	<strong>Tags (Table Lookup):</strong>
-	<% if @tags.nil? %>
+	<% if @event_tags.nil? %>
 		None	
 	<% else %>
-		<% puts @tags.column_names %>
-		<% @tags.each do |tag| %>
+		<% puts @event_tags.column_names %>
+		<% @event_tags.each do |tag| %>
 			<%= tag.tag_name %>, 		
 		<% end %>
 	<% end %>	
