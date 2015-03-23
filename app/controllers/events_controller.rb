@@ -77,8 +77,6 @@ class EventsController < ApplicationController
   	@tags = Tag.all
     @event = Event.new(event_params)
     
-    #assign current user's id to created event
-    @event.attendances.build(user_id: session[:user_id])
 
 	#######important; 
 	#@event.event_tags.build(event_id: params[:id], tag_id: params[:tag_ids][0])
@@ -101,9 +99,9 @@ class EventsController < ApplicationController
     respond_to do |format|
       if @event.save
         increase_num_events(current_user)
-        #link attendance to created event
-        Attendance.create(event_id: @event.id, user_id: session[:user_id])
-                
+        #assign current user's id to created event
+        @event.attendances.create(user_id: session[:user_id])
+
         #######important
         #add validation for amount of event_tags to event model?
         #EventTag.create(event_id: params[:id], tag_id: params[:tags][:tag_id])
