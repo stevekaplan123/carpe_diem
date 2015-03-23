@@ -26,12 +26,10 @@ class Event < ActiveRecord::Base
         puts time_occurrence
 
         if time_occurrence < now
-            puts "noooo"
             self.errors.add :start_time, 'event cannot occur in the past!'
          #validates event doesn't occur more than 24 hours in the future
          #now.utc_offset
         elsif time_occurrence >= DateTime.new(now.year, now.month, (now.day + 1), now.hour, now.min, now.sec)
-            puts "nooo again"
             self.errors.add :start_time, 'event cannot occur more than 24 hours in the future'
         end
     end

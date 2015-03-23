@@ -95,6 +95,7 @@ class EventsController < ApplicationController
 		tag_string = tag_array.join(",")
 		@event.tags = tag_string
 	end
+	puts "size of tag_array: #{tag_array.size}"
 	
     respond_to do |format|
       if @event.save
@@ -104,7 +105,10 @@ class EventsController < ApplicationController
 
         #######important
         #add validation for amount of event_tags to event model?
-        #EventTag.create(event_id: params[:id], tag_id: params[:tags][:tag_id])
+        tag_array.each do |chosen_tag|
+        	puts "do a loop"
+        	@event.event_tags.create(event_id: params[:id], event_name: params[:event][:name], tag_id: chosen_tag.to_i, tag_name: Tag.find(chosen_tag).name)
+        end
         
         format.html { redirect_to @event, notice: 'Event was successfully created.' }
         format.json { render :show, status: :created, location: @event }
