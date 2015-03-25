@@ -24,6 +24,8 @@
         var me_window =  null; 
         var loc = null;
         var windows = [];
+        var tag = null;
+        var attendances = []
 
 
         
@@ -36,6 +38,7 @@
             };
             gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
 
+            loadAttendances()
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(success, error); 
@@ -46,8 +49,9 @@
             
        }
 
+
         function loadXMLDoc(type)
-        {
+        {          
           if (loc=="error") //if loc error and no value set on map
           {
               alert("In order to see events near you, either allow geolocation on your browser or select your position on the map.")
@@ -65,6 +69,8 @@
                   clearWindows()
 
                   //start re-setting the menu on top of the navigation bar with preEventHTML() 
+                  document.getElementById("navbar").innerHTML='<%= form_tag("/events/signup", method: “put”) do %>'
+
                   document.getElementById("navbar").innerHTML=preEventHTML(type)
 
                     //now show the filtered events
@@ -84,9 +90,12 @@
                         //repopulate the navigation bar with the events filtered by 'type'
                         document.getElementById("navbar").innerHTML += eventHTML(event_id, creator_id, xmlhttp) 
                     }    
+
+                    document.getElementById("navbar").innerHTML="<% end %>"
+
                 }
               }
-              xmlhttp.open("GET","/events/filter.json?type="+type+"&location="+loc,true);
+              xmlhttp.open("GET","/events/filter.json?type="+type+"&location="+loc+"&tag="+tag,true);
               xmlhttp.send();
           }
 
@@ -94,6 +103,7 @@
         function success(position) {
            document.getElementById("locationDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude; 
            loc = document.getElementById("locationDiv").innerHTML.split(", ")
+           tag = "academic"
            var latitude = loc[0]
            var longitude = loc[1]
            markMe(latitude, longitude)
@@ -114,6 +124,15 @@
             });
             loadXMLDoc("user")
          }
+
+
+        function loadAttendances()
+        {
+          <% current_user.attendances.each do |attending| %>
+               attendances.push(<%= attending[“event_id”] %>)
+          <% end %>
+        }
+
 
         function loadXMLHTTP()
         {
@@ -167,19 +186,28 @@
           var append_to="";
           var current_name = '<%= current_user.name %>';
           var current_id = <%= current_user.id %>
-          if (current_name=="admin" || current_id==creator_id)
+          var alreadyGoing = attendances.indexOf(event_id);
+
+          if (current_id==creator_id || current_name=="admin")
           {
-            append_to= '<a href="/events/'+event_id+
+            append_to =  '<a data-confirm="Are you sure?" rel="nofollow"' +
+                        'data-method="delete" href="/events/'+event_id+
+                        '">Cancel Event</a>'+
+                        '<a href="/events/'+event_id+
                         '">Show</a> | ' +
                         '<a href="/events/'+event_id+
-                        '/edit">Edit</a> | ' +
-                        '<a data-confirm="Are you sure?" rel="nofollow"' +
-                        'data-method="delete" href="/events/'+event_id+
-                        '">Destroy</a>'
+                        '/edit">Edit</a>'
           }
-          else 
+          else if (alreadyGoing < 0)
           {
-             append_to = '<a href="/events/'+event_id+
+            append_to = '<input type="submit" name="sign_up" value="Sign Up!">'+
+                        '<a href="/events/'+event_id+
+                        '">Show</a>'
+          }
+          else if (alreadyGoing >= 0)
+          {
+            append_to = '<input type="submit" name="not_going" value="I Don\'t Want To Go.">'+
+                        '<a href="/events/'+event_id+
                         '">Show</a>'
           }
 
@@ -189,10 +217,6 @@
                     JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
                   'style="cursor: pointer"><b><font color="blue">' +
                     JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></font></span>' +
-                   '<input type="button" onclick="OpenWindow(&quot;'+
-                    JSON.parse(xmlhttp.responseText)[i]["name"]+
-                    '&quot;, &quot;attendance&quot;)"'+
-                   'value="Get Attendance!"/>'+
                    append_to;
 
         }
@@ -206,6 +230,7 @@
                                       '<option selected="selected" value="location">NEAR ME</option>' +
                                         '<option value="time">HAPPENING SOON</option>' +
                                         '<option value="user">CREATED BY ME</option>'+
+                                        '<option value="tag">TAG</option>'
                                     '</select><br> '  
               }
               else if (type=='user')
@@ -215,6 +240,7 @@
                                       '<option value="location">NEAR ME</option>' +
                                         '<option value="time">HAPPENING SOON</option>' +
                                         '<option selected="selected" value="user">CREATED BY ME</option>'+
+                                        '<option value="tag">TAG</option>'+
                                     '</select><br> '  
               } 
               else if (type=='time')
@@ -224,15 +250,17 @@
                                       '<option value="location">NEAR ME</option>' +
                                         '<option selected="selected" value="time">HAPPENING SOON</option>' +
                                         '<option value="user">CREATED BY ME</option>'+
+                                        '<option value="tag">TAG</option>'+
                                     '</select><br>'  
               } 
-              else if (type=='attendance')
+              else if (type=='tag')
               {
                         return '<br> VIEW EVENTS BY:'+
                                       '<select onchange="loadXMLDoc(this.value)">' +
                                       '<option value="location">NEAR ME</option>' +
                                         '<option value="time">HAPPENING SOON</option>' +
                                         '<option value="user">CREATED BY ME</option>'+
+                                        '<option selected="selected" value="tag">TAG</option>'+
                                     '</select><br>'  
               }
               else if (type=='all')
@@ -251,25 +279,7 @@
        
           function OpenWindow(event_info, type)
           {
-            if (type=='attendance')
-            {
-                if (attendance_window != null)
-                  { 
-                    attendance_window.close()
-                  }
-
-                attendance_window = new google.maps.InfoWindow({
-                    content: "EVENTUALLY THIS WILL LIST THE ATTENDANCE for the event "+event_info,
-                    position: new google.maps.LatLng(42.3650, -71.258595) 
-                    //this position is on the road just outside the entrace to brandeis
-
-                 });
-               attendance_window.open(gMap);
-               windows.push(attendance_window)
-           }
-           else
-           {
-
+  
               var info=event_info.split("+")
               var lat=Number(info[0])
               var lng=Number(info[1])
@@ -285,7 +295,7 @@
                  });
                desc_window.open(gMap);
                windows.push(desc_window)
-           }
+           
           }
 
           function clearWindows()
