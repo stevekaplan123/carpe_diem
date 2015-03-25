@@ -302,6 +302,7 @@ class EventsController < ApplicationController
     def event_params
       event_params = params.require(:event).permit(:name, :time_occurrence, :location, :longitude, :latitude, :description)
       event_params[:creator_id] = current_user.id
+      event_params[:user] = current_user
       event_params
     end
 
@@ -314,7 +315,7 @@ class EventsController < ApplicationController
     # Confirms the correct user or admin
     def correct_user
       set_event
-      unless @event.creator_id == current_user.id || is_admin?
+      unless @event.user == current_user || is_admin?
         redirect_to root_path
       end
     end

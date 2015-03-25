@@ -1,5 +1,6 @@
 class User < ActiveRecord::Base
   has_many :attendances
+  has_many :events
   has_many :events, through: :attendances
 
   before_save :downcase_fields, :default_options
