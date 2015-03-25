@@ -47,9 +47,12 @@
 		None	
 	<% else %>
 		<% puts @event_tags.column_names %>
+		<% eventtag_array = []%>
 		<% @event_tags.each do |tag| %>
-			<%= tag.tag_name %>, 		
+			<% eventtag_array.push(tag.tag_name)%>
+			 		
 		<% end %>
+		<%= eventtag_array.join(", ")%>
 	<% end %>	
 </p>
 
