@@ -2,6 +2,8 @@ class Event < ActiveRecord::Base
     has_many :attendances
     has_many :users, through: :attendances
     has_many :event_tags
+    
+    accepts_nested_attributes_for :event_tags
 
     
     validates :name, :description, presence: true
