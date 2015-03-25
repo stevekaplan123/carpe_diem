@@ -189,19 +189,22 @@ class EventsController < ApplicationController
       	elsif num_newtags > num_oldtags
       		
       		old_event_tags.each do |tags|
-      			if iter > num_oldtags
-      				#create
-      				@event.event_tags.create(event_id: params[:id], event_name: params[:event][:name], tag_id: chosen_tag.to_i, tag_name: Tag.find(chosen_tag).name)
-      				
-      			else
-      				#update old event_tag
-      				tags.tag_id = tag_array[iter - 1].to_i
-    				tags.tag_name = Tag.find(tag_array[iter - 1]).name
-    				tags.save
-    				iter += 1
-      				
-      			end     			
+      			#update old event_tag
+      			tags.tag_id = tag_array[iter - 1].to_i
+    			tags.tag_name = Tag.find(tag_array[iter - 1]).name
+    			tags.save
+    			iter += 1
+      				    			 
+      		end  
+      			
+      		#create new tags
+      		curr_tag_array_index = iter - 1
+      		(curr_tag_array_index..(num_newtags - 1)).each do |i|
+      			puts "i: #{i}"
+      			puts "tag_array index: #{tag_array[i]}"
+      			@event.event_tags.create(event_id: params[:id], event_name: params[:event][:name], tag_id: tag_array[i].to_i, tag_name: Tag.find(tag_array[i]).name)
       		end
+      			     		
       	    	
       	
       	#only update
