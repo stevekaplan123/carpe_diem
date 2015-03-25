@@ -2,6 +2,7 @@ require 'time'
 require 'byebug'
 class EventsController < ApplicationController
 
+  before_action :correct_user, only: [:edit, :update, :destroy]
   before_action :set_event, only: [:show, :edit, :update, :destroy]
 
   # GET /events
@@ -19,10 +20,10 @@ class EventsController < ApplicationController
     @event.attendances.each do |a|
       @attendees.push(User.find(a.user_id).name)
     end
-    
+
     current_event_id = params[:id]
     @event_tags = EventTag.where(event_id: current_event_id)
-        
+
   end
 
 
@@ -73,10 +74,10 @@ class EventsController < ApplicationController
   # POST /events
   # POST /events.json
   def create
-  
+
   	@tags = Tag.all
     @event = Event.new(event_params)
-    
+
 
 	#steps to put data into time_occurrence field
     day_int = params[:event_day].to_date
@@ -93,7 +94,7 @@ class EventsController < ApplicationController
 		@event.tags = tag_string
 	end
 	puts "size of tag_array: #{tag_array.size}"
-	
+
     respond_to do |format|
       if @event.save
         increase_num_events(current_user)
@@ -104,7 +105,7 @@ class EventsController < ApplicationController
         tag_array.each do |chosen_tag|
         	@event.event_tags.create(event_id: params[:id], event_name: params[:event][:name], tag_id: chosen_tag.to_i, tag_name: Tag.find(chosen_tag).name)
         end
-        
+
         format.html { redirect_to @event, notice: 'Event was successfully created.' }
         format.json { render :show, status: :created, location: @event }
       else
@@ -250,7 +251,7 @@ class EventsController < ApplicationController
      @events = Event.where(creator_id: user)
   end
 
-  
+
   def filterByAttendance(username)
     user = User.where(name: username)
     unless user.empty?
@@ -305,5 +306,13 @@ class EventsController < ApplicationController
     # increase the num_events in current user by 1
     def increase_num_events(user)
       user.update_attribute(:num_events, user.num_events + 1)
+    end
+
+    # Confirms the correct user or admin
+    def correct_user
+      set_event
+      unless @event.creator_id == current_user.id || is_admin?
+        redirect_to root_path
+      end
     end
 end
