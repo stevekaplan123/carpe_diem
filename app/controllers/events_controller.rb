@@ -203,6 +203,7 @@ class EventsController < ApplicationController
     def event_params
       event_params = params.require(:event).permit(:name, :time_occurrence, :location, :longitude, :latitude, :description)
       event_params[:creator_id] = current_user.id
+      event_params[:user] = current_user
       event_params
     end
 
