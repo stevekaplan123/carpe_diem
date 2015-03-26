@@ -75,30 +75,20 @@ class EventsController < ApplicationController
   #   event occurring within a few hours, and events created by the same user
   # 'arg' is the current location of user, or current time, or name of user
  def filter
-       whichType = params[:type]
-       @events = []
-
-       if whichType == "location"
-          lat, lng = params[:location].split(",")
-          @events = filterByLocation(lat, lng)
-       elsif whichType == "time"
-          @events = filterByTime(Time.now)
-       elsif whichType == "user"
-          @events = filterByUser(current_user.id)
-       elsif whichType == "tag"
-          @events = filterByTag(params[:tag])
-       else
-          respond_to do |format|
-            format.json { redirect_to events_url, notice: 'INVALID FILTERING TYPE.'}
-            format.html { redirect_to events_url, notice: 'INVALID FILTERING TYPE.' }
-          end
-
+       filter_events = Filter.new(params[:type], current_user.id, params[:location], params[:tag])
+       @events = filter_events.events
+      if @events.empty?
+        respond_to do |format|
+          format.json { redirect_to events_url, notice: 'INVALID FILTERING TYPE.'}
+          format.html { redirect_to events_url, notice: 'INVALID FILTERING TYPE.' }
+        end
       end
 
-      respond_to do |format|
-          format.json { render :json => @events}
-      end
-  end
+
+      # respond_to do |format|
+      #     format.json { render :json => @events}
+      # end
+ end
 
 
 
@@ -135,7 +125,9 @@ class EventsController < ApplicationController
 		tag_string = tag_array.join(",")
 		@event.tags = tag_string
 	end
-	puts "size of tag_array: #{tag_array.size}"
+  unless tag_array == nil
+  	puts "size of tag_array: #{tag_array.size}"
+  end
 
     respond_to do |format|
       if @event.save
@@ -151,7 +143,11 @@ class EventsController < ApplicationController
         format.html { redirect_to @event, notice: 'Event was successfully created.' }
         format.json { render :show, status: :created, location: @event }
       else
-        format.html { render :new }
+          error_msg = ""
+          @event.errors.full_messages.each do |msg|
+            error_msg += msg+"\n"
+          end
+        format.html { redirect_to "/events/new", notice: error_msg }  #was render :new
         format.json { render json: @event.errors, status: :unprocessable_entity }
       end
     end
@@ -265,7 +261,11 @@ class EventsController < ApplicationController
         format.html { redirect_to @event, notice: 'Event was successfully updated.' }
         format.json { render :show, status: :ok, location: @event }
       else
-        format.html { render :edit }
+          error_msg = ""
+          @event.errors.full_messages.each do |msg|
+            error_msg += msg+"\n"
+          end
+        format.html { redirect_to "/events/"+params[:id]+"/edit", notice: error_msg }
         format.json { render json: @event.errors, status: :unprocessable_entity }
       end
     end
@@ -293,65 +293,6 @@ class EventsController < ApplicationController
       format.json { head :no_content }
     end
   end
-
-  ##Filtering functions start here
-
-  def filterByTag(tag)
-    puts "********************************"
-    puts tag
-    events_tag = EventTag.where(tag_name: tag)
-    events = []
-    events_tag.each do |et|
-      temp_event = Event.find_by(id: et.event_id)
-      if temp_event 
-          events.push(temp_event)
-      end
-    end
-    events
-  end
-
-  def filterByTime(time)
-      # how do we define "soon" when the maximum amount of hours is 24?
-      # we will use a reasonable definition of 4 hours
-      # subtract five hours because of ETS to UTC conversion
-      events = Event.where(time_occurrence: (Time.now-5.hours)..(Time.now-1.hours))
-      #@events = Event.where(time_occurrence: (Time.now)..(Time.now+4.hours))
-      events
-  end
-
-  def filterByUser(user)
-     events = Event.where(creator_id: user)
-     events
-  end
-
-
-  def calcDistance(orig_coords, end_coords)
-    x=orig_coords[0]-end_coords[0]
-    y=orig_coords[1]-end_coords[1]
-    Math.sqrt(x*x + y*y)
-  end
-
-  def filterByLocation(lat, lng)
-      #  0.008 is distance from North to Theater
-      #  0.002 is distance from North to Usdan
-      #  0.0036 is distance from Gosman Gym to Usdan
-      #  a reasonable distance to use to discern whether I am "close" to an event
-      #  is a distance of 0.0045
-
-      my_coords = [lat.to_f, lng.to_f]
-      @events = Event.all
-      filtered_events = []
-      @events.each do |event|
-          event_coords = [event.latitude.to_f, event.longitude.to_f]
-          dist = calcDistance(my_coords, event_coords)
-          if dist <= 0.0045
-            filtered_events.push(event)
-          end
-      end
-      filtered_events
-  end
-
-
 
   private
     # Use callbacks to share common setup or constraints between actions.

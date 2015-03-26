@@ -1,6 +1,6 @@
 <h1>New Event</h1>
 
-
+<p id="notice"><%= notice %></p>
 
 
 <%= render 'form' %>
@@ -17,7 +17,7 @@
         if( !localStorage.getItem( 'firstLoad' ) )
         {
           localStorage[ 'firstLoad' ] = true;
-          window.location.reload();
+          window.location.reload()
         }  
         else
           localStorage.removeItem( 'firstLoad' );

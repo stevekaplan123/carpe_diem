@@ -1,6 +1,4 @@
-<p id="notice"><%= notice %></p>
 
-<p id="notice"><%= notice %></p>
 
 <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script type='text/javascript'>
@@ -12,7 +10,6 @@
             if( !localStorage.getItem( 'firstLoad' ) )
             {
               localStorage[ 'firstLoad' ] = true;
-              window.location.reload();
             }  
             else
               localStorage.removeItem( 'firstLoad' );
@@ -102,7 +99,7 @@
         function success(position) {
            document.getElementById("locationDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude; 
            loc = document.getElementById("locationDiv").innerHTML.split(", ")
-           tag = "academic"
+           tag = ""
            var latitude = loc[0]
            var longitude = loc[1]
            markMe(latitude, longitude)
@@ -190,7 +187,6 @@
           var current_name = '<%= current_user.name %>';
           var current_id = <%= current_user.id %>
           var alreadyGoing = attendances.indexOf(event_id);
-          alert(alreadyGoing+"alreadyGoing")
 
           if (current_id==creator_id || current_name=="admin")
           {
