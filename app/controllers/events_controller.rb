@@ -11,6 +11,27 @@ class EventsController < ApplicationController
     @events = Event.all
   end
 
+
+  def signup
+    event_id = params[:event_id]
+    user_id = params[:user_id]
+
+    ## first create/delete an attendance 
+    if params[:whatAction]=="1"                              
+         #sign up for event
+        Attendance.create(event_id: event_id, user_id: user_id)
+        @event = Event.find_by(event_id)
+        redirect_to @event, notice: "You have successfully signed up for this event."
+        
+    elsif params[:whatAction]=="0"                            
+      #i dont want to go, cancel my attendance from the event
+        attendances = Attendance.where(event_id: event_id, user_id: user_id)
+        attendances.each do |att|
+          att.destroy 
+        end
+        redirect_to events_url, notice: "You are no longer signed up for this event."
+    end
+  end
   # GET /events/1
   # GET /events/1.json
   # Low efficiency, will have to check the database every time - Leifeng, 03/17
@@ -253,7 +274,8 @@ class EventsController < ApplicationController
   # DELETE /events/1
   # DELETE /events/1.json
   def destroy
-    e_id = @event["id"]
+     e_id = @event["id"]
+
 
     attendances = Attendance.where(event_id: e_id)
     attendances.each do |att|
