@@ -1,7 +1,5 @@
 <p id="notice"><%= notice %></p>
 
-<p id="notice"><%= notice %></p>
-
 <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script type='text/javascript'>
         //the following function causes page to refresh
@@ -190,7 +188,6 @@
           var current_name = '<%= current_user.name %>';
           var current_id = <%= current_user.id %>
           var alreadyGoing = attendances.indexOf(event_id);
-          alert(alreadyGoing+"alreadyGoing")
 
           if (current_id==creator_id || current_name=="admin")
           {
