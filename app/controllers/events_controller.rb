@@ -27,6 +27,27 @@ class EventsController < ApplicationController
   end
 
 
+  def signup
+    event_id = params[:event_id]
+    user_id = params[:user_id]
+
+    ## first create/delete an attendance 
+    if params[:whatAction]=="1"                              
+         #sign up for event
+        Attendance.create(event_id: event_id, user_id: user_id)
+        @event = Event.find_by(event_id)
+        redirect_to @event, notice: "You have successfully signed up for this event."
+        
+    elsif params[:whatAction]=="0"                            
+      #i dont want to go, cancel my attendance from the event
+        attendances = Attendance.where(event_id: event_id, user_id: user_id)
+        attendances.each do |att|
+          att.destroy 
+        end
+        redirect_to events_url, notice: "You are no longer signed up for this event."
+    end
+  end
+
   # GET /events/filter?type=X&arg=Y
   # 'type' is either location, time, or user
   #   in other words, events occurring at nearby location,
@@ -43,8 +64,8 @@ class EventsController < ApplicationController
           @events = filterByTime(Time.now)
        elsif whichType == "user"
           @events = filterByUser(current_user.id)
-        elsif whichType == "attendance"
-          @events = filterByAttendance(params[:attendant])
+       elsif whichType == "tag"
+          @events = filterByTag(params[:tag])
        else
           respond_to do |format|
             format.json { redirect_to events_url, notice: 'INVALID FILTERING TYPE.'}
@@ -232,37 +253,55 @@ class EventsController < ApplicationController
   # DELETE /events/1
   # DELETE /events/1.json
   def destroy
+    e_id = @event["id"]
+
+    attendances = Attendance.where(event_id: e_id)
+    attendances.each do |att|
+        att.destroy
+    end          
+
+    event_tags = EventTag.where(event_id: e_id)
+    event_tags.each do |etag|
+      etag.destroy
+    end
+    
     @event.destroy
     respond_to do |format|
-      format.html { redirect_to events_url, notice: 'Event was successfully destroyed.' }
+      format.html { redirect_to events_url, notice: 'Event was successfully cancelled.' }
       format.json { head :no_content }
     end
   end
 
   ##Filtering functions start here
 
+  def filterByTag(tag)
+    puts "********************************"
+    puts tag
+    events_tag = EventTag.where(tag_name: tag)
+    events = []
+    events_tag.each do |et|
+      temp_event = Event.find_by(id: et.event_id)
+      if temp_event 
+          events.push(temp_event)
+      end
+    end
+    events
+  end
+
   def filterByTime(time)
       # how do we define "soon" when the maximum amount of hours is 24?
       # we will use a reasonable definition of 4 hours
       # subtract five hours because of ETS to UTC conversion
-      @events = Event.where(time_occurrence: (Time.now-5.hours)..(Time.now-1.hours))
+      events = Event.where(time_occurrence: (Time.now-5.hours)..(Time.now-1.hours))
       #@events = Event.where(time_occurrence: (Time.now)..(Time.now+4.hours))
-
+      events
   end
 
   def filterByUser(user)
-     @events = Event.where(creator_id: user)
+     events = Event.where(creator_id: user)
+     events
   end
 
-
-  def filterByAttendance(username)
-    user = User.where(name: username)
-    unless user.empty?
-      user.first.events
-    else
-      return []
-    end
-  end
 
   def calcDistance(orig_coords, end_coords)
     x=orig_coords[0]-end_coords[0]

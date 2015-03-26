@@ -1,4 +1,6 @@
 
+<p id="notice"><%= notice %></p>
+
 <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script type='text/javascript'>
         //the following function causes page to refresh
@@ -69,8 +71,6 @@
                   clearWindows()
 
                   //start re-setting the menu on top of the navigation bar with preEventHTML() 
-                  document.getElementById("navbar").innerHTML='<%= form_tag("/events/signup", method: “put”) do %>'
-
                   document.getElementById("navbar").innerHTML=preEventHTML(type)
 
                     //now show the filtered events
@@ -90,8 +90,6 @@
                         //repopulate the navigation bar with the events filtered by 'type'
                         document.getElementById("navbar").innerHTML += eventHTML(event_id, creator_id, xmlhttp) 
                     }    
-
-                    document.getElementById("navbar").innerHTML="<% end %>"
 
                 }
               }
@@ -128,8 +126,10 @@
 
         function loadAttendances()
         {
+          var event_id;
           <% current_user.attendances.each do |attending| %>
-               attendances.push(<%= attending[“event_id”] %>)
+               event_id = '<%= attending['event_id'] %>'
+               attendances.push(event_id)
           <% end %>
         }
 
@@ -183,32 +183,35 @@
 
         function eventHTML(event_id, creator_id, xmlhttp)
         {
+                              //token=6OLjbvZ86MX4A2Y/hgcpG612KNRddl8wKsvKU7gEuKaRb0j/OHXofvGP2hLsxWe7BhEVicgdEqNxqHjCpFkXQ"
+
           var append_to="";
           var current_name = '<%= current_user.name %>';
           var current_id = <%= current_user.id %>
           var alreadyGoing = attendances.indexOf(event_id);
+          alert(alreadyGoing+"alreadyGoing")
 
           if (current_id==creator_id || current_name=="admin")
           {
             append_to =  '<a data-confirm="Are you sure?" rel="nofollow"' +
                         'data-method="delete" href="/events/'+event_id+
-                        '">Cancel Event</a>'+
+                        '">Cancel Event</a> | '+
                         '<a href="/events/'+event_id+
                         '">Show</a> | ' +
                         '<a href="/events/'+event_id+
-                        '/edit">Edit</a>'
+                        '/edit">Edit</a><br>'
           }
           else if (alreadyGoing < 0)
           {
-            append_to = '<input type="submit" name="sign_up" value="Sign Up!">'+
-                        '<a href="/events/'+event_id+
-                        '">Show</a>'
+            append_to = '<a data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+
+                        '&whatAction=1">Sign up!</a> | '+'<a href="/events/'+event_id+
+                        '">Show</a> <br> '
           }
           else if (alreadyGoing >= 0)
           {
-            append_to = '<input type="submit" name="not_going" value="I Don\'t Want To Go.">'+
-                        '<a href="/events/'+event_id+
-                        '">Show</a>'
+            append_to = '<a data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+
+                        '&whatAction=0">I Don\'t Want To Go</a> | '+'<a href="/events/'+event_id+
+                        '">Show</a> <br>'
           }
 
           return '<span onclick="OpenWindow(&quot;' +
@@ -216,7 +219,7 @@
                     JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
                     JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
                   'style="cursor: pointer"><b><font color="blue">' +
-                    JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></font></span>' +
+                    JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></font></span>   |   ' +
                    append_to;
 
         }
@@ -271,6 +274,7 @@
                                       '<option value="location">NEAR ME</option>' +
                                         '<option value="time">HAPPENING SOON</option>' +
                                         '<option value="user">CREATED BY ME</option>'+
+                                       '<option value="tag">TAG</option>'+
                                     '</select> <br>'  
               }      
 
@@ -325,7 +329,13 @@
 </style>
 <div id="container">
   <div id="navbar">
-
+<br>VIEW EVENTS BY:
+  <select onchange="loadXMLDoc(this.value)">
+  <option selected="selected" value="location">NEAR ME</option>
+  <option value="time">HAPPENING SOON</option>
+   <option value="user">CREATED BY ME</option>
+    <option value="tag">TAG</option>
+      </select><br> 
   </div>
   
   <div id="content">   <div id="map_canvas" style="width: 800px; height: 400px"></div>

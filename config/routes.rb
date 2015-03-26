@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   end
 
   get 'signup' => 'users#new'
+  put 'events/signup'
   get 'events/filter'
 
   resources :events do
