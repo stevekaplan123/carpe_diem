@@ -1,5 +1,4 @@
 
-<p id="notice"><%= notice %></p>
 
 <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script type='text/javascript'>
@@ -11,6 +10,7 @@
             if( !localStorage.getItem( 'firstLoad' ) )
             {
               localStorage[ 'firstLoad' ] = true;
+              window.location.reload()
             }  
             else
               localStorage.removeItem( 'firstLoad' );
@@ -336,10 +336,12 @@
       </select><br> 
   </div>
   
-  <div id="content">   <div id="map_canvas" style="width: 800px; height: 400px"></div>
+  <div id="content">  <div id="map_canvas" style="width: 800px; height: 400px"></div>
 
 </div>
 </div>
+
+
 <div id="locationDiv" style="visibility:hidden"></div>
  
 

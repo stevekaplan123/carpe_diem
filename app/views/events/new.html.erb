@@ -1,6 +1,5 @@
 <h1>New Event</h1>
 
-<p id="notice"><%= notice %></p>
 
 
 <%= render 'form' %>
@@ -10,19 +9,7 @@
     <script type='text/javascript' src='//code.jquery.com/jquery-1.9.1.js'></script>
     <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script type='text/javascript'>
-    (function()
-    {
-      if( window.localStorage )
-      {
-        if( !localStorage.getItem( 'firstLoad' ) )
-        {
-          localStorage[ 'firstLoad' ] = true;
-          window.location.reload()
-        }  
-        else
-          localStorage.removeItem( 'firstLoad' );
-      }
-    })();
+
     var marker = null;
     var map = null;
 

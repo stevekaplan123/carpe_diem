@@ -1,10 +1,11 @@
 <header class="navbar navbar-fixed-top navbar-inverse">
   <div class="container">
-    <%= link_to "Carpe Diem", root_path, id: "logo" %>
+    <%= link_to "Carpe Diem", "/events", id: "logo" %>
     <nav>
       <ul class="nav navbar-nav navbar-right">
 
         <% if logged_in? %>
+        <li><%= link_to "Home", events_url %></li>
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               Account <b class="caret"></b>

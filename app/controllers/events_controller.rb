@@ -29,12 +29,13 @@ class EventsController < ApplicationController
         attendances.each do |att|
           att.destroy 
         end
-        redirect_to events_url, notice: "You are no longer signed up for this event."
+        @event = Event.find_by(event_id)
+        redirect_to @event, notice: "You are no longer signed up for this event."
     end
   end
   # GET /events/1
   # GET /events/1.json
-  # Low efficiency, will have to check the database every time - Leifeng, 03/17
+  # Low efficiency, will have to check the database every time - Leifeng, 03/17 
   def show
     @creator = User.find(@event.creator_id).name
     @attendees = []
@@ -48,26 +49,7 @@ class EventsController < ApplicationController
   end
 
 
-  def signup
-    event_id = params[:event_id]
-    user_id = params[:user_id]
 
-    ## first create/delete an attendance 
-    if params[:whatAction]=="1"                              
-         #sign up for event
-        Attendance.create(event_id: event_id, user_id: user_id)
-        @event = Event.find_by(event_id)
-        redirect_to @event, notice: "You have successfully signed up for this event."
-        
-    elsif params[:whatAction]=="0"                            
-      #i dont want to go, cancel my attendance from the event
-        attendances = Attendance.where(event_id: event_id, user_id: user_id)
-        attendances.each do |att|
-          att.destroy 
-        end
-        redirect_to events_url, notice: "You are no longer signed up for this event."
-    end
-  end
 
   # GET /events/filter?type=X&arg=Y
   # 'type' is either location, time, or user
@@ -77,12 +59,6 @@ class EventsController < ApplicationController
  def filter
        filter_events = Filter.new(params[:type], current_user.id, params[:location], params[:tag])
        @events = filter_events.events
-      if @events.empty?
-        respond_to do |format|
-          format.json { redirect_to events_url, notice: 'INVALID FILTERING TYPE.'}
-          format.html { redirect_to events_url, notice: 'INVALID FILTERING TYPE.' }
-        end
-      end
 
 
       # respond_to do |format|
@@ -143,9 +119,9 @@ class EventsController < ApplicationController
         format.html { redirect_to @event, notice: 'Event was successfully created.' }
         format.json { render :show, status: :created, location: @event }
       else
-          error_msg = ""
+          error_msg = "ERROR: "
           @event.errors.full_messages.each do |msg|
-            error_msg += msg+"\n"
+            error_msg += msg+"; "
           end
         format.html { redirect_to "/events/new", notice: error_msg }  #was render :new
         format.json { render json: @event.errors, status: :unprocessable_entity }
@@ -261,9 +237,9 @@ class EventsController < ApplicationController
         format.html { redirect_to @event, notice: 'Event was successfully updated.' }
         format.json { render :show, status: :ok, location: @event }
       else
-          error_msg = ""
+          error_msg = "ERROR: "
           @event.errors.full_messages.each do |msg|
-            error_msg += msg+"\n"
+            error_msg += msg+"; "
           end
         format.html { redirect_to "/events/"+params[:id]+"/edit", notice: error_msg }
         format.json { render json: @event.errors, status: :unprocessable_entity }
@@ -289,7 +265,7 @@ class EventsController < ApplicationController
     
     @event.destroy
     respond_to do |format|
-      format.html { redirect_to events_url, notice: 'Event was successfully cancelled.' }
+      format.html { redirect_to events_url, alert: 'Event was successfully cancelled.' }
       format.json { head :no_content }
     end
   end
