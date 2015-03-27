@@ -170,7 +170,8 @@ body {
                   clearMarkers()
                   clearWindows()
 
-                  //start re-setting the menu on top of the navigation bar with preEventHTML() 
+                    //clear out old list of events
+                   document.getElementById("below_menu").innerHTML = ""
 
                     //now show the filtered events
                     result = JSON.parse(xmlhttp.responseText);
@@ -187,7 +188,6 @@ body {
                         markEvents(latitude, longitude, event_name)
 
                         //repopulate the navigation bar with the events filtered by 'type'
-                        document.getElementById("below_menu").innerHTML = ""
                         document.getElementById("below_menu").innerHTML += eventHTML(event_id, creator_id, xmlhttp) 
                     }    
 
