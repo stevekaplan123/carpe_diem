@@ -1,3 +1,104 @@
+<style>
+body {
+    font-family:Arial;
+    font-size:12px;
+}
+
+/* We remove the margin, padding, and list style of UL and LI components */
+#menuwrapper ul, #menuwrapper ul li{
+    margin:0;
+    padding:0;
+    list-style:none;
+}
+
+/* We apply background color and border bottom white and width to 150px */
+#menuwrapper ul li{
+    background-color:#7f95db;
+    border-bottom:solid 1px white;
+    width:150px;
+    cursor:pointer;
+}
+
+/* We apply the background hover color when user hover the mouse over of the li component */
+#menuwrapper ul li:hover{
+    background-color:#6679e9;
+    position:relative;
+}
+
+/* We apply the link style */
+#menuwrapper ul li a{
+    padding:5px 15px;
+    color:#ffffff;
+    display:inline-block;
+    text-decoration:none;
+}
+
+/**** SECOND LEVEL MENU ****/
+/* We make the position to absolute for flyout menu and hidden the ul until the user hover the parent li item */
+#menuwrapper ul li ul{
+    position:absolute;
+    display:none;
+}
+
+/* When user has hovered the li item, we show the ul list by applying display:block, note: 150px is the individual menu width.  */
+#menuwrapper ul li:hover ul{
+    left:150px;
+    top:0px;
+    display:block;
+}
+
+/* we apply different background color to 2nd level menu items*/
+#menuwrapper ul li ul li{
+    background-color:#cae25a;
+}
+
+/* We change the background color for the level 2 submenu when hovering the menu */
+#menuwrapper ul li:hover ul li:hover{
+    background-color:#b1b536;
+}
+
+/* We style the color of level 2 links */
+#menuwrapper ul li ul li a{
+    color:#454444;
+    display:inline-block;
+    width:120px;
+}
+
+/**** THIRD LEVEL MENU ****/
+/* We need to hide the 3rd menu, when hovering the first level menu */
+#menuwrapper ul li:hover ul li ul{
+    position:absolute;
+    display:none;
+}
+
+/* We show the third level menu only when they hover the second level menu parent */
+#menuwrapper ul li:hover ul li:hover ul{
+    display:block;
+    left:150px;
+    top:0;
+}
+
+/* We change the background color for the level 3 submenu*/
+#menuwrapper ul li:hover ul li:hover ul li{
+    background:#86d3fa;
+}
+
+/* We change the background color for the level 3 submenu when hovering the menu */
+
+#menuwrapper ul li:hover ul li:hover ul li:hover{
+    background:#358ebc;
+}
+
+/* We change the level 3 link color */
+#menuwrapper ul li:hover ul li:hover ul li a{
+    color:#ffffff;
+}
+
+/* Clear float */
+.clear{
+    clear:both;
+}
+</style>
 
 
 <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
@@ -70,7 +171,6 @@
                   clearWindows()
 
                   //start re-setting the menu on top of the navigation bar with preEventHTML() 
-                  document.getElementById("navbar").innerHTML=preEventHTML(type)
 
                     //now show the filtered events
                     result = JSON.parse(xmlhttp.responseText);
@@ -87,7 +187,8 @@
                         markEvents(latitude, longitude, event_name)
 
                         //repopulate the navigation bar with the events filtered by 'type'
-                        document.getElementById("navbar").innerHTML += eventHTML(event_id, creator_id, xmlhttp) 
+                        document.getElementById("below_menu").innerHTML = ""
+                        document.getElementById("below_menu").innerHTML += eventHTML(event_id, creator_id, xmlhttp) 
                     }    
 
                 }
@@ -222,61 +323,6 @@
 
         }
 
-        function preEventHTML(type)
-        {
-              if (type=='location')
-              {
-                       return '<br>VIEW EVENTS BY:'+
-                                      '<select onchange="loadXMLDoc(this.value)">' +
-                                      '<option selected="selected" value="location">NEAR ME</option>' +
-                                        '<option value="time">HAPPENING SOON</option>' +
-                                        '<option value="user">CREATED BY ME</option>'+
-                                        '<option value="tag">TAG</option>'
-                                    '</select><br> '  
-              }
-              else if (type=='user')
-              {
-                       return '<br> VIEW EVENTS BY:'+
-                                      '<select onchange="loadXMLDoc(this.value)">' +
-                                      '<option value="location">NEAR ME</option>' +
-                                        '<option value="time">HAPPENING SOON</option>' +
-                                        '<option selected="selected" value="user">CREATED BY ME</option>'+
-                                        '<option value="tag">TAG</option>'+
-                                    '</select><br> '  
-              } 
-              else if (type=='time')
-              {
-                       return '<br> VIEW EVENTS BY:'+
-                                      '<select onchange="loadXMLDoc(this.value)">' +
-                                      '<option value="location">NEAR ME</option>' +
-                                        '<option selected="selected" value="time">HAPPENING SOON</option>' +
-                                        '<option value="user">CREATED BY ME</option>'+
-                                        '<option value="tag">TAG</option>'+
-                                    '</select><br>'  
-              } 
-              else if (type=='tag')
-              {
-                        return '<br> VIEW EVENTS BY:'+
-                                      '<select onchange="loadXMLDoc(this.value)">' +
-                                      '<option value="location">NEAR ME</option>' +
-                                        '<option value="time">HAPPENING SOON</option>' +
-                                        '<option value="user">CREATED BY ME</option>'+
-                                        '<option selected="selected" value="tag">TAG</option>'+
-                                    '</select><br>'  
-              }
-              else if (type=='all')
-              {
-
-                        return '<br> VIEW EVENTS BY:'+
-                                      '<select onchange="loadXMLDoc(this.value)">' +
-                                      '<option value="location">NEAR ME</option>' +
-                                        '<option value="time">HAPPENING SOON</option>' +
-                                        '<option value="user">CREATED BY ME</option>'+
-                                       '<option value="tag">TAG</option>'+
-                                    '</select> <br>'  
-              }      
-
-        }
 
        
           function OpenWindow(event_info, type)
@@ -318,7 +364,7 @@
   padding: 4px ;
 
 }
-#navbar {
+#menuwrapper {
   float: left;
   width: 26%;
   padding: 4px ;
@@ -326,16 +372,28 @@
 }
 </style>
 <div id="container">
-  <div id="navbar">
-<br>VIEW EVENTS BY:
-  <select onchange="loadXMLDoc(this.value)">
-  <option selected="selected" value="location">NEAR ME</option>
-  <option value="time">HAPPENING SOON</option>
-   <option value="user">CREATED BY ME</option>
-    <option value="tag">TAG</option>
-      </select><br> 
-  </div>
-  
+ <div id="menuwrapper">
+    <ul>
+        <li onclick="loadXMLDoc('location')"><a href="#">NEAR ME</a></li>
+        <li onclick="loadXMLDoc('time')"><a href="#">HAPPENING SOON</a></li>
+        <li onclick="loadXMLDoc('user')"><a href="#">CREATED BY ME</a></li>
+        <li><a href="#">TAGS</a>
+            <ul>
+                <li onclick="tag='academic'; loadXMLDoc('tag')"><a href="#">Academic</a></li>
+                <li onclick="tag='competition'; loadXMLDoc('tag')"><a href="#">Competition</a></li>
+                <li onclick="tag='entertainment'; loadXMLDoc('tag')"><a href="#">Entertainment</a></li>
+                <li onclick="tag='food'; loadXMLDoc('tag')"><a href="#">Food</a></li>
+                <li onclick="tag='game'; loadXMLDoc('tag')"><a href="#">Game</a></li>
+                <li onclick="tag='off-campus'; loadXMLDoc('tag')"><a href="#">Off-Campus</a></li>
+                <li onclick="tag='music'; loadXMLDoc('tag')"><a href="#">Music</a></li>
+                <li onclick="tag='party'; loadXMLDoc('tag')"><a href="#">Party</a></li>
+                <li onclick="tag='sports'; loadXMLDoc('tag')"><a href="#">Sports</a></li>
+            </ul>
+        </li>
+    </ul>
+    <div id="below_menu">
+    </div>
+</div>
   <div id="content">  <div id="map_canvas" style="width: 800px; height: 400px"></div>
 
 </div>
@@ -344,6 +402,7 @@
 
 <div id="locationDiv" style="visibility:hidden"></div>
  
+
 
 <%= link_to 'New Event', new_event_path %>
 <%= link_to 'Back', root_path %>
