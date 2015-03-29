@@ -57,6 +57,7 @@ body {
     background-color:#b1b536;
 }
 
+
 /* We style the color of level 2 links */
 #menuwrapper ul li ul li a{
     color:#454444;
@@ -64,35 +65,6 @@ body {
     width:120px;
 }
 
-/**** THIRD LEVEL MENU ****/
-/* We need to hide the 3rd menu, when hovering the first level menu */
-#menuwrapper ul li:hover ul li ul{
-    position:absolute;
-    display:none;
-}
-
-/* We show the third level menu only when they hover the second level menu parent */
-#menuwrapper ul li:hover ul li:hover ul{
-    display:block;
-    left:150px;
-    top:0;
-}
-
-/* We change the background color for the level 3 submenu*/
-#menuwrapper ul li:hover ul li:hover ul li{
-    background:#86d3fa;
-}
-
-/* We change the background color for the level 3 submenu when hovering the menu */
-
-#menuwrapper ul li:hover ul li:hover ul li:hover{
-    background:#358ebc;
-}
-
-/* We change the level 3 link color */
-#menuwrapper ul li:hover ul li:hover ul li a{
-    color:#ffffff;
-}
 
 /* Clear float */
 .clear{
@@ -170,7 +142,8 @@ body {
                   clearMarkers()
                   clearWindows()
 
-                  //start re-setting the menu on top of the navigation bar with preEventHTML() 
+                  //clear out the old list of events
+                  document.getElementById("below_menu").innerHTML = ""
 
                     //now show the filtered events
                     result = JSON.parse(xmlhttp.responseText);
@@ -187,7 +160,6 @@ body {
                         markEvents(latitude, longitude, event_name)
 
                         //repopulate the navigation bar with the events filtered by 'type'
-                        document.getElementById("below_menu").innerHTML = ""
                         document.getElementById("below_menu").innerHTML += eventHTML(event_id, creator_id, xmlhttp) 
                     }    
 
@@ -298,28 +270,27 @@ body {
                         '<a href="/events/'+event_id+
                         '">Show</a> | ' +
                         '<a href="/events/'+event_id+
-                        '/edit">Edit</a><br>'
+                        '/edit">Edit</a>'
           }
           else if (alreadyGoing < 0)
           {
             append_to = '<a data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+
                         '&whatAction=1">Sign up!</a> | '+'<a href="/events/'+event_id+
-                        '">Show</a> <br> '
+                        '">Show</a>'
           }
           else if (alreadyGoing >= 0)
           {
             append_to = '<a data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+
                         '&whatAction=0">I Don\'t Want To Go</a> | '+'<a href="/events/'+event_id+
-                        '">Show</a> <br>'
+                        '">Show</a>'
           }
 
-          return '<span onclick="OpenWindow(&quot;' +
+          return append_to+' | <span onclick="OpenWindow(&quot;' +
                     JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
                     JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
                     JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
                   'style="cursor: pointer"><b><font color="blue">' +
-                    JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></font></span>   |   ' +
-                   append_to;
+                    JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></font></span>'
 
         }
 
@@ -360,13 +331,13 @@ body {
 
 <body><style>
 #content {
-  margin-left:  26%;
+  margin-left:  30%;
   padding: 4px ;
 
 }
 #menuwrapper {
   float: left;
-  width: 26%;
+  width: 30%;
   padding: 4px ;
 
 }

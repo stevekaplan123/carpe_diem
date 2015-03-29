@@ -34,7 +34,8 @@ class Filter
       # how do we define "soon" when the maximum amount of hours is 24?
       # we will use a reasonable definition of 4 hours
       # subtract five hours because of ETS to UTC conversion
-      events = Event.where(time_occurrence: (Time.now-5.hours)..(Time.now-1.hours))
+    
+      events = Event.where(time_occurrence: (Time.now-4.hours)..(Time.now))
       #@events = Event.where(time_occurrence: (Time.now)..(Time.now+4.hours))
       events
   end
@@ -70,4 +71,16 @@ class Filter
       end
       filtered_events
   end
+
+
+  def destroy_old_events
+       @events.each do |event|
+          puts Time.now
+          puts event["time_occurrence"]
+          if event["time_occurrence"] < (Time.now-28.hours) #28 hours is 24 hours because of UNIX time
+            event.destroy
+          end
+        end
+  end
+
 end

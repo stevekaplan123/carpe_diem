@@ -58,9 +58,8 @@ class EventsController < ApplicationController
   # 'arg' is the current location of user, or current time, or name of user
  def filter
        filter_events = Filter.new(params[:type], current_user.id, params[:location], params[:tag])
-       @events = filter_events.events
-
-
+       @events = filter_events.destroy_old_events
+       @events
       # respond_to do |format|
       #     format.json { render :json => @events}
       # end
