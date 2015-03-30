@@ -5,15 +5,20 @@ body {
     font-size:12px;
 }
 
+p {
+    border-style: solid;
+    border-width: 1px;
+    margin-right: 40%;
+}
 
 #content {
-  margin-left:  30%;
+  margin-left:  25%;
   padding: 4px ;
 
 }
 #menuwrapper {
   float: left;
-  width: 30%;
+  width: 25%;
   padding: 0px ;
 
 }
@@ -56,8 +61,8 @@ body {
 
 /* When user has hovered the li item, we show the ul list by applying display:block, note: 150px is the individual menu width.  */
 #menuwrapper ul li:hover ul{
-    left:150px;
-    top:0px;
+    left:0px;
+    top:25px;
     display:block;
 }
 
@@ -71,7 +76,6 @@ body {
     background-color:#b1b536;
 }
 
-
 /* We style the color of level 2 links */
 #menuwrapper ul li ul li a{
     color:#454444;
@@ -79,6 +83,35 @@ body {
     width:120px;
 }
 
+/**** THIRD LEVEL MENU ****/
+/* We need to hide the 3rd menu, when hovering the first level menu */
+#menuwrapper ul li:hover ul li ul{
+    position:absolute;
+    display:none;
+}
+
+/* We show the third level menu only when they hover the second level menu parent */
+#menuwrapper ul li:hover ul li:hover ul{
+    display:block;
+    left:150px;
+    top:0;
+}
+
+/* We change the background color for the level 3 submenu*/
+#menuwrapper ul li:hover ul li:hover ul li{
+    background:#86d3fa;
+}
+
+/* We change the background color for the level 3 submenu when hovering the menu */
+
+#menuwrapper ul li:hover ul li:hover ul li:hover{
+    background:#358ebc;
+}
+
+/* We change the level 3 link color */
+#menuwrapper ul li:hover ul li:hover ul li a{
+    color:#ffffff;
+}
 
 /* Clear float */
 .clear{
@@ -137,6 +170,23 @@ body {
             
        }
 
+       function hide_and_seek_menus()
+       {
+          var ULs = document.getElementsByClassName("menu");
+          for (var i=0; i<ULs.length; i++)
+          {
+            if (ULs[i].style.visibility == "hidden")
+            {
+                ULs[i].style.visibility = "visible";
+            }
+            else
+            {
+                ULs[i].style.visibility = "hidden";
+            }
+
+          }
+       }
+
 
         function loadXMLDoc(type)
         {          
@@ -158,10 +208,15 @@ body {
 
                   //clear out the old list of events
                   document.getElementById("below_menu").innerHTML = ""
-
+                  document.getElementById("below_menu").innerHTML = filterHTML(type, tag)
                     //now show the filtered events
                     result = JSON.parse(xmlhttp.responseText);
                     length = result.length;
+                    if (length==0)
+                    {
+                       document.getElementById("below_menu").innerHTML += "<h4><i>[NO RESULTS]</i></h4>" 
+
+                    }
                     for (i=0; i<length; i++)
                     {
                         latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
@@ -172,7 +227,6 @@ body {
  
                         //mark events on map that were result of filtering by 'type'
                         markEvents(latitude, longitude, event_name)
-
                         //repopulate the navigation bar with the events filtered by 'type'
                         document.getElementById("below_menu").innerHTML += eventHTML(event_id, creator_id, xmlhttp) 
                     }    
@@ -267,6 +321,28 @@ body {
           }
         }
 
+        function filterHTML(type, tag)
+        {
+          var msg="";
+          if (type=="user")
+          {
+            msg="Events you created:"
+          }
+          else if (type=="location")
+          {
+            msg="Events near you:"
+          }
+          else if (type=="time")
+          {
+            msg="Events happening soon:"
+          }
+          else if (type=="tag")
+          {
+            msg="Events in the category '"+tag+"'"
+          }          
+          return "<h4>"+msg+"</h4><br>";
+        }
+
         function eventHTML(event_id, creator_id, xmlhttp)
         {
                               //token=6OLjbvZ86MX4A2Y/hgcpG612KNRddl8wKsvKU7gEuKaRb0j/OHXofvGP2hLsxWe7BhEVicgdEqNxqHjCpFkXQ"
@@ -276,9 +352,10 @@ body {
           var current_id = <%= current_user.id %>
           var alreadyGoing = attendances.indexOf(event_id);
 
+          
           if (current_id==creator_id || current_name=="admin")
-          {
-            append_to =  '<a data-confirm="Are you sure?" rel="nofollow"' +
+          { 
+            append_to =  '<p><a data-confirm="Are you sure?" rel="nofollow"' +
                         'data-method="delete" href="/events/'+event_id+
                         '">Cancel Event</a> | '+
                         '<a href="/events/'+event_id+
@@ -288,13 +365,13 @@ body {
           }
           else if (alreadyGoing < 0)
           {
-            append_to = '<a data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+
+            append_to = '<p><a data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+
                         '&whatAction=1">Sign up!</a> | '+'<a href="/events/'+event_id+
                         '">Show</a>'
           }
           else if (alreadyGoing >= 0)
           {
-            append_to = '<a data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+
+            append_to = '<p><a data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+
                         '&whatAction=0">I Don\'t Want To Go</a> | '+'<a href="/events/'+event_id+
                         '">Show</a>'
           }
@@ -304,7 +381,7 @@ body {
                     JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
                     JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
                   'style="cursor: pointer"><b><font color="blue">' +
-                    JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></font></span>'
+                    JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></font></span></p><br>'
 
         }
 
@@ -347,22 +424,25 @@ body {
 <div id="container">
  <div id="menuwrapper">
     <ul>
-        <li onclick="loadXMLDoc('location')"><a href="#">NEAR ME</a></li>
-        <li onclick="loadXMLDoc('time')"><a href="#">HAPPENING SOON</a></li>
-        <li onclick="loadXMLDoc('user')"><a href="#">CREATED BY ME</a></li>
-        <li><a href="#">TAGS</a>
-            <ul>
-                <li onclick="tag='academic'; loadXMLDoc('tag')"><a href="#">Academic</a></li>
-                <li onclick="tag='competition'; loadXMLDoc('tag')"><a href="#">Competition</a></li>
-                <li onclick="tag='entertainment'; loadXMLDoc('tag')"><a href="#">Entertainment</a></li>
-                <li onclick="tag='food'; loadXMLDoc('tag')"><a href="#">Food</a></li>
-                <li onclick="tag='game'; loadXMLDoc('tag')"><a href="#">Game</a></li>
-                <li onclick="tag='off-campus'; loadXMLDoc('tag')"><a href="#">Off-Campus</a></li>
-                <li onclick="tag='music'; loadXMLDoc('tag')"><a href="#">Music</a></li>
-                <li onclick="tag='party'; loadXMLDoc('tag')"><a href="#">Party</a></li>
-                <li onclick="tag='sports'; loadXMLDoc('tag')"><a href="#">Sports</a></li>
-            </ul>
-        </li>
+      <li><a href="#" onclick="hide_and_seek_menus(); "><u>CLICK TO SEARCH</u></a>
+        <ul class="menu">
+            <li onclick="hide_and_seek_menus(); loadXMLDoc('location')"><a href="#">NEAR ME</a></li>
+            <li onclick="hide_and_seek_menus(); loadXMLDoc('time')"><a href="#">HAPPENING SOON</a></li>
+            <li onclick="hide_and_seek_menus(); loadXMLDoc('user')"><a href="#">CREATED BY ME</a></li>
+            <li><a href="#">TAGS</a>
+                <ul class="menu">
+                    <li onclick="tag='academic'; hide_and_seek_menus(); loadXMLDoc('tag')"><a href="#">Academic</a></li>
+                    <li onclick="tag='competition'; hide_and_seek_menus(); loadXMLDoc('tag')"><a href="#">Competition</a></li>
+                    <li onclick="tag='entertainment'; hide_and_seek_menus(); loadXMLDoc('tag')"><a href="#">Entertainment</a></li>
+                    <li onclick="tag='food'; hide_and_seek_menus(); loadXMLDoc('tag')"><a href="#">Food</a></li>
+                    <li onclick="tag='game'; hide_and_seek_menus(); loadXMLDoc('tag')"><a href="#">Game</a></li>
+                    <li onclick="tag='off-campus'; hide_and_seek_menus(); loadXMLDoc('tag')"><a href="#">Off-Campus</a></li>
+                    <li onclick="tag='music'; hide_and_seek_menus(); loadXMLDoc('tag')"><a href="#">Music</a></li>
+                    <li onclick="tag='party'; hide_and_seek_menus(); loadXMLDoc('tag')"><a href="#">Party</a></li>
+                    <li onclick="tag='sports'; hide_and_seek_menus(); loadXMLDoc('tag')"><a href="#">Sports</a></li>
+                </ul>
+            </li>
+          </ul>
     </ul>
     <div id="below_menu">
     </div>

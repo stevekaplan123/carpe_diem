@@ -1,4 +1,3 @@
-
 <p>
   <strong>Creator:</strong>
   <%= @creator %>
@@ -61,6 +60,5 @@
 	<% tags_array.each { |tag_id| name_array.push(Tag.find(tag_id).name) } %>
 	<%= name_array.join(", ") %>	
 </p>
-
 <%= link_to 'Edit', edit_event_path(@event) %> |
 <%= link_to 'Back', events_path %>
