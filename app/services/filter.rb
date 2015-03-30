@@ -73,14 +73,15 @@ class Filter
   end
 
 
-  def destroy_old_events
+  def archive_old_events
        @events.each do |event|
-          puts Time.now
-          puts event["time_occurrence"]
           if event["time_occurrence"] < (Time.now-28.hours) #28 hours is 24 hours because of UNIX time
+            ArchivedEvent.create(creator_id: event["creator_id"], name: event["name"], time_occurrence: event["time_occurrence"],
+              location: event["location"], latitude: event["latitude"], longitude: event["longitude"], description: event["description"],
+              tags: event["tags"])
             event.destroy
           end
         end
-  end
+     end
 
 end
