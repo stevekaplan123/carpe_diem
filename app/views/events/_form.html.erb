@@ -101,7 +101,7 @@ div#checkboxcol3 {
     	<!--2nd arg to radio button the value saved
     	make first arg variable? -->
     	<p hidden> <%= @date_today = DateTime.now %> </p>
-    	<p hidden> <%= @date_tom = DateTime.new(@date_today.year, @date_today.month, (@date_today.day + 1), @date_today.hour, @date_today.min, @date_today.sec) %> </p>
+    	<p hidden> <%= @date_tom = DateTime.now+1 %> </p>
     	<p hidden> <%= @nothing = Time.now %> </p>
     	<div id="radio_buttons">
     		
