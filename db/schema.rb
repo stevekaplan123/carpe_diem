@@ -13,21 +13,8 @@
 
 ActiveRecord::Schema.define(version: 20150330184103) do
 
-  create_table "archive_events", force: :cascade do |t|
-    t.integer  "user_id"
-    t.integer  "creator_id"
-    t.string   "name"
-    t.datetime "time_occurrence"
-    t.string   "location"
-    t.decimal  "longitude"
-    t.decimal  "latitude"
-    t.text     "description"
-    t.string   "tags"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
-  end
-
   create_table "archived_events", force: :cascade do |t|
+    t.integer  "user_id"
     t.integer  "creator_id"
     t.string   "name"
     t.datetime "time_occurrence"
