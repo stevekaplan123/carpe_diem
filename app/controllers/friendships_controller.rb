@@ -10,19 +10,20 @@ class FriendshipsController < ApplicationController
   def add_new_friend
     
     desired_friend = User.find_by(name: params[:friend_name])
-    desired_friend_id = desired_friend["id"]
-
     my_id = params[:user_id]
     my_name = User.find_by(id: my_id)["name"]
-
     #TODO: need to check that desired_friend is not already my friend
     #and check that i am not adding myself
+ 
     if desired_friend
+      desired_friend_id = desired_friend["id"]
       @friendship = Friendship.create(user_id: my_id, user_name: my_name, friend_id: desired_friend_id, friend_name: desired_friend["name"])
+      redirect_to "/users/"+my_id
+
     else
-      redirect_to root_path, "The friend, "+params[:friend_name]+" you tried to add is not registered in our system."
+      friend_name = params[:friend_name]
+      redirect_to "/users/"+my_id, notice: "The friend, "+friend_name.to_s+" you tried to add is not registered in our system."
     end
-    redirect_to "/users/"+my_id
   end
   # GET /friendships/1
   # GET /friendships/1.json
