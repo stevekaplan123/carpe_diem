@@ -1,13 +1,35 @@
-<p id="notice"><%= notice %></p>
+
+
 <% provide(:title, @user.name) %>
 <div class="row">
-  <aside class="col-md-4">
+  <div class="col-md-3">
     <section class="user_info">
       <h1>
         <%= gravatar_for @user %>
       </h1>
     </section>
-  </aside>
+  </div>
+
+  <div class="col-md-3"><h1>Your friends:</h1>
+<ul><% @user.friendships.each do |friendship| %>
+  <li><i><%= friendship['friend_name'] %></i></li>
+<% end %></ul></div>
+
+<div class="col-md-3"><h1>Your events:</h1>
+<ul><% @user.events.each do |event| %>
+<li><%= link_to event['name'], "/events/"+event['id'].to_s %> (Click to see event details)</li>
+<% end %></ul>
+</div>
+
+
+<div class="col-md-3">
+ <%= form_tag("/friendships/add_new_friend", method: "post") do %>
+<%= hidden_field_tag(:user_id, current_user.id) %>
+  <%= label_tag(:friend_name, "Name of friend:") %>
+<%= text_field_tag(:friend_name) %>
+  <%= submit_tag("Add Friend") %>
+<% end %>
+</div>
 </div>
 
 <p>
@@ -28,18 +50,6 @@
 <%= link_to 'Edit', edit_user_path(@user) %> |
 <%= link_to 'Back', users_path %>
 <br><br>
-Your friends:
-<% @user.friendships.each do |friendship| %>
-  <%= friendship['friend_name'] %>
-<% end %>
 
-
-
- <%= form_tag("/friendships/add_new_friend", method: "post") do %>
-<%= hidden_field_tag(:user_id, current_user.id) %>
-  <%= label_tag(:friend_name, "Name of friend:") %>
-<%= text_field_tag(:friend_name) %>
-  <%= submit_tag("Add Friend") %>
-<% end %>
 
 
