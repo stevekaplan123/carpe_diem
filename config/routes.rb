@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :friendships
+
   mount RailsAdmin::Engine => '/admin', :as => 'rails_admin'
 
   controller :sessions do
@@ -14,10 +16,12 @@ Rails.application.routes.draw do
     get 'contact' => :contact
   end
 
+  post '/friendships/add_new_friend'
   get 'signup' => 'users#new'
   put 'events/signup'
   get 'events/filter'
 
+  resources :friendships
   resources :events do
     resources :attendances
   end

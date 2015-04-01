@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
   # check session on every page. will have to rewrite the tests
   before_action :authorize
   protect_from_forgery with: :exception
-  include SessionsHelper
+  require 'authenticate'
 
   protected
     def authorize

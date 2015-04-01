@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150330184103) do
+ActiveRecord::Schema.define(version: 20150401154911) do
 
   create_table "archived_events", force: :cascade do |t|
     t.integer  "user_id"
@@ -55,6 +55,15 @@ ActiveRecord::Schema.define(version: 20150330184103) do
     t.string   "tags"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
+  end
+
+  create_table "friendships", force: :cascade do |t|
+    t.integer  "user_id"
+    t.string   "user_name"
+    t.integer  "friend_id"
+    t.string   "friend_name"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
   end
 
   create_table "tags", force: :cascade do |t|
