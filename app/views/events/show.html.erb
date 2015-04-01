@@ -1,3 +1,8 @@
+
+
+
+<div id="showcontainer">
+<div id="showtext">
 <p>
   <strong>Creator:</strong>
   <%= @creator %>
@@ -60,5 +65,246 @@
 	<% tags_array.each { |tag_id| name_array.push(Tag.find(tag_id).name) } %>
 	<%= name_array.join(", ") %>	
 </p>
+</div>
+
+<%= content_tag :div, class: "location_class", data: {latitude: @event.latitude, longitude: @event.longitude, event_id: @event.name} do %>
+<% end %>
+
+
+<div id="showmap">
+<script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script type='text/javascript'>
+        //the following function causes page to refresh
+        (function()
+        {
+          if( window.localStorage )
+          {
+            if( !localStorage.getItem( 'firstLoad' ) )
+            {
+              localStorage[ 'firstLoad' ] = true;
+              window.location.reload()
+            }  
+            else
+              localStorage.removeItem( 'firstLoad' );
+          }
+        })();
+
+
+        var gMap = null;
+        var attendance_window = null;
+        var desc_window = null;
+        var markers = [];
+        var me_window =  null; 
+        var loc = null;
+        var windows = [];
+        var tag = null;
+        var attendances = []
+
+
+        
+        window.onload = function(){
+        
+        	
+        
+        
+            //var xmlhttp = loadXMLHTTP()
+            //var latitudeA=JSON.parse(xmlhttp.responseText)["latitude"];
+            //var longitudeA=JSON.parse(xmlhttp.responseText)["longitude"];
+            //var event_name=JSON.parse(xmlhttp.responseText)[i]["event_name"];
+            
+            var latitude = $('.location_class').data('latitude')
+            var longitude = $('.location_class').data('longitude')
+            var event_name = $('.location_class').data('event_name')
+            
+            var myOptions = {
+            	
+            
+                center: new google.maps.LatLng(latitude, longitude),
+                
+                        
+                zoom: 15,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
+			markEvents(latitude, longitude, event_name);
+            
+
+            
+            
+       }
+
+       function hide_and_seek_menus()
+       {
+          var ULs = document.getElementsByClassName("menu");
+          for (var i=0; i<ULs.length; i++)
+          {
+            if (ULs[i].style.visibility == "hidden")
+            {
+                ULs[i].style.visibility = "visible";
+            }
+            else
+            {
+                ULs[i].style.visibility = "hidden";
+            }
+
+          }
+       }
+
+
+        function loadXMLDoc(type)
+        {          
+          if (loc=="error") //if loc error and no value set on map
+          {
+              alert("In order to see events near you, either allow geolocation on your browser or select your position on the map.")
+          }
+          //first just gets the right xmlhttp based on browser
+            var xmlhttp = loadXMLHTTP()
+            //each time state changes, from 0 to 1 to 2 to 3 to 4, check if it finished (finished means state of 4)
+            //and check status is 200, if status != 200, then the server failed to respond correctly (404 or 500)  
+            xmlhttp.onreadystatechange=function()
+              {
+              if (xmlhttp.readyState==4 && xmlhttp.status==200)
+                {
+                  //first clear old event markers and clear out table of events
+                  clearMarkers()
+                  clearWindows()
+
+                  //clear out the old list of events
+                  document.getElementById("below_menu").innerHTML = ""
+                  document.getElementById("below_menu").innerHTML = filterHTML(type, tag)
+                    //now show the filtered events
+                    result = JSON.parse(xmlhttp.responseText);
+                    length = result.length;
+                    if (length==0)
+                    {
+                       document.getElementById("below_menu").innerHTML += "<h4><i>[NO RESULTS]</i></h4>" 
+
+                    }
+                    for (i=0; i<length; i++)
+                    {
+                        latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
+                        longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
+                        var event_id = JSON.parse(xmlhttp.responseText)[i]["id"].toString();
+                        var event_name=JSON.parse(xmlhttp.responseText)[i]["event_name"];
+                        var creator_id=JSON.parse(xmlhttp.responseText)[i]["creator_id"];
+ 
+                        //mark events on map that were result of filtering by 'type'
+                        markEvents(latitude, longitude, event_name)
+                        //repopulate the navigation bar with the events filtered by 'type'
+                        document.getElementById("below_menu").innerHTML += eventHTML(event_id, creator_id, xmlhttp) 
+                    }    
+
+                }
+              }
+              xmlhttp.open("GET","/events/filter.json?type="+type+"&location="+loc+"&tag="+tag,true);
+              xmlhttp.send();
+          }
+
+
+        function success(position) {
+           document.getElementById("locationDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude; 
+           loc = document.getElementById("locationDiv").innerHTML.split(", ")
+           tag = ""
+           var latitude = loc[0]
+           var longitude = loc[1]
+           markMe(latitude, longitude)
+           loadXMLDoc("location")  //by default load events near user's locaton
+
+         }
+         function error()
+         {
+            document.getElementById("locationDiv").innerHTML = "error"
+            loc = "error"
+
+            //user needs to be able to click on map
+            google.maps.event.addListener(gMap, 'click', function(event) {
+                var lat = event.latLng.lat()
+                var lng = event.latLng.lng()
+                loc = lat.toString() + ", " + lng.toString()
+                markMe(lat, lng)
+            });
+            loadXMLDoc("user")
+         }
+
+
+        
+
+
+        function loadXMLHTTP()
+        {
+          var xmlhttp;
+           if (window.XMLHttpRequest)
+              {// code for IE7+, Firefox, Chrome, Opera, Safari
+              xmlhttp=new XMLHttpRequest();
+              }
+            else
+              {// code for IE6, IE5
+              xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+              }
+          return xmlhttp;
+        }
+
+        function markMe(latitude, longitude)
+        {
+            if (me_window != null)
+            {
+                me_window.close()
+            }
+            me_window = new google.maps.InfoWindow({
+                content: "You are here",
+                position: new google.maps.LatLng(latitude, longitude),
+             });
+
+            me_window.open(gMap);
+        }
+
+        function markEvents(latitude, longitude, event_name)
+        {
+              var temp_latlng = new google.maps.LatLng(latitude, longitude);
+              marker = new google.maps.Marker({
+                  position: temp_latlng,
+                  map: gMap,
+                  title: event_name
+              });
+
+              markers.push(marker) 
+        }
+
+        function clearMarkers()
+        {
+            for (var i = 0; i < markers.length; i++) {
+              markers[i].setMap(null);
+          }
+        }
+
+        
+
+        
+
+
+       
+          
+
+          function clearWindows()
+          { 
+              for (var i=0; i<windows.length; i++)
+              {
+                windows[i].close()
+              }
+          }
+
+
+
+    </script>
+
+
+  		<div id="map_canvas" style="width: 725px; height: 400px;"></div>
+</div>
+
+</div>
+
+
+
+
 <%= link_to 'Edit', edit_event_path(@event) %> |
 <%= link_to 'Back', events_path %>
