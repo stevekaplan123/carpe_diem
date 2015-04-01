@@ -2,7 +2,7 @@
   <div class="home-welcome">
     <div class="row">
       <div class=col-md-6>
-        <h1>Seize the day.</h2>
+        <h1>Seize the day.</h1>
         <p>Today is <%= Time.now.strftime("%A, %B %d, %Y (EDT)") %>. There are <%= Event.count %> events happening right now at Brandeis.</p>
       </div>
 
@@ -43,4 +43,5 @@
         <%= f.submit "Log in", class: "btn btn-primary" %>
       <% end %>
     </div>
+  </div>
 </div>
