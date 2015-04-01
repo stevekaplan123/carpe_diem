@@ -22,7 +22,7 @@ class FriendshipsController < ApplicationController
 
     else
       friend_name = params[:friend_name]
-      redirect_to "/users/"+my_id, notice: "The friend, "+friend_name.to_s+" you tried to add is not registered in our system."
+      redirect_to "/users/"+my_id, notice: "Your friend, "+friend_name.to_s+", is not registered in our system."
     end
   end
   # GET /friendships/1
