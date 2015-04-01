@@ -27,3 +27,19 @@
 
 <%= link_to 'Edit', edit_user_path(@user) %> |
 <%= link_to 'Back', users_path %>
+<br><br>
+Your friends:
+<% @user.friendships.each do |friendship| %>
+  <%= friendship['friend_name'] %>
+<% end %>
+
+
+
+ <%= form_tag("/friendships/add_new_friend", method: "post") do %>
+<%= hidden_field_tag(:user_id, current_user.id) %>
+  <%= label_tag(:friend_name, "Name of friend:") %>
+<%= text_field_tag(:friend_name) %>
+  <%= submit_tag("Add Friend") %>
+<% end %>
+
+
