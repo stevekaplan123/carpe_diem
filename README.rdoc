@@ -26,4 +26,4 @@ Things you may want to cover:
 
 Please feel free to use a different markup language if you do not plan to run
 <tt>rake doc:app</tt>.
-<a href="https://codeclimate.com/github/stevekaplan123/carpe_diem"><img src="https://codeclimate.com/github/stevekaplan123/carpe_diem/badges/gpa.svg" /></a>
+{<img src="https://codeclimate.com/github/stevekaplan123/carpe_diem/badges/coverage.svg" />}[https://codeclimate.com/github/stevekaplan123/carpe_diem]
