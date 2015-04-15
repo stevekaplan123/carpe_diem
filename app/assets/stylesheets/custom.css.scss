@@ -1,6 +1,18 @@
 @import "bootstrap-sprockets";
 @import "bootstrap";
 
+#fake-signup {
+  margin-top: 25%;
+}
+
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: block;
+}
+
 .home-welcome {
   padding-top: 80px;
   padding-bottom: 80px;

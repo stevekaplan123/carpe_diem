@@ -34,6 +34,8 @@ gem 'bootstrap-sass'
 
 gem 'rails_admin'
 
+gem 'whenever'
+
 group :development, :test do
   # gem for generating fake data
   gem 'fabrication'
