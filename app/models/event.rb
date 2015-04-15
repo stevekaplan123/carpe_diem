@@ -1,10 +1,8 @@
 class Event < ActiveRecord::Base
-
   has_many :attendances
   belongs_to :user
   has_many :users, through: :attendances
   has_many :event_tags
-
 
   validates :name, :description, presence: true
   validates :latitude, :longitude, presence: true
@@ -16,6 +14,8 @@ class Event < ActiveRecord::Base
 
   #validates there are not more than 3 tags selected
   validate :num_tags
+
+  scope :expired, -> { where('time_occurrence < ?', DateTime.now) }
 
   #the increment to day will automatically increment the month
   def valid_dates
@@ -44,5 +44,10 @@ class Event < ActiveRecord::Base
         self.errors.add :tag_error, ": cannot select more than #{max} tags"
       end
     end
+  end
+
+  # remove expired events
+  def self.remove_expired
+    self.expired.each { |event| event.destroy }
   end
 end
