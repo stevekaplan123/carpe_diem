@@ -20,7 +20,7 @@ class EventsController < ApplicationController
     if params[:whatAction]=="1"                              
          #sign up for event
         Attendance.create(event_id: event_id, user_id: user_id)
-        @event = Event.find_by(event_id)
+        @event = Event.find_by(id: event_id)
         redirect_to @event, notice: "You have successfully signed up for this event."
         
     elsif params[:whatAction]=="0"                            
@@ -29,7 +29,7 @@ class EventsController < ApplicationController
         attendances.each do |att|
           att.destroy 
         end
-        @event = Event.find_by(event_id)
+        @event = Event.find_by(id: event_id)
         redirect_to @event, notice: "You are no longer signed up for this event."
     end
   end
