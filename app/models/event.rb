@@ -45,9 +45,4 @@ class Event < ActiveRecord::Base
       end
     end
   end
-
-  # remove expired events
-  def self.remove_expired
-    self.expired.each { |event| event.destroy }
-  end
 end
