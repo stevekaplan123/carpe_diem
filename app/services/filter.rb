@@ -2,47 +2,27 @@ class Filter
 
   attr_reader :events	
 
-  def initialize(whichType, user_id, location, tag)
-  	   @events = []
-       if whichType == "location"
+  def initialize(user_id, location, friends, time)
+  	   @events = Event.all
+
+       if location != 0
           lat, lng = location.split(",")
-          @events = filterByLocation(lat, lng)
-       elsif whichType == "time"
-          @events = filterByTime(Time.now)
-       elsif whichType == "user"
-          @events = filterByUser(user_id)
-       elsif whichType == "tag"
-          @events = filterByTag(tag)
+          @events = filterByLocation(lat, lng, location)
        end
-  end
 
-  def filterByTag(tag)
-    puts "********************************"
-    puts tag
-    events_tag = EventTag.where(tag_name: tag)
-    events = []
-    events_tag.each do |et|
-      temp_event = Event.find_by(id: et.event_id)
-      if temp_event 
-          events.push(temp_event)
-      end
-    end
-    events
-  end
+       if time != 0
+          @events = @events.where(time_occurrence: (Time.now-4.hours)..(Time.now))
+       end
 
-  def filterByTime(time)
-      # how do we define "soon" when the maximum amount of hours is 24?
-      # we will use a reasonable definition of 4 hours
-      # subtract five hours because of ETS to UTC conversion
-    
-      events = Event.where(time_occurrence: (Time.now-4.hours)..(Time.now))
-      #@events = Event.where(time_occurrence: (Time.now)..(Time.now+4.hours))
-      events
-  end
+       if friends != 0
+          @users_friends = Friendship.where(user_id: user_id)
+          @users_friends.each do |my_friend|
 
-  def filterByUser(user)
-     events = Event.where(creator_id: user)
-     events
+          end
+
+          @events = @events.where()
+       end
+
   end
 
 
@@ -72,16 +52,5 @@ class Filter
       filtered_events
   end
 
-
-  def archive_old_events
-       @events.each do |event|
-          if event["time_occurrence"] < (Time.now-28.hours) #28 hours is 24 hours because of UNIX time
-            ArchivedEvent.create(creator_id: event["creator_id"], name: event["name"], time_occurrence: event["time_occurrence"],
-              location: event["location"], latitude: event["latitude"], longitude: event["longitude"], description: event["description"],
-              tags: event["tags"])
-            event.destroy
-          end
-        end
-     end
 
 end
