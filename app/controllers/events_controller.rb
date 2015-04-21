@@ -1,5 +1,4 @@
 require 'time'
-require 'byebug'
 class EventsController < ApplicationController
 
   before_action :correct_user, only: [:edit, :update, :destroy]
