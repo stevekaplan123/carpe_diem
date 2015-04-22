@@ -94,10 +94,6 @@ div#checkboxcol3 {
     <%= f.text_field :name %>
   </div>
   
-  <div class="field">
-    <%= f.label :event_location %><br>
-    <%= f.text_field :location %>
-  </div>
 
   <div class="field">
   
@@ -123,9 +119,11 @@ div#checkboxcol3 {
     			<%= label_tag(:choose_tomorrow, "Tomorrow, #{Date::MONTHNAMES[@date_tom.month]} #{@date_tom.day}") %>
 			</div>    	
     	</div>
-
-    	<% puts "wooo #{params[:time_occurrence]}"%>
-    	<%= time_select :usertime, :hourmin, {:ampm => true, :minute_step => 5} %>
+      <% if @event["time_occurrence"] != nil %>
+    	<%= time_select :usertime, :hourmin, {:ampm => true, :minute_step => 5, :default => {:hour => (@event["time_occurrence"].hour+4).to_s, :minute => @event["time_occurrence"].min.to_s}} %>
+      <% else %>
+      <%= time_select :usertime, :hourmin, {:ampm => true, :minute_step => 5} %>
+      <% end %>
     	<!--<%= f.datetime_select :time_occurrence, ampm: true %>  Original line-->
     	
     	<!-- <%= f.radio_button :time_occurrence, DateTime.now, :checked => true %> 
@@ -207,4 +205,3 @@ div#checkboxcol3 {
 
 
 <% end %>
-
