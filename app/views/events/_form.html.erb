@@ -106,7 +106,7 @@ div#checkboxcol3 {
     	<div id="radio_buttons">
     		
     		<div id="radio1">
-    			<%= radio_button_tag(:event_day, DateTime.now, :checked => true) %> 
+    			<%= radio_button_tag(:event_day, DateTime.now) %> 
     		</div>
     		<div id="label1">
     			<%= label_tag(:choose_today, "Today, #{Date::MONTHNAMES[@date_today.month]} #{@date_today.day}") %>
