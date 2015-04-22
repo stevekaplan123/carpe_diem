@@ -1,4 +1,5 @@
 require 'time'
+require 'byebug'
 class EventsController < ApplicationController
 
   before_action :correct_user, only: [:edit, :update, :destroy]
@@ -13,16 +14,11 @@ class EventsController < ApplicationController
   def signup
     event_id = params[:event_id]
     user_id = params[:user_id]
-
-    ## first create/delete an attendance 
-    if params[:whatAction]=="1"                              
-         #sign up for event
+    if params[:whatAction]=="1"       #1 for sign up, 0 for cancel                      
         Attendance.create(event_id: event_id, user_id: user_id)
         @event = Event.find_by(id: event_id)
-        redirect_to @event, notice: "You have successfully signed up for this event."
-        
+        redirect_to @event, notice: "You have successfully signed up for this event."        
     elsif params[:whatAction]=="0"                            
-      #i dont want to go, cancel my attendance from the event
         attendances = Attendance.where(event_id: event_id, user_id: user_id)
         attendances.each do |att|
           att.destroy 
@@ -43,44 +39,22 @@ class EventsController < ApplicationController
     current_event_id = params[:id]
     @event_tags = EventTag.where(event_id: current_event_id)
   end
-
   # GET /events/filter?args
- def filter
-       filter_events = Filter.new(params[:type], current_user.id, params[:location], params[:tag])
-       @events = filter_events.archive_old_events
- end
-
-
-
+  def filter
+       filter_events = Filter.new(current_user.id, params[:location], params[:near_me], params[:friendship], params[:time])
+       @events = filter_events.events
+  end
   # GET /events/new
   def new
     @event = Event.new
     @tags = Tag.all
   end
-
   # GET /events/1/edit
   def edit
     @tags = Tag.all
   end
-
   # POST /events
   # POST /events.json
-  def get_tag_string(tag_array)
-    if !tag_array.nil?
-      tag_array.join(",")
-    else
-      ""
-    end
-  end
-
-  def create_time(params)
-    day_int = params[:event_day].to_date
-    event_day = DateTime.new(day_int.year, day_int.month, day_int.day, 1, 1, 1)
-    thehour = params[:usertime]["hourmin(4i)"].to_i
-    themin = params[:usertime]["hourmin(5i)"].to_i
-    DateTime.new(event_day.year, event_day.month, event_day.day, thehour, themin, 59)
-  end
-
   def create
     @tags = Tag.all
     @event = Event.new(event_params)
@@ -88,16 +62,15 @@ class EventsController < ApplicationController
     tag_array = params[:tag_ids]
     tag_string = get_tag_string(tag_array)
     @event.tags = tag_string
-
     respond_to do |format|
       if @event.save
         increase_num_events(current_user)
         @event.attendances.create(user_id: session[:user_id])         #assign current user's id to created event
-
-        tag_array.each do |chosen_tag|         #adds tags to event_tags table
-          @event.event_tags.create(event_id: params[:id], event_name: params[:event][:name], tag_id: chosen_tag.to_i, tag_name: Tag.find(chosen_tag).name)
+        if tag_array != nil
+          tag_array.each do |chosen_tag|         #adds tags to event_tags table
+            @event.event_tags.create(event_id: params[:id], event_name: params[:event][:name], tag_id: chosen_tag.to_i, tag_name: Tag.find(chosen_tag).name)
+          end
         end
-
         format.html { redirect_to @event, notice: 'Event was successfully created.' }
         format.json { render :show, status: :created, location: @event }
       else
@@ -110,8 +83,6 @@ class EventsController < ApplicationController
       end
     end
   end
-
-
   # PATCH/PUT /events/1
   # PATCH/PUT /events/1.json
   def update
@@ -127,27 +98,11 @@ class EventsController < ApplicationController
     "time_occurrence"=>time_occurrence_datetime, 
     "tags"=>tag_string}    
     old_event_tags = EventTag.where(event_id: params[:id])
-
-    respond_to do |format|
-      #changed from event_params to updated_params
-      if @event.update(updated_params)
-        destroy_array = []
-        old_event_tags.each do |old_etag|
-          if new_tags_array.include?(old_etag["tag_id"]) == false
-            puts "going to destroy "+old_etag["tag_id"].to_s
-            destroy_array.push(old_etag["tag_id"])
-          end
-        end
-        destroy_array.each do |tid|
-          EventTag.where(event_id: params[:id]).find_by(tag_id: tid).destroy
-        end
-        new_tags_array.each do |new_tid|
-          if old_event_tags.find_by(tag_id: new_tid) == nil
-            @event.event_tags.create(event_id: params[:id], event_name: params[:event][:name], tag_id: new_tid, tag_name: Tag.find(new_tid).name)
-          end
-        end
-        format.html { redirect_to @event, notice: 'Event was successfully updated.' }
-        format.json { render :show, status: :ok, location: @event }
+    respond_to do |format| 
+      if @event.update(updated_params) #changed from event_params to updated_params
+          update_event_tags(old_event_tags, new_tags_array)
+          format.html { redirect_to @event, notice: 'Event was successfully updated.' }
+          format.json { render :show, status: :ok, location: @event }
       else
           error_msg = "ERROR: "
           @event.errors.full_messages.each do |msg|
@@ -159,7 +114,7 @@ class EventsController < ApplicationController
     end
   end
   # DELETE /events/1
-  # DELETE /events/1.json
+  # DELETE /events/1.json  
   def destroy
      e_id = @event["id"]
     attendances = Attendance.where(event_id: e_id)
@@ -175,6 +130,41 @@ class EventsController < ApplicationController
       format.html { redirect_to events_url, alert: 'Event was successfully cancelled.' }
       format.json { head :no_content }
     end
+  end
+
+  def create_time(params)
+    day_int = params[:event_day].to_date
+    event_day = DateTime.new(day_int.year, day_int.month, day_int.day, 1, 1, 1)
+    thehour = params[:usertime]["hourmin(4i)"].to_i
+    themin = params[:usertime]["hourmin(5i)"].to_i
+    DateTime.new(event_day.year, event_day.month, event_day.day, thehour, themin, 59)
+  end
+
+  def get_tag_string(tag_array)
+    if !tag_array.nil?
+      tag_array.join(",")
+    else
+      ""
+    end
+  end
+
+  def update_event_tags(old_event_tags, new_tags_array)
+       destroy_array = []
+        old_event_tags.each do |old_etag|
+          if new_tags_array==nil or new_tags_array.include?(old_etag["tag_id"]) == false
+            destroy_array.push(old_etag["tag_id"])
+          end
+        end
+        destroy_array.each do |tid|
+          EventTag.where(event_id: params[:id]).find_by(tag_id: tid).destroy
+        end
+        if new_tags_array != nil
+          new_tags_array.each do |new_tid|
+            if old_event_tags.find_by(tag_id: new_tid) == nil
+              @event.event_tags.create(event_id: params[:id], event_name: params[:event][:name], tag_id: new_tid, tag_name: Tag.find(new_tid).name)
+            end
+          end
+        end
   end
 
   private
@@ -205,4 +195,3 @@ class EventsController < ApplicationController
       end
     end
 end
-
