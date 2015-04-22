@@ -8,23 +8,22 @@ class FriendshipsController < ApplicationController
   end
 
   def add_new_friend
-    
-    desired_friend = User.find_by(name: params[:friend_name])
-    my_id = params[:user_id]
-    my_name = User.find_by(id: my_id)["name"]
-    #TODO: need to check that desired_friend is not already my friend
-    #and check that i am not adding myself
+    friend = User.find_by(name: params[:friend_name])
  
-    if desired_friend
-      desired_friend_id = desired_friend["id"]
-      @friendship = Friendship.create(user_id: my_id, user_name: my_name, friend_id: desired_friend_id, friend_name: desired_friend["name"])
-      redirect_to "/users/"+my_id
-
+    if not friend
+      flash[:danger] = 'We can\'t find your friend in our system.'
+    elsif current_user?(friend)
+      flash[:danger] = 'Can\'t add yourself as friend :('
+    elsif Friendship.friends?(current_user, friend) || Friendship.friends?(friend, current_user)
+      flash[:danger] = 'You have already add this friend.'
     else
-      friend_name = params[:friend_name]
-      redirect_to "/users/"+my_id, notice: "Your friend, "+friend_name.to_s+", is not registered in our system."
+      flash[:success] = 'You have added a new friend.'
+      @friendship = Friendship.create(user_id: current_user.id, user_name: current_user.name, 
+                                      friend_id: friend.id, friend_name: friend.name)
     end
+    redirect_to current_user
   end
+
   # GET /friendships/1
   # GET /friendships/1.json
   def show
