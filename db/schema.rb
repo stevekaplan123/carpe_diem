@@ -14,7 +14,6 @@
 ActiveRecord::Schema.define(version: 20150401154911) do
 
   create_table "archived_events", force: :cascade do |t|
-    t.integer  "user_id"
     t.integer  "creator_id"
     t.string   "name"
     t.datetime "time_occurrence"
@@ -44,7 +43,6 @@ ActiveRecord::Schema.define(version: 20150401154911) do
   end
 
   create_table "events", force: :cascade do |t|
-    t.integer  "user_id"
     t.integer  "creator_id"
     t.string   "name"
     t.datetime "time_occurrence"

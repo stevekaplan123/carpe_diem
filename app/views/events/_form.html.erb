@@ -94,10 +94,6 @@ div#checkboxcol3 {
     <%= f.text_field :name %>
   </div>
   
-  <div class="field">
-    <%= f.label :event_location %><br>
-    <%= f.text_field :location %>
-  </div>
 
   <div class="field">
   
@@ -107,25 +103,31 @@ div#checkboxcol3 {
     	<p hidden> <%= @date_today = DateTime.now %> </p>
     	<p hidden> <%= @date_tom = DateTime.now+1 %> </p>
     	<p hidden> <%= @nothing = Time.now %> </p>
+      <% if @event["time_occurrence"] != nil %>
+            <% today_checked = (@event["time_occurrence"].day == Time.now.day) %>
+            <% tomorrow_checked = !(@event["time_occurrence"].day == Time.now.day)  %>
+      <% end %>
     	<div id="radio_buttons">
     		
     		<div id="radio1">
-    			<%= radio_button_tag(:event_day, DateTime.now, :checked => true) %> 
+    			<%= radio_button_tag(:event_day, DateTime.now, today_checked) %> 
     		</div>
     		<div id="label1">
     			<%= label_tag(:choose_today, "Today, #{Date::MONTHNAMES[@date_today.month]} #{@date_today.day}") %>
     		</div>
     	    	
     		<div id="radio2">	
-    			<%= radio_button_tag(:event_day, @date_tom) %>
+    			<%= radio_button_tag(:event_day, @date_tom, tomorrow_checked) %>
     		</div>
     		<div id="label2">
     			<%= label_tag(:choose_tomorrow, "Tomorrow, #{Date::MONTHNAMES[@date_tom.month]} #{@date_tom.day}") %>
 			</div>    	
     	</div>
-
-    	<% puts "wooo #{params[:time_occurrence]}"%>
-    	<%= time_select :usertime, :hourmin, {:ampm => true, :minute_step => 5} %>
+      <% if @event["time_occurrence"] != nil %>
+    	<%= time_select :usertime, :hourmin, {:ampm => true, :minute_step => 5, :default => {:hour => (@event["time_occurrence"].hour+4).to_s, :minute => @event["time_occurrence"].min.to_s}} %>
+      <% else %>
+      <%= time_select :usertime, :hourmin, {:ampm => true, :minute_step => 5} %>
+      <% end %>
     	<!--<%= f.datetime_select :time_occurrence, ampm: true %>  Original line-->
     	
     	<!-- <%= f.radio_button :time_occurrence, DateTime.now, :checked => true %> 
@@ -207,4 +209,3 @@ div#checkboxcol3 {
 
 
 <% end %>
-

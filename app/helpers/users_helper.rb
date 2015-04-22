@@ -7,4 +7,11 @@ module UsersHelper
     image_tag(gravatar_url, alt: user.name, class: "gravatar")
   end
 
+  def user_person(user)
+  	if user.id == current_user.id
+  		"My "
+  	else
+  		user.name + "'s "
+  	end
+  end
 end

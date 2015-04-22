@@ -1,8 +1,9 @@
 class Event < ActiveRecord::Base
+  belongs_to :user, :foreign_key => :creator_id
   has_many :attendances
-  belongs_to :user
   has_many :users, through: :attendances
   has_many :event_tags
+  has_many :tags, through: :event_tags
 
   validates :name, :description, presence: true
   validates :latitude, :longitude, presence: true
