@@ -1,7 +1,6 @@
 class CreateEvents < ActiveRecord::Migration
   def change
     create_table :events do |t|
-      t.belongs_to :user
       t.integer :creator_id
       t.string :name
       t.datetime :time_occurrence
@@ -11,7 +10,7 @@ class CreateEvents < ActiveRecord::Migration
       t.text :description
       t.string :tags
 
-      t.timestamps null: false # might need to be set true to enable created_at, check later - Leifeng ,2015/3/2
+      t.timestamps null: false
     end
   end
 end

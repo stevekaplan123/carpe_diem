@@ -1,6 +1,6 @@
 class User < ActiveRecord::Base
   has_many :attendances
-  has_many :events
+  has_many :events, :foreign_key => :creator_id
   has_many :events, through: :attendances
   has_many :friendships
 

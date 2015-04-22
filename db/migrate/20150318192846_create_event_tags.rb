@@ -5,7 +5,7 @@ class CreateEventTags < ActiveRecord::Migration
       t.integer :tag_id
       t.string :event_name
       t.string :tag_name
-
+      
       t.timestamps null: false
     end
   end
