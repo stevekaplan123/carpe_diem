@@ -9,8 +9,24 @@ class Filter
        puts @events.length
 
 
+       puts "received args:"
+       puts user_id
+       puts location
+       puts near_me
+       puts friends
+       puts time
+       puts "end received args"
+
        if time != '0'
           @events = @events.where(time_occurrence: (Time.now-4.hours)..(Time.now-4.hours+time.to_i.hours))
+
+          puts "time filtered"
+          puts @events.length
+          if (@events.first.isnil?)
+             puts "events is nil"
+          else
+             puts @events.first.name
+          end
        end
 
        puts "after time"
@@ -18,12 +34,39 @@ class Filter
 
        if friends != '0'
           @events = filterByFriends(@events, user_id, friends)
+
+          puts "friends filtered"
+          puts @events.length
+          if (@events.first.isnil?)
+             puts "events is nil"
+          else
+             puts @events.first.name
+          end
+
        end
 
        if near_me != '0'
           lat, lng = location.split(",")
           @events = filterByLocation(@events, lat, lng, near_me)
+
+          puts "location filtered"
+          puts @events.length
+          if (@events.first.isnil?)
+             puts "events is nil"
+          else
+             puts @events.first.name
+          end
        end
+
+       puts "end of filter"
+       puts @events
+       puts @events.length
+       if (@events.first.isnil?)
+          puts "events is nil"
+       else
+          puts @events.first.name
+       end
+       puts "-----"
   end
 
   def filterByFriends(events, user_id, friends)
@@ -85,6 +128,7 @@ class Filter
 
       my_coords = [lat.to_f, lng.to_f]
       filtered_events = []
+      puts "in filter location"
       puts events
       events.each do |event|
           event_coords = [event.latitude.to_f, event.longitude.to_f]
