@@ -286,16 +286,70 @@ p {
 
       function filteredHTMLTitle(locMsg, timeMsg, friendMsg){
         var msg="";
-        if (friendMsg=="0") {
-          msg="Events happening within '"+locMsg+"' and in '"+timeMsg+"'"
+
+        var tempTime = timeMsg;
+        if (tempTime == "30") {
+          tempTime = "30 mins";
         }
-        else if (friendMsg=="going_to"){
-          msg="Events happening within '"+locMsg+"' and in '"+timeMsg+"' that my friends are going to"
-        }      
+        else if(tempTime == "0"){
+          //do nothing
+        }
         else {
-          msg="Events happening within '"+locMsg+"' and in '"+timeMsg+"' that my friends created"
-        }    
-          return "<h4>"+msg+"</h4><br>";
+          tempTime += " hour(s)";
+        }
+
+        if(locMsg=="0") {
+          if (tempTime =="0"){
+            if (friendMsg=="0") {
+              msg="No Criteria Set"
+            }
+            else if (friendMsg=="going_to"){
+              msg="Events that my friends are going to"
+            }      
+            else {
+              msg="Events that my friends created"
+            }
+          }  
+          else {
+            if (friendMsg=="0") {
+              msg="Events happening in "+tempTime
+            }
+            else if (friendMsg=="going_to"){
+              msg="Events happening in "+tempTime+" that my friends are going to"
+            }      
+            else {
+              msg="Events happening in "+tempTime+" that my friends created"
+            } 
+          }   
+        }
+        else {
+          if (tempTime =="0"){
+            if (friendMsg=="0") {
+              msg="Events within "+locMsg+" meters"
+            }
+            else if (friendMsg=="going_to"){
+              msg="Events within "+locMsg+" meters that my friends are going to"
+            }      
+            else {
+              msg="Events within "+locMsg+" meters that my friends created"
+            }
+          }  
+          else {
+            if (friendMsg=="0") {
+              msg="Events within "+locMsg+" meters happening in "+tempTime
+            }
+            else if (friendMsg=="going_to"){
+              msg="Events within "+locMsg+" meters happening in "+tempTime+" that my friends are going to"
+            }      
+            else {
+              msg="Events within "+locMsg+" meters happening in "+tempTime+" that my friends created"
+            } 
+          }
+
+
+        } 
+
+        return "<h4>"+msg+"</h4><br>";
       }
 
 
@@ -485,6 +539,8 @@ p {
             <li onclick="setFilterArgs('loc', '100'); sendFilterArgs()"><a href="#">100 meters</a></li>
             <li onclick="setFilterArgs('loc', '200'); sendFilterArgs()"><a href="#">200 meters</a></li>
             <li onclick="setFilterArgs('loc', '500'); sendFilterArgs()"><a href="#">500 meters</a></li>
+            <li onclick="setFilterArgs('loc', '1000'); sendFilterArgs()"><a href="#">1000 meters</a></li>
+            <li onclick="setFilterArgs('loc', '2000'); sendFilterArgs()"><a href="#">2000 meters</a></li>
           </ul>
        </li>
 
