@@ -1,9 +1,11 @@
 class ArchivedEvent < ActiveRecord::Base
+
   # Moves expired events from events table to archived_events table.
-  # Deletes them after moving.
+  # Removes attendance of expired events
   def self.archive
     Event.expired.each do |event|
-      ArchivedEvent.new(event.attributes)
+      self.new(event.attributes)
+      Attendance.delete_all('event_id = ?', event.id)
       event.destroy
     end
   end
