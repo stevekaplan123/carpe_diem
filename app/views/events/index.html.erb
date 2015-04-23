@@ -76,6 +76,7 @@ p {
         var tag = null;
         var attendances = []
         var count=0
+        var curr_zoom = 0
 
 
         var locationReq = "100";
@@ -84,10 +85,10 @@ p {
 
         
         window.onload = function(){
-           
+           curr_zoom = 15;
           var myOptions = {
               center: new google.maps.LatLng(42.3654347, -71.258595),
-              zoom: 15,
+              zoom: curr_zoom,
               mapTypeId: google.maps.MapTypeId.ROADMAP
           };
           gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
@@ -141,7 +142,9 @@ p {
                 //first clear old event markers and clear out table of events
               clearMarkers()
               clearWindows()
-
+              curr_zoom = 15            //reset zoom and center to brandeis campus
+              gMap.setZoom(curr_zoom)
+              gMap.setCenter(new google.maps.LatLng(42.3654347, -71.258595))
               //clear out the old list of events
               document.getElementById("below_menu").innerHTML = ""
               //document.getElementById("below_menu").innerHTML = filterHTML(type, tag)
@@ -161,6 +164,7 @@ p {
                   var event_id = JSON.parse(xmlhttp.responseText)[i]["id"].toString();
                   var event_name=JSON.parse(xmlhttp.responseText)[i]["event_name"];
                   var creator_id=JSON.parse(xmlhttp.responseText)[i]["creator_id"];
+                  makeItFit(latitude, longitude) //zoom out if necessary to have all events on map
 
                   //mark events on map that were result of filtering by 'type'
                   markEvents(latitude, longitude, event_name)
@@ -179,6 +183,25 @@ p {
         xmlhttp.send();
       }
 
+        function makeItFit(lat, lng)
+        {
+            var bounds = gMap.getBounds();
+            var ne = bounds.getNorthEast(); // LatLng of the north-east corner 73, 180
+            var sw = bounds.getSouthWest(); // LatLng of the south-west corder -85, -180
+            //var nw = new google.maps.LatLng(ne.lat(), sw.lng());
+           // var se = new google.maps.LatLng(sw.lat(), ne.lng());
+            if (ne.lat() >= lat && sw.lat() <= lat && ne.lng() >= lng && sw.lng() <= lng)
+            {
+              return true;
+            }
+            else
+            {
+              curr_zoom = curr_zoom - 2;
+              gMap.setZoom(curr_zoom)
+              makeItFit(lat, lng)
+            }
+        }
+        
       function setFilterArgs(type, arg) {
         if(type=="loc"){
           locationReq = arg;
