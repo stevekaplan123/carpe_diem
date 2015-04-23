@@ -4,74 +4,51 @@ class Filter
 
   def initialize(user_id, location, near_me, friends, time)
     @events = Event.all
-    puts time.to_i.hours
-    puts "before time"
-    puts @events.length
-
-
-    puts "received args:"
-    puts user_id
-    puts location
-    puts near_me
-    puts time
-    puts friends
-    puts "end received args"
 
     if time != '0'
-
       if time == '30'
-        @events = @events.where(time_occurrence: (Time.now-4.hours)..(Time.now-4.hours+time.to_i.hours))
+        @events = @events.where(time_occurrence: (Time.now-4.hours)..(Time.now-4.hours+time.to_i.minutes))
       else
         @events = @events.where(time_occurrence: (Time.now-4.hours)..(Time.now-4.hours+time.to_i.hours))
       end
-
-      puts "time filtered"
-      puts @events.length
       if (@events.first.nil?)
-       puts "time - events is nil"
-     else
+         puts "time - events is nil"
+       else
+         puts @events.first.name
+      end
+   end
+
+   if friends != '0'
+      @events = filterByFriends(@events, user_id, friends)
+      if (@events.first.nil?)
+       puts "friend - events is nil"
+      else
        puts @events.first.name
      end
    end
 
-   puts "after time"
-   puts @events.length
+   if near_me != '0'
+      lat, lng = location.split(",")
+      @events = filterByLocation(@events, lat, lng, near_me)
 
-   if friends != '0'
-    @events = filterByFriends(@events, user_id, friends)
+      puts "location filtered"
+      puts @events.length
+      if (@events.first.nil?)
+       puts "loc - events is nil"
+     else
+       puts @events.first.name
+      end
+    end
 
-    puts "friends filtered"
+    puts "end of filter"
+    puts @events
     puts @events.length
     if (@events.first.nil?)
-     puts "friend - events is nil"
-   else
-     puts @events.first.name
-   end
-
- end
-
- if near_me != '0'
-  lat, lng = location.split(",")
-  @events = filterByLocation(@events, lat, lng, near_me)
-
-  puts "location filtered"
-  puts @events.length
-  if (@events.first.nil?)
-   puts "loc - events is nil"
- else
-   puts @events.first.name
- end
-end
-
-puts "end of filter"
-puts @events
-puts @events.length
-if (@events.first.nil?)
-  puts "end - events is nil"
-else
-  puts @events.first.name
-end
-puts "-----"
+      puts "end - events is nil"
+    else
+      puts @events.first.name
+    end
+    puts "-----"
 end
 
 def filterByFriends(events, user_id, friends)
