@@ -4,7 +4,7 @@ class Friendship < ActiveRecord::Base
 
   # Returns true if p1 and p2 are friends
   def self.friends?(p1, p2)
-    not self.where('user_id = ?', p1.id).where('friend_id = ?', p2.id).empty?
+    not self.where('user_id = ? AND friend_id = ?', p1.id, p2.id).empty?
   end
 
 end
