@@ -19,7 +19,7 @@ p {
 #menuwrapper {
   float: left;
   width: 50%;
-  padding: 0px ;
+  padding: 4px ;
 
 }
 
@@ -30,6 +30,15 @@ p {
 }
 
 
+
+#lower-group {
+  height: 500px;
+  overflow: scroll;
+}
+
+#map-group {
+  height: 572px;
+}
 
 
 /* Clear float */
@@ -497,13 +506,15 @@ p {
     </ul>
   </div>
     </nav>
-    <nav class="navbar navbar-default">
+    <nav class="navbar navbar-default" id="lower-group">
     <div id="below_menu"></div>
-   </nav>
+    </nav>
   </div><!-- close menuwrapper-->
   
   <div id="content">  
-    <div id="map_canvas" style="width: 600px; height: 400px"></div>
+    <nav class="navbar navbar-default" id="map-group">
+    <div id="map_canvas" style="width: 560px; height: 570px"></div>
+  </nav>
   </div>
 </div>
 
