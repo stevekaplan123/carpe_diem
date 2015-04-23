@@ -8,22 +8,34 @@ class EventsController < ApplicationController
   # GET /events.json
   def index
     @events = Event.all
+    puts "?!!!!!!"
+    puts "?!!!!!!"
+    puts "?!!!!!!"
+    puts "?!!!!!!"
+    puts "?!!!!!!"
+    if params[:user_action] != nil and params[:user_action] == "cancelled"
+      @status = "You are no longer signed up for '"+params[:eid]+"'."
+    elsif params[:user_action] != nil and params[:user_action] == "signed_up"
+      @status = "You've signed up for '"+params[:eid]+"'."
+    else
+      @status = ""
+    end
   end
-
+# PUT /events/signup?args where args are event_id, whatAction, user_id
   def signup
     event_id = params[:event_id]
     user_id = params[:user_id]
     if params[:whatAction]=="1"       #1 for sign up, 0 for cancel                      
         Attendance.create(event_id: event_id, user_id: user_id)
         @event = Event.find_by(id: event_id)
-        redirect_to @event, notice: "You have successfully signed up for this event."        
+        redirect_to "/events?user_action=signed_up&eid="+@event["name"]       
     elsif params[:whatAction]=="0"                            
         attendances = Attendance.where(event_id: event_id, user_id: user_id)
         attendances.each do |att|
           att.destroy 
         end
         @event = Event.find_by(id: event_id)
-        redirect_to @event, notice: "You are no longer signed up for this event."
+        redirect_to "/events?user_action=cancelled&eid="+@event["name"]
     end
   end
   # GET /events/1

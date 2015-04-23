@@ -14,8 +14,8 @@ class FriendshipsController < ApplicationController
       flash[:danger] = 'We can\'t find your friend in our system.'
     elsif current_user?(friend)
       flash[:danger] = 'Can\'t add yourself as friend :('
-    elsif Friendship.friends?(current_user, friend) || Friendship.friends?(friend, current_user)
-      flash[:danger] = 'You have already add this friend.'
+    elsif Friendship.friends?(current_user, friend)
+      flash[:danger] = 'You have already added this friend.'
     else
       flash[:success] = 'You have added a new friend.'
       @friendship = Friendship.create(user_id: current_user.id, user_name: current_user.name, 
