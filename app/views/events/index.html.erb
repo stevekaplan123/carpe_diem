@@ -221,10 +221,10 @@ p {
         }
 
       function checkCookies(type) {
+          uid = '<%= current_user.id %>'
           if (type == "friends")
           {
-
-             var friends_pref = getCookie("carpe_diem_preferences_friend");
+             var friends_pref = getCookie(uid+"carpe_diem_preferences_friend");
              if (friends_pref != "" && friends_pref != null)
              {
                 return friends_pref
@@ -232,7 +232,7 @@ p {
           }
           else if (type == "loc")
           {
-             var loc_pref = getCookie("carpe_diem_preferences_loc");
+             var loc_pref = getCookie(uid+"carpe_diem_preferences_loc");
              if (loc_pref != "" && loc_pref != null)
              {
                 return loc_pref
@@ -240,7 +240,7 @@ p {
           }
           else if (type == "time")
           {
-             var time_pref = getCookie("carpe_diem_preferences_time");
+             var time_pref = getCookie(uid+"carpe_diem_preferences_time");
              if (time_pref != "" && time_pref != null)
              {
                 return time_pref
@@ -255,7 +255,8 @@ p {
       }
         
       function setFilterArgs(type, arg) {
-        setCookie("carpe_diem_preferences_"+type, arg, 30)
+        uid = '<%= current_user.id %>'
+        setCookie(uid+"carpe_diem_preferences_"+type, arg, 30)
         if(type=="loc"){
           locationReq = arg;
         }
