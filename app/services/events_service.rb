@@ -1,5 +1,16 @@
 class EventsService
 
+  def self.convert_words_to_uri(txt)
+    if txt != nil
+      txt_array = txt.split(" ")
+      if txt_array.length > 1
+        txt_array.join("_")
+      else
+        txt
+      end
+    end
+  end
+
   def self.create_time(params)
     puts "called"
     day_int = params[:event_day].to_date
