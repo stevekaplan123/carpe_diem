@@ -67,7 +67,14 @@
           <%= "You have yet to sign up for any events." %>
         <% end %>
         <ul><% @user.events.each do |event| %>
-          <li><%= link_to event['name'], "/events/"+event['id'].to_s %> (Click to see event details)</li>
+          <li>
+            <%= link_to event['name'], "/events/"+event['id'].to_s %>
+            <%if event.creator_id == current_user.id%>
+              <%= link_to 'Cancel', event, method: :delete, data: { confirm: 'Are you sure?' } %>
+              <% else %>
+              <%= link_to 'I\'m not going.', event.attendances.find_by(user_id: current_user.id), method: :delete, data: { confirm: 'Are you sure?' } %>
+            <% end %>
+          </li>
           <% end %>
         </ul>
       </div>

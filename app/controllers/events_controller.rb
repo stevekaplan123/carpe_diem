@@ -138,7 +138,7 @@ class EventsController < ApplicationController
     end
     @event.destroy
     respond_to do |format|
-      format.html { redirect_to events_url, alert: 'Event was successfully cancelled.' }
+      format.html { redirect_to :back, alert: 'Event was successfully cancelled.' }
       format.json { head :no_content }
     end
   end
