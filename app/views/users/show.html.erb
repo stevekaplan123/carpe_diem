@@ -1,32 +1,27 @@
-
-
 <% provide(:title, @user.name) %>
 
-  <div class="col-md-3">
-    <section class="user_info">
-      <h1>
-        <%= gravatar_for @user %>
-      </h1>
-    </section>
-    <p>
-      <strong>User name:</strong>
-      <%= @user.name %>
-    </p>
+<div class="col-md-3">
+  <section class="user_info">
+    <h1>
+      <%= gravatar_for @user %>
+    </h1>
+  </section>
+  <p>
+    <strong>Name:</strong>
+    <%= @user.name %>
+  </p>
 
-    <p>
-      <strong>Email:</strong>
-      <%= @user.email %>
-    </p>
+  <p>
+    <strong>Email:</strong>
+    <%= @user.email %>
+  </p>
 
-    <p>
-      <strong>User ID:</strong>
-      <%= @user.id %>
-    </p>
-  </div>
+  <% if current_user?(@user) %>
+    <%= link_to 'Edit', edit_user_path(@user) %>
+  <% end %>
+</div>
 
-
-
-<div class="user_container">
+<div class="col-md-9">
   <ul class="nav nav-tabs">
     <li class="active"><a data-toggle="tab" href="#home">Friends</a></li>
     <li><a data-toggle="tab" href="#menu1">Events</a></li>
@@ -44,6 +39,7 @@
             <% @user.friendships.each do |friendship| %>
               <li>
                 <%= link_to friendship['friend_name'], "/users/"+friendship['friend_id'].to_s %>
+                |
                 <%= link_to 'Delete', friendship, method: :delete, data: { confirm: 'Are you sure?' } %>
               </li>
             <% end %>
@@ -67,38 +63,33 @@
           <%= "You have yet to sign up for any events." %>
         <% end %>
         <ul><% @user.events.each do |event| %>
-          <li><%= link_to event['name'], "/events/"+event['id'].to_s %> (Click to see event details)</li>
+          <li>
+            <% temp = "collapseEvent#{event.id}" %>
+            <%= link_to event.name, "##{temp}", "data-toggle" => "collapse", 
+                                    "aria-expanded" => "false", "aria-controls" => temp %>
+
+            |
+
+            <% if current_user?(event.user) %>
+              <%= link_to 'Cancel', event, method: :delete, data: { confirm: 'Are you sure?' } %>
+            <% else %>
+              <%= link_to 'I\'m not going.', event.attendances.find_by(user_id: current_user.id), method: :delete, data: { confirm: 'Are you sure?' } %>
+            <% end %>
+
+            <div class="collapse" id="<%= temp %>">
+              <strong>Created by:</strong>
+              <%= link_to event.user.name, event.user %>
+              <br>
+              <strong>Time:</strong>
+              <%= event.time_occurrence.utc().to_formatted_s(:long) %>
+              <br>
+              <strong>Description:</strong>
+              <%= event.description %>
+            </div>
+          </li>
           <% end %>
         </ul>
       </div>
     </div>
   </div>
 </div>
-
-
-<!-- <table class="table table-striped table-bordered">
-  <thead>
-    <tr>
-      <th>Event Name</th>
-      <th>Time</th>
-      <th>Location</th>
-      <th>Creator Name</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @user.events.each do |event| %>
-      <tr>
-        <td><%= event.name %></td>
-        <td><%= event.time_occurrence %></td>
-        <td><%= event.location %></td>
-        <td><%= User.find(event.creator_id).name %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table> -->
-
-<br><br>
-
-
-
