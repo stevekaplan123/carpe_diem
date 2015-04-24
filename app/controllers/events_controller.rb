@@ -8,11 +8,11 @@ class EventsController < ApplicationController
   # GET /events.json
   def index
     @events = Event.all
-    puts "?!!!!!!"
-    puts "?!!!!!!"
-    puts "?!!!!!!"
-    puts "?!!!!!!"
-    puts "?!!!!!!"
+    @users = {}
+    @events.each do |event|
+      uid = event["creator_id"]
+      @users[uid] = User.find_by(id: uid)["name"]
+    end
     if params[:user_action] != nil and params[:user_action] == "cancelled"
       @status = "You are no longer signed up for '"+params[:eid]+"'."
     elsif params[:user_action] != nil and params[:user_action] == "signed_up"
@@ -38,18 +38,18 @@ class EventsController < ApplicationController
         redirect_to "/events?user_action=cancelled&eid="+@event["name"]
     end
   end
+
   # GET /events/1
   # GET /events/1.json
-  # Low efficiency, will have to check the database every time - Leifeng, 03/17 
   def show
-    @creator = User.find(@event.creator_id).name
     @attendees = []
-    @event.attendances.each do |a|
-      @attendees.push(User.find(a.user_id).name)
-    end
-    current_event_id = params[:id]
-    @event_tags = EventTag.where(event_id: current_event_id)
+    @event.attendances.each { |a| @attendees.push(a.user) }
+
+    @event_tags = []
+    EventTag.where(event_id: @event.id).each { |t| @event_tags.push(t.tag_name) }
+
   end
+
   # GET /events/filter?args
   def filter
        filter_events = Filter.new(current_user.id, params[:location], params[:near_me], params[:friendship], params[:time])
