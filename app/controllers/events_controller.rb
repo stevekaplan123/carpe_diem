@@ -8,11 +8,11 @@ class EventsController < ApplicationController
   # GET /events.json
   def index
     @events = Event.all
-    puts "?!!!!!!"
-    puts "?!!!!!!"
-    puts "?!!!!!!"
-    puts "?!!!!!!"
-    puts "?!!!!!!"
+    @users = {}
+    @events.each do |event|
+      uid = event["creator_id"]
+      @users[uid] = User.find_by(id: uid)["name"]
+    end
     if params[:user_action] != nil and params[:user_action] == "cancelled"
       @status = "You are no longer signed up for '"+params[:eid]+"'."
     elsif params[:user_action] != nil and params[:user_action] == "signed_up"

@@ -79,30 +79,37 @@ p {
         var curr_zoom = 0
 
 
-        var locationReq = "100";
-        var timeReq = "1";
+        var locationReq = "250";
+        var timeReq = "5";
         var friendReq = "0";
+        var users = new Object()
 
         
         window.onload = function(){
-           curr_zoom = 15;
-          var myOptions = {
-              center: new google.maps.LatLng(42.3654347, -71.258595),
-              zoom: curr_zoom,
-              mapTypeId: google.maps.MapTypeId.ROADMAP
-          };
-          gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
 
-          loadAttendances()
+            <% @users.each do |user| %>
+                <% if user != nil %>
+                users[<%= user[0] %>] = '<%= user[1] %>'
+                <% end %>
+            <% end %>
+            curr_zoom = 15;
+            var myOptions = {
+                center: new google.maps.LatLng(42.3654347, -71.258595),
+                zoom: curr_zoom,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
 
-          if (navigator.geolocation) {
-              navigator.geolocation.getCurrentPosition(success, error); 
+            loadAttendances()
 
-          } else { 
-              error();
-          }
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(success, error); 
 
-          hide_and_seek_menus()            
+            } else { 
+                error();
+            }
+
+            hide_and_seek_menus()            
        }
 
        function hide_and_seek_menus()
@@ -137,15 +144,13 @@ p {
           {
             if (xmlhttp.readyState==4 && xmlhttp.status==200)
             {
-                //first clear old event markers and clear out table of events
-              clearMarkers()
+              clearMarkers()        //first clear old event markers and clear out table of events
               clearWindows()
               curr_zoom = 15            //reset zoom and center to brandeis campus
               gMap.setZoom(curr_zoom)
               gMap.setCenter(new google.maps.LatLng(42.3654347, -71.258595))
               //clear out the old list of events
               document.getElementById("below_menu").innerHTML = ""
-              //document.getElementById("below_menu").innerHTML = filterHTML(type, tag)
               document.getElementById("below_menu").innerHTML = filteredHTMLTitle(locArg, timeArg, friendArg)
                 //now show the filtered events
               result = JSON.parse(xmlhttp.responseText);
@@ -160,24 +165,18 @@ p {
                   latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
                   longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
                   var event_id = JSON.parse(xmlhttp.responseText)[i]["id"].toString();
-                  var event_name=JSON.parse(xmlhttp.responseText)[i]["event_name"];
+                  var event_name=JSON.parse(xmlhttp.responseText)[i]["name"];
                   var creator_id=JSON.parse(xmlhttp.responseText)[i]["creator_id"];
+                  var creator_name = users[creator_id]
+                  var description = JSON.parse(xmlhttp.responseText)[i]["description"]
                   makeItFit(latitude, longitude) //zoom out if necessary to have all events on map
-
-                  //mark events on map that were result of filtering by 'type'
-                  markEvents(latitude, longitude, event_name)
-                  //repopulate the navigation bar with the events filtered by 'type'
-                  document.getElementById("below_menu").innerHTML += eventHTML(event_id, creator_id, xmlhttp) 
+                  markEvents(latitude, longitude, event_name) //mark events on map that were result of filtering by 'type'
+                  document.getElementById("below_menu").innerHTML += eventHTML(event_id, event_name, creator_id, creator_name, description, xmlhttp) 
               }    
 
             }
           }
-        //xmlhttp.open("GET","/events/filter.json?type="+type+"&location="+loc+"&tag="+tag,true);
-
-        //talk to Steve to get params when he is done
-        //xmlhttp.open("GET","/events/filter.json?type="+locArg+"&location="+timeArg+"&tag="+friendArg,true);
         xmlhttp.open("GET","/events/filter.json?location="+loc+"&near_me="+locArg+"&friendship="+friendArg+"&time="+timeArg,true);
-
         xmlhttp.send();
       }
 
@@ -385,45 +384,39 @@ p {
           }
         }
 
-        function eventHTML(event_id, creator_id, xmlhttp)
+        function eventHTML(event_id, event_name, creator_id, creator_name, description, xmlhttp)
         {
-                              //token=6OLjbvZ86MX4A2Y/hgcpG612KNRddl8wKsvKU7gEuKaRb0j/OHXofvGP2hLsxWe7BhEVicgdEqNxqHjCpFkXQ"
-
-          var append_to="";
+          var append_to="";  
           var current_name = '<%= current_user.name %>';
           var current_id = <%= current_user.id %>
-          var alreadyGoing = attendances.indexOf(event_id);
-
-          
+          var alreadyGoing = attendances.indexOf(event_id); 
           if (current_id==creator_id || current_name=="admin")
           { 
-            append_to =  '<p><a data-confirm="Are you sure?" rel="nofollow"' +
+            append_to =  '<a style="font-size:x-small" data-confirm="Are you sure?" rel="nofollow"' +
                         'data-method="delete" href="/events/'+event_id+
                         '">Cancel Event</a> | '+
-                        '<a href="/events/'+event_id+
+                        '<a style="font-size:x-small" href="/events/'+event_id+
                         '">Show</a> | ' +
-                        '<a href="/events/'+event_id+
+                        '<a style="font-size:x-small" href="/events/'+event_id+
                         '/edit">Edit</a>'
           }
           else if (alreadyGoing < 0)
           {
-            append_to = '<p><a data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+
-                        '&whatAction=1">Sign up!</a> | '+'<a href="/events/'+event_id+
+            append_to = '<a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=1">Sign up!</a> | '+'<a style="font-size:x-small" href="/events/'+event_id+
                         '">Show</a>'
           }
           else if (alreadyGoing >= 0)
           {
-            append_to = '<p><a data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+
-                        '&whatAction=0">I Don\'t Want To Go</a> | '+'<a href="/events/'+event_id+
+            append_to = '<a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0">I Don\'t Want To Go</a> | '+'<a style="font-size:x-small" href="/events/'+event_id+
                         '">Show</a>'
           }
 
-          return append_to+' | <span onclick="OpenWindow(&quot;' +
+          return ' <p>Creator: '+creator_name+' | Event: <span onclick="OpenWindow(&quot;' +
                     JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
                     JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
                     JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
                   'style="cursor: pointer"><b><font color="blue">' +
-                    JSON.parse(xmlhttp.responseText)[i]["name"] + '</b></font></span></p><br>'
+                    event_name + '</b></font></span> | Description: '+description+' | '+append_to+'</p>'
 
         }
 
