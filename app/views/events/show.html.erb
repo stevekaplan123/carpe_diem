@@ -1,37 +1,18 @@
-
-
-
 <div id="showcontainer">
 
 <div id="showtext">
 <p>
-  <strong>Creator:</strong>
-  <%= @creator %>
+  <strong><%= @event.name %></strong>
 </p>
 
 <p>
-  <strong>Event name:</strong>
-  <%= @event.name %>
+  <strong>Created by:</strong>
+  <%= link_to @event.user.name, @event.user %>
 </p>
 
 <p>
-  <strong>Time occurrence:</strong>
+  <strong>Time:</strong>
   <%= @event.time_occurrence.utc().to_formatted_s(:long) %>
-</p>
-
-<p>
-  <strong>Location:</strong>
-  <%= @event.location %>
-</p>
-
-<p>
-  <strong>Longitude:</strong>
-  <%= @event.longitude %>
-</p>
-
-<p>
-  <strong>Latitude:</strong>
-  <%= @event.latitude %>
 </p>
 
 <p>
@@ -41,30 +22,14 @@
 
 <p>
   <strong>Attendance:</strong>
-  <%= @attendees %>
+  <% @attendees.each do |a| %>
+    <%= link_to a.name, a %>
+  <% end %>
 </p>
 
 <p>
-	<strong>Tags (Table Lookup):</strong>
-	<% if @event_tags.nil? %>
-		None	
-	<% else %>
-		<% puts @event_tags.column_names %>
-		<% eventtag_array = []%>
-		<% @event_tags.each do |tag| %>
-			<% eventtag_array.push(tag.tag_name)%>
-			 		
-		<% end %>
-		<%= eventtag_array.join(", ")%>
-	<% end %>	
-</p>
-
-<p>
-	<strong>Tags (Event Field):</strong>
-	<% tags_array = @event.tags.split(",") %>
-	<% name_array = [] %>
-	<% tags_array.each { |tag_id| name_array.push(Tag.find(tag_id).name) } %>
-	<%= name_array.join(", ") %>	
+	<strong>Tags:</strong>
+	<%= @event_tags.join(", ") %>	
 </p>
 </div>
 
@@ -303,9 +268,6 @@
 </div>
 
 </div>
-
-
-
 
 <%= link_to 'Edit', edit_event_path(@event) %> |
 <%= link_to 'Back', events_path %>
