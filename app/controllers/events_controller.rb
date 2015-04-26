@@ -13,10 +13,11 @@ class EventsController < ApplicationController
       uid = event["creator_id"]
       @users[uid] = User.find_by(id: uid)["name"]
     end
+    eid = params[:eid]
     if params[:user_action] != nil and params[:user_action] == "cancelled"
-      @status = "You are no longer signed up for '"+params[:eid]+"'."
+      @status = "You are no longer signed up for '"+eid+"'."
     elsif params[:user_action] != nil and params[:user_action] == "signed_up"
-      @status = "You've signed up for '"+params[:eid]+"'."
+      @status = "You've signed up for '"+eid+"'."
     else
       @status = ""
     end
@@ -28,14 +29,14 @@ class EventsController < ApplicationController
     if params[:whatAction]=="1"       #1 for sign up, 0 for cancel                      
         Attendance.create(event_id: event_id, user_id: user_id)
         @event = Event.find_by(id: event_id)
-        redirect_to "/events?user_action=signed_up&eid="+@event["name"]       
+        redirect_to "/events?user_action=signed_up&eid="+EventsService.convert_words_to_uri(@event["name"])       
     elsif params[:whatAction]=="0"                            
         attendances = Attendance.where(event_id: event_id, user_id: user_id)
         attendances.each do |att|
           att.destroy 
         end
         @event = Event.find_by(id: event_id)
-        redirect_to "/events?user_action=cancelled&eid="+@event["name"]
+        redirect_to "/events?user_action=cancelled&eid="+EventsService.convert_words_to_uri(@event["name"]) 
     end
   end
 
@@ -111,7 +112,7 @@ class EventsController < ApplicationController
     old_event_tags = EventTag.where(event_id: params[:id])
     respond_to do |format| 
       if @event.update(updated_params) #changed from event_params to updated_params
-          EventsService.update_event_tags(old_event_tags, new_tags_array)
+          EventsService.update_event_tags(params, @event, old_event_tags, new_tags_array)
           format.html { redirect_to @event, notice: 'Event was successfully updated.' }
           format.json { render :show, status: :ok, location: @event }
       else

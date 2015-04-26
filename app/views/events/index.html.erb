@@ -79,20 +79,22 @@ p {
         var curr_zoom = 0
 
 
-        var locationReq = "250";
-        var timeReq = "5";
+        var locationReq = "0";
+        var timeReq = "0";
         var friendReq = "0";
         var users = new Object()
 
         
         window.onload = function(){
-
             <% @users.each do |user| %>
                 <% if user != nil %>
                 users[<%= user[0] %>] = '<%= user[1] %>'
                 <% end %>
             <% end %>
-            curr_zoom = 15;
+            locationReq = checkCookies("loc")
+            timeReq = checkCookies("time")
+            friendReq = checkCookies("friends")
+            curr_zoom = 15
             var myOptions = {
                 center: new google.maps.LatLng(42.3654347, -71.258595),
                 zoom: curr_zoom,
@@ -198,8 +200,63 @@ p {
               makeItFit(lat, lng)
             }
         }
+
+       function getCookie(cname) {
+            var name = cname + "=";
+            var ca = document.cookie.split(';');
+            for(var i=0; i<ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0)==' ') c = c.substring(1);
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+        }
+
+      function setCookie(cname,cvalue,exdays) {
+            var d = new Date();
+            d.setTime(d.getTime() + (exdays*24*60*60*1000));
+            var expires = "expires=" + d.toGMTString();
+            document.cookie = cname+"="+cvalue+"; "+expires;
+        }
+
+      function checkCookies(type) {
+          uid = '<%= current_user.id %>'
+          if (type == "friends")
+          {
+             var friends_pref = getCookie(uid+"carpe_diem_preferences_friend");
+             if (friends_pref != "" && friends_pref != null)
+             {
+                return friends_pref
+             }
+          }
+          else if (type == "loc")
+          {
+             var loc_pref = getCookie(uid+"carpe_diem_preferences_loc");
+             if (loc_pref != "" && loc_pref != null)
+             {
+                return loc_pref
+             }
+          }
+          else if (type == "time")
+          {
+             var time_pref = getCookie(uid+"carpe_diem_preferences_time");
+             if (time_pref != "" && time_pref != null)
+             {
+                return time_pref
+             }
+          }
+          else
+          {
+             return 0;
+          }
+
+          return 0;
+      }
         
       function setFilterArgs(type, arg) {
+        uid = '<%= current_user.id %>'
+        setCookie(uid+"carpe_diem_preferences_"+type, arg, 30)
         if(type=="loc"){
           locationReq = arg;
         }
@@ -411,12 +468,13 @@ p {
                         '">Show</a>'
           }
 
-          return ' <p>Creator: '+creator_name+' | Event: <span onclick="OpenWindow(&quot;' +
+          return ' <p><b>'+ event_name + ':</b>    '+description+'<br><b>Creator: </b>'+creator_name+'<br>'+append_to+
+                ' | <b><u><font color="blue"><span onclick="OpenWindow(&quot;' +
                     JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
                     JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
                     JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
-                  'style="cursor: pointer"><b><font color="blue">' +
-                    event_name + '</b></font></span> | Description: '+description+' | '+append_to+'</p>'
+                  'style="cursor: pointer">More Info!</span></b></u></font>' 
+                    '</p>'
 
         }
 
