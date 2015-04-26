@@ -28,7 +28,7 @@ class EventsService
     end
   end
 
-  def self.update_event_tags(old_event_tags, new_tags_array)
+  def self.update_event_tags(params, event, old_event_tags, new_tags_array)
        destroy_array = []
         old_event_tags.each do |old_etag|
           if new_tags_array==nil or new_tags_array.include?(old_etag["tag_id"]) == false
@@ -41,7 +41,7 @@ class EventsService
         if new_tags_array != nil
           new_tags_array.each do |new_tid|
             if old_event_tags.find_by(tag_id: new_tid) == nil
-              @event.event_tags.create(event_id: params[:id], event_name: params[:event][:name], tag_id: new_tid, tag_name: Tag.find(new_tid).name)
+              event.event_tags.create(event_id: params[:id], event_name: params[:event][:name], tag_id: new_tid, tag_name: Tag.find(new_tid).name)
             end
           end
         end

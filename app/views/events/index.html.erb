@@ -451,29 +451,30 @@ p {
           { 
             append_to =  '<a style="font-size:x-small" data-confirm="Are you sure?" rel="nofollow"' +
                         'data-method="delete" href="/events/'+event_id+
-                        '">Cancel Event</a> '+
+                        '">Cancel Event</a> | '+
                         '<a style="font-size:x-small" href="/events/'+event_id+
-                        '">Show</a> ' +
+                        '">Show</a> | ' +
                         '<a style="font-size:x-small" href="/events/'+event_id+
                         '/edit">Edit</a>'
           }
           else if (alreadyGoing < 0)
           {
-            append_to = '<a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=1">Sign up!</a> '+'<a style="font-size:x-small" href="/events/'+event_id+
+            append_to = '<a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=1">Sign up!</a> | '+'<a style="font-size:x-small" href="/events/'+event_id+
                         '">Show</a>'
           }
           else if (alreadyGoing >= 0)
           {
-            append_to = '<a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0">I Don\'t Want To Go</a> '+'<a style="font-size:x-small" href="/events/'+event_id+
+            append_to = '<a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0">I Don\'t Want To Go</a> | '+'<a style="font-size:x-small" href="/events/'+event_id+
                         '">Show</a>'
           }
 
-          return ' <p>Creator: '+creator_name+' | Event: <span onclick="OpenWindow(&quot;' +
+          return ' <p><b>'+ event_name + ':</b>    '+description+'<br><b>Creator: </b>'+creator_name+'<br>'+append_to+
+                ' | <b><u><font color="blue"><span onclick="OpenWindow(&quot;' +
                     JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
                     JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
                     JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
-                  'style="cursor: pointer"><b><u><font color="blue">' +
-                    event_name + '</b></u></font></span> | Description: '+description+' | '+append_to+'</p>'
+                  'style="cursor: pointer">More Info!</span></b></u></font>' 
+                    '</p>'
 
         }
 

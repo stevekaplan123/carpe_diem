@@ -112,7 +112,7 @@ class EventsController < ApplicationController
     old_event_tags = EventTag.where(event_id: params[:id])
     respond_to do |format| 
       if @event.update(updated_params) #changed from event_params to updated_params
-          EventsService.update_event_tags(old_event_tags, new_tags_array)
+          EventsService.update_event_tags(params, @event, old_event_tags, new_tags_array)
           format.html { redirect_to @event, notice: 'Event was successfully updated.' }
           format.json { render :show, status: :ok, location: @event }
       else
