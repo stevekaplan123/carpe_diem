@@ -77,13 +77,16 @@ p {
         var attendances = []
         var count=0
         var curr_zoom = 0
+        var curr_event_name = ""
 
 
         var locationReq = "0";
         var timeReq = "0";
         var friendReq = "0";
         var users = new Object()
-
+        var display_total_desc = new Object()
+        var ne;
+        var sw;
         
         window.onload = function(){
             <% @users.each do |user| %>
@@ -111,7 +114,8 @@ p {
                 error();
             }
 
-            hide_and_seek_menus()            
+            hide_and_seek_menus()  
+
        }
 
        function hide_and_seek_menus()
@@ -168,6 +172,10 @@ p {
                   longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
                   var event_id = JSON.parse(xmlhttp.responseText)[i]["id"].toString();
                   var event_name=JSON.parse(xmlhttp.responseText)[i]["name"];
+                  if (display_total_desc[event_name] == null)
+                  {
+                     display_total_desc[event_name] = false;  //by default, dont display description beyond 50 words
+                  }
                   var creator_id=JSON.parse(xmlhttp.responseText)[i]["creator_id"];
                   var creator_name = users[creator_id]
                   var description = JSON.parse(xmlhttp.responseText)[i]["description"]
@@ -185,8 +193,8 @@ p {
         function makeItFit(lat, lng)
         {
             var bounds = gMap.getBounds();
-            var ne = bounds.getNorthEast(); // LatLng of the north-east corner 73, 180
-            var sw = bounds.getSouthWest(); // LatLng of the south-west corder -85, -180
+            ne = bounds.getNorthEast(); // LatLng of the north-east corner 73, 180
+            sw = bounds.getSouthWest(); // LatLng of the south-west corder -85, -180
             //var nw = new google.maps.LatLng(ne.lat(), sw.lng());
            // var se = new google.maps.LatLng(sw.lat(), ne.lng());
             if (ne.lat() >= lat && sw.lat() <= lat && ne.lng() >= lng && sw.lng() <= lng)
@@ -441,6 +449,45 @@ p {
           }
         }
 
+ 
+
+        function onlyAllow50Words(event_name, txt)
+        {
+            txt_array = txt.split(" ")
+            if (txt_array.length > 50)
+            {
+
+               if (display_total_desc[event_name] == false)   //check here whether this event should display its entire description or not based on hash display_total_desc; default is false
+               {
+                  var show_txt = ""
+                  var hidden_txt = ""
+                  for (var i=0; i<50; i++)
+                  {
+                    show_txt = show_txt + txt_array[i] + " "
+                  }
+                  curr_event_name = event_name
+                  show_txt = show_txt + ' ... <a href="#" onclick="setEventDisplay(true)">(See Full Description)</a>'
+                  return show_txt;
+                }
+                else
+                {
+                  curr_event_name = event_name
+                  txt = txt + ' <a href="#" onclick="setEventDisplay(false)">(See Less Description)</a> '
+                }
+            }
+            else 
+            {
+              return txt;
+            }
+            return txt
+        } 
+
+        function setEventDisplay(val)
+        {
+          display_total_desc[curr_event_name] = val
+          sendFilterArgs()
+        }
+
         function eventHTML(event_id, event_name, creator_id, creator_name, description, xmlhttp)
         {
           var append_to="";  
@@ -467,20 +514,19 @@ p {
             append_to = '<a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0">I Don\'t Want To Go</a> | '+'<a style="font-size:x-small" href="/events/'+event_id+
                         '">Show</a>'
           }
-
+          description = onlyAllow50Words(event_name, description)
           return ' <p><b>'+ event_name + ':</b>    '+description+'<br><b>Creator: </b>'+creator_name+'<br>'+append_to+
                 ' | <b><u><font color="blue"><span onclick="OpenWindow(&quot;' +
                     JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
                     JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
-                    JSON.parse(xmlhttp.responseText)[i]["description"] + '&quot, &quot;desc&quot;)"' +
-                  'style="cursor: pointer">More Info!</span></b></u></font>' 
+                    JSON.parse(xmlhttp.responseText)[i]["name"] + '&quot)"' +
+                  'style="cursor: pointer">View Event On Map</span></b></u></font>' 
                     '</p>'
 
         }
 
-
        
-          function OpenWindow(event_info, type)
+          function OpenWindow(event_info)
           {
   
               var info=event_info.split("+")
