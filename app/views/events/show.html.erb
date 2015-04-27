@@ -1,7 +1,14 @@
 <div id="showcontainer">
 
 <div id="showtext">
+  <p>
+
+<%= link_to 'Edit', edit_event_path(@event) %> |
+<%= link_to 'Back to Campus Events', events_path %>
+  </p>
+  
 <p>
+
   <strong><%= @event.name %></strong>
 </p>
 
@@ -243,14 +250,6 @@
           }
         }
 
-        
-
-        
-
-
-       
-          
-
           function clearWindows()
           { 
               for (var i=0; i<windows.length; i++)
@@ -268,6 +267,3 @@
 </div>
 
 </div>
-
-<%= link_to 'Edit', edit_event_path(@event) %> |
-<%= link_to 'Back', events_path %>
