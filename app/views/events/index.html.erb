@@ -137,58 +137,99 @@ p {
        }
 
 
-      function loadXMLDoc(locArg, timeArg, friendArg) {          
-        if (loc=="error") //if loc error and no value set on map
-        {
-            alert("In order to see events near you, either allow geolocation on your browser or select your position on the map.")
-        }
-        //first just gets the right xmlhttp based on browser
-          var xmlhttp = loadXMLHTTP()
-          //each time state changes, from 0 to 1 to 2 to 3 to 4, check if it finished (finished means state of 4)
-          //and check status is 200, if status != 200, then the server failed to respond correctly (404 or 500)  
-          xmlhttp.onreadystatechange=function()
+        function loadXMLDoc(locArg, timeArg, friendArg) {          
+          if (loc=="error") //if loc error and no value set on map
           {
-            if (xmlhttp.readyState==4 && xmlhttp.status==200)
+              alert("In order to see events near you, either allow geolocation on your browser or select your position on the map.")
+          }
+          //first just gets the right xmlhttp based on browser
+            var xmlhttp = loadXMLHTTP()
+            //each time state changes, from 0 to 1 to 2 to 3 to 4, check if it finished (finished means state of 4)
+            //and check status is 200, if status != 200, then the server failed to respond correctly (404 or 500)  
+            xmlhttp.onreadystatechange=function()
             {
-              clearMarkers()        //first clear old event markers and clear out table of events
-              clearWindows()
-              curr_zoom = 15            //reset zoom and center to brandeis campus
-              gMap.setZoom(curr_zoom)
-              gMap.setCenter(new google.maps.LatLng(42.3654347, -71.258595))
-              //clear out the old list of events
-              document.getElementById("below_menu").innerHTML = ""
-              document.getElementById("below_menu").innerHTML = filteredHTMLTitle(locArg, timeArg, friendArg)
-                //now show the filtered events
-              result = JSON.parse(xmlhttp.responseText);
-              length = result.length;
-              if (length==0)
+              if (xmlhttp.readyState==4 && xmlhttp.status==200)
               {
-                 document.getElementById("below_menu").innerHTML += "<h4><i>[NO RESULTS]</i></h4>" 
+                clearMarkers()        //first clear old event markers and clear out table of events
+                clearWindows()
+                curr_zoom = 15            //reset zoom and center to brandeis campus
+                gMap.setZoom(curr_zoom)
+                gMap.setCenter(new google.maps.LatLng(42.3654347, -71.258595))
+                //clear out the old list of events
+                document.getElementById("below_menu").innerHTML = ""
+                document.getElementById("below_menu").innerHTML = filteredHTMLTitle(locArg, timeArg, friendArg)
+                  //now show the filtered events
+                result = JSON.parse(xmlhttp.responseText);
+                length = result.length;
+                if (length==0)
+                {
+                   document.getElementById("below_menu").innerHTML += "<h4><i>[NO RESULTS]</i></h4>" 
+
+                }
+                for (i=0; i<length; i++)
+                {
+                    latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
+                    longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
+                    var event_id = JSON.parse(xmlhttp.responseText)[i]["id"].toString();
+                    var event_name=JSON.parse(xmlhttp.responseText)[i]["name"];
+                    var event_time=JSON.parse(xmlhttp.responseText)[i]["time_occurrence"]
+                    event_time = makeRailsDateReadable(event_time)
+                    if (display_total_desc[event_name] == null)
+                    {
+                       display_total_desc[event_name] = false;  //by default, dont display description beyond 50 words
+                    }
+                    var creator_id=JSON.parse(xmlhttp.responseText)[i]["creator_id"];
+                    var creator_name = users[creator_id]
+                    var description = JSON.parse(xmlhttp.responseText)[i]["description"]
+                    makeItFit(latitude, longitude) //zoom out if necessary to have all events on map
+                    markEvents(latitude, longitude, event_name) //mark events on map that were result of filtering by 'type'
+                    document.getElementById("below_menu").innerHTML += eventHTML(event_id, event_name, creator_id, creator_name, description, event_time, xmlhttp) 
+                }    
 
               }
-              for (i=0; i<length; i++)
-              {
-                  latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
-                  longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
-                  var event_id = JSON.parse(xmlhttp.responseText)[i]["id"].toString();
-                  var event_name=JSON.parse(xmlhttp.responseText)[i]["name"];
-                  if (display_total_desc[event_name] == null)
-                  {
-                     display_total_desc[event_name] = false;  //by default, dont display description beyond 50 words
-                  }
-                  var creator_id=JSON.parse(xmlhttp.responseText)[i]["creator_id"];
-                  var creator_name = users[creator_id]
-                  var description = JSON.parse(xmlhttp.responseText)[i]["description"]
-                  makeItFit(latitude, longitude) //zoom out if necessary to have all events on map
-                  markEvents(latitude, longitude, event_name) //mark events on map that were result of filtering by 'type'
-                  document.getElementById("below_menu").innerHTML += eventHTML(event_id, event_name, creator_id, creator_name, description, xmlhttp) 
-              }    
-
             }
-          }
-        xmlhttp.open("GET","/events/filter.json?location="+loc+"&near_me="+locArg+"&friendship="+friendArg+"&time="+timeArg,true);
-        xmlhttp.send();
-      }
+          xmlhttp.open("GET","/events/filter.json?location="+loc+"&near_me="+locArg+"&friendship="+friendArg+"&time="+timeArg,true);
+          xmlhttp.send();
+        }
+
+        function makeRailsDateReadable(event_time)
+        {
+               var readable_time = ""
+               event_time = event_time.replace(":59.000-04:00","")
+               event_time = event_time.replace("T", " ")
+               var date = event_time.split(" ")[0]
+               var time = event_time.split(" ")[1]
+               date = date.replace("-", "/")
+               date = date.replace("-", "/")
+               var js_date = new Date(Date.parse(date))
+               var today = new Date()
+               if (js_date.getDate() != today.getDate())
+               {
+                  readable_time = "Tomorrow " 
+               }
+               else if (js_date.getDate() == today.getDate())
+               {
+                  readable_time = "Today " 
+               }
+               var hour = Number(time.split(":")[0]) + 4
+               if (hour == 12)
+               {
+                   readable_time = readable_time + hour + " noon"
+               }
+               else if (hour == 24)
+               {
+                   readable_time = readable_time + "12 midnight"
+               }
+               else if (hour < 12)
+               {
+                    readable_time = readable_time + hour + " A.M."
+               }
+               else if (hour > 12)
+               {
+                    readable_time = readable_time + ((Number(hour) - 12).toString()) + " P.M."
+               }
+               return readable_time
+        }
 
         function makeItFit(lat, lng)
         {
@@ -300,7 +341,7 @@ p {
         if(locMsg=="0") {
           if (tempTime =="0"){
             if (friendMsg=="0") {
-              msg="No Criteria Set"
+              msg="All Events"
             }
             else if (friendMsg=="going_to"){
               msg="Events that my friends are going to"
@@ -451,28 +492,28 @@ p {
 
  
 
-        function onlyAllow50Words(event_name, txt)
+        function onlyAllow30Words(event_name, txt)
         {
             txt_array = txt.split(" ")
-            if (txt_array.length > 50)
+            if (txt_array.length > 30)
             {
 
                if (display_total_desc[event_name] == false)   //check here whether this event should display its entire description or not based on hash display_total_desc; default is false
                {
                   var show_txt = ""
                   var hidden_txt = ""
-                  for (var i=0; i<50; i++)
+                  for (var i=0; i<30; i++)
                   {
                     show_txt = show_txt + txt_array[i] + " "
                   }
                   curr_event_name = event_name
-                  show_txt = show_txt + ' ... <a href="#" onclick="setEventDisplay(true)">(See Full Description)</a>'
+                  show_txt = show_txt + ' ... <a style="cursor: pointer" onclick="setEventDisplay(true)">(See Full Description)</a>'
                   return show_txt;
                 }
                 else
                 {
                   curr_event_name = event_name
-                  txt = txt + ' <a href="#" onclick="setEventDisplay(false)">(See Less Description)</a> '
+                  txt = txt + ' <a style="cursor: pointer" onclick="setEventDisplay(false)">(See Less Description)</a> '
                 }
             }
             else 
@@ -488,7 +529,7 @@ p {
           sendFilterArgs()
         }
 
-        function eventHTML(event_id, event_name, creator_id, creator_name, description, xmlhttp)
+        function eventHTML(event_id, event_name, creator_id, creator_name, description, event_time, xmlhttp)
         {
           var append_to="";  
           var current_name = '<%= current_user.name %>';
@@ -498,25 +539,20 @@ p {
           { 
             append_to =  '<a style="font-size:x-small" data-confirm="Are you sure?" rel="nofollow"' +
                         'data-method="delete" href="/events/'+event_id+
-                        '">Cancel Event</a> | '+
-                        '<a style="font-size:x-small" href="/events/'+event_id+
-                        '">Show</a> | ' +
+                        '">Cancel Event</a> | ' +
                         '<a style="font-size:x-small" href="/events/'+event_id+
                         '/edit">Edit</a>'
           }
           else if (alreadyGoing < 0)
           {
-            append_to = '<a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=1">Sign up!</a> | '+'<a style="font-size:x-small" href="/events/'+event_id+
-                        '">Show</a>'
+            append_to = '<a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=1">Sign up!</a>'
           }
           else if (alreadyGoing >= 0)
           {
-            append_to = '<a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0">I Don\'t Want To Go</a> | '+'<a style="font-size:x-small" href="/events/'+event_id+
-                        '">Show</a>'
+            append_to = '<a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0">I Don\'t Want To Go</a>'
           }
-          description = onlyAllow50Words(event_name, description)
-          return ' <p><b>'+ event_name + ':</b>    '+description+'<br><b>Creator: </b>'+creator_name+'<br>'+append_to+
-                ' | <b><u><font color="blue"><span onclick="OpenWindow(&quot;' +
+          description = onlyAllow30Words(event_name, description)
+          return ' <p><b>'+ event_name + ':</b>    '+description+'<br><b>Time: </b>'+event_time+'<br><b>Creator: </b>'+creator_name+'<br>'+append_to+' | <b><u><font color="blue"><span onclick="OpenWindow(&quot;' +
                     JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
                     JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
                     JSON.parse(xmlhttp.responseText)[i]["name"] + '&quot)"' +

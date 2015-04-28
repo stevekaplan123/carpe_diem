@@ -21,6 +21,8 @@ class EventsController < ApplicationController
     else
       @status = ""
     end
+   # @attendees = []
+   # @event.attendances.each { |a| @attendees.push(a.user) }
   end
 # PUT /events/signup?args where args are event_id, whatAction, user_id
   def signup
