@@ -24,6 +24,21 @@ Rails.application.configure do
   # Apache or NGINX already handles this.
   config.serve_static_files = ENV['RAILS_SERVE_STATIC_FILES'].present?
 
+    # Don't care if the mailer can't send.
+    config.action_mailer.raise_delivery_errors = false
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.perform_deliveries = true
+    config.action_mailer.default_options = {from: 'system@carpediem.com'}
+    ActionMailer::Base.smtp_settings = {
+      :user_name => 'ralphxiaoz',
+      :password => '1234@Sendgrid',
+      :domain => 'www.carpediem.com',
+      :address => 'smtp.sendgrid.net',
+      :port => 587,
+      :authentication => :plain,
+      :enable_starttls_auto => true
+    }
+
   # Compress JavaScripts and CSS.
   config.assets.js_compressor = :uglifier
   # config.assets.css_compressor = :sass

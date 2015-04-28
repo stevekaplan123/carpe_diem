@@ -18,15 +18,15 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.perform_deliveries = true
   config.action_mailer.default_options = {from: 'system@carpediem.com'}
-  # ActionMailer::Base.smtp_settings = {
-  #   :user_name => 'your_sendgrid_username',
-  #   :password => 'your_sendgrid_password',
-  #   :domain => 'yourdomain.com',
-  #   :address => 'smtp.sendgrid.net',
-  #   :port => 587,
-  #   :authentication => :plain,
-  #   :enable_starttls_auto => true
-  # }
+  ActionMailer::Base.smtp_settings = {
+    :user_name => 'ralphxiaoz',
+    :password => '1234@Sendgrid',
+    :domain => 'www.carpediem.com',
+    :address => 'smtp.sendgrid.net',
+    :port => 587,
+    :authentication => :plain,
+    :enable_starttls_auto => true
+  }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

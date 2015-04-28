@@ -76,6 +76,7 @@ class EventsController < ApplicationController
     @event.tags = tag_string
     respond_to do |format|
       if @event.save
+        UserMailer.create_event_email(@event).deliver_now
         increase_num_events(current_user)
         @event.attendances.create(user_id: session[:user_id])         #assign current user's id to created event
         if tag_array != nil
@@ -112,6 +113,7 @@ class EventsController < ApplicationController
     old_event_tags = EventTag.where(event_id: params[:id])
     respond_to do |format| 
       if @event.update(updated_params) #changed from event_params to updated_params
+          UserMailer.update_event_email(@event).deliver_now
           EventsService.update_event_tags(params, @event, old_event_tags, new_tags_array)
           format.html { redirect_to @event, notice: 'Event was successfully updated.' }
           format.json { render :show, status: :ok, location: @event }
@@ -137,6 +139,7 @@ class EventsController < ApplicationController
     event_tags.each do |etag|
       etag.destroy
     end
+    UserMailer.cancel_event_email(@event).deliver_now
     @event.destroy
     respond_to do |format|
       format.html { redirect_to :back, alert: 'Event was successfully cancelled.' }
