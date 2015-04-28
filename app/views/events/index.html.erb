@@ -5,12 +5,6 @@ body {
     font-size:12px;
 }
 
-p {
-    border-style: solid;
-    border-width: 1px;
-    margin-right: 40%;
-}
-
 #content {
   margin-left:  50%;
   padding: 4px ;
@@ -27,6 +21,12 @@ p {
 #filter_buttons li{
   font-size: 1.15em;
   display: inline;
+}
+
+#trythis {
+  background-color: khaki;
+  margin-left: 3%;
+  margin-right: 3%;
 }
 
 
@@ -160,6 +160,7 @@ p {
                 document.getElementById("below_menu").innerHTML = filteredHTMLTitle(locArg, timeArg, friendArg)
                   //now show the filtered events
                 result = JSON.parse(xmlhttp.responseText);
+
                 length = result.length;
                 if (length==0)
                 {
@@ -168,28 +169,40 @@ p {
                 }
                 for (i=0; i<length; i++)
                 {
-                    latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
-                    longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
-                    var event_id = JSON.parse(xmlhttp.responseText)[i]["id"].toString();
-                    var event_name=JSON.parse(xmlhttp.responseText)[i]["name"];
-                    var event_time=JSON.parse(xmlhttp.responseText)[i]["time_occurrence"]
-                    event_time = makeRailsDateReadable(event_time)
-                    if (display_total_desc[event_name] == null)
+                    if (JSON.parse(xmlhttp.responseText)[i]["name"] == null)
                     {
-                       display_total_desc[event_name] = false;  //by default, dont display description beyond 50 words
+                        addAttendance(JSON.parse(xmlhttp.responseText)[i])
                     }
-                    var creator_id=JSON.parse(xmlhttp.responseText)[i]["creator_id"];
-                    var creator_name = users[creator_id]
-                    var description = JSON.parse(xmlhttp.responseText)[i]["description"]
-                    makeItFit(latitude, longitude) //zoom out if necessary to have all events on map
-                    markEvents(latitude, longitude, event_name) //mark events on map that were result of filtering by 'type'
-                    document.getElementById("below_menu").innerHTML += eventHTML(event_id, event_name, creator_id, creator_name, description, event_time, xmlhttp) 
+                    else
+                    {
+                      latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
+                      longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
+                      var event_id = JSON.parse(xmlhttp.responseText)[i]["id"].toString();
+                      var event_name=JSON.parse(xmlhttp.responseText)[i]["name"];
+                      var event_time=JSON.parse(xmlhttp.responseText)[i]["time_occurrence"]
+                      event_time = makeRailsDateReadable(event_time)
+                      if (display_total_desc[event_name] == null)
+                      {
+                         display_total_desc[event_name] = false;  //by default, dont display description beyond 50 words
+                      }
+                      var creator_id=JSON.parse(xmlhttp.responseText)[i]["creator_id"];
+                      var creator_name = users[creator_id]
+                      var description = JSON.parse(xmlhttp.responseText)[i]["description"]
+                      makeItFit(latitude, longitude) //zoom out if necessary to have all events on map
+                      markEvents(latitude, longitude, event_name) //mark events on map that were result of filtering by 'type'
+                      document.getElementById("below_menu").innerHTML += eventHTML(event_id, event_name, creator_id, creator_name, description, event_time, xmlhttp) 
+                    }
                 }    
 
               }
             }
           xmlhttp.open("GET","/events/filter.json?location="+loc+"&near_me="+locArg+"&friendship="+friendArg+"&time="+timeArg,true);
           xmlhttp.send();
+        }
+
+        function addAttendance(json)
+        {
+          alert(json)
         }
 
         function makeRailsDateReadable(event_time)
@@ -203,14 +216,6 @@ p {
                date = date.replace("-", "/")
                var js_date = new Date(Date.parse(date))
                var today = new Date()
-               if (js_date.getDate() != today.getDate())
-               {
-                  readable_time = "Tomorrow " 
-               }
-               else if (js_date.getDate() == today.getDate())
-               {
-                  readable_time = "Today " 
-               }
                var hour = Number(time.split(":")[0]) + 4
                if (hour == 12)
                {
@@ -227,6 +232,14 @@ p {
                else if (hour > 12)
                {
                     readable_time = readable_time + ((Number(hour) - 12).toString()) + " P.M."
+               }
+               if (js_date.getDate() != today.getDate())
+               {
+                  readable_time = readable_time + " tomorrow" 
+               }
+               else if (js_date.getDate() == today.getDate())
+               {
+                  readable_time = readable_time + " today"
                }
                return readable_time
         }
@@ -326,7 +339,10 @@ p {
 
       function filteredHTMLTitle(locMsg, timeMsg, friendMsg){
         var msg="";
-
+        // locMsg = locMsg.replace("250", "250m (3 min walk)")
+        // locMsg = locMsg.replace("750", "750m (10 min walk)")
+        // locMsg = locMsg.replace("1500", "1500m (20 min walk")
+        // locMsg = locMsg.replace("3000", "3000m (40 min walk)")
         var tempTime = timeMsg;
         if (tempTime == "30") {
           tempTime = "30 mins";
@@ -368,28 +384,25 @@ p {
               msg="Events within "+locMsg+" meters"
             }
             else if (friendMsg=="going_to"){
-              msg="Events within "+locMsg+" meters that my friends are going to"
+              msg="Events within "+locMsg+" that my friends are going to"
             }      
             else {
-              msg="Events within "+locMsg+" meters that my friends created"
+              msg="Events within "+locMsg+" that my friends created"
             }
           }  
           else {
             if (friendMsg=="0") {
-              msg="Events within "+locMsg+" meters happening in "+tempTime
+              msg="Events within "+locMsg+" happening in "+tempTime
             }
             else if (friendMsg=="going_to"){
-              msg="Events within "+locMsg+" meters happening in "+tempTime+" that my friends are going to"
+              msg="Events within "+locMsg+" happening in "+tempTime+" that my friends are going to"
             }      
             else {
-              msg="Events within "+locMsg+" meters happening in "+tempTime+" that my friends created"
+              msg="Events within "+locMsg+" happening in "+tempTime+" that my friends created"
             } 
           }
-
-
         } 
-
-        return "<h4>"+msg+"</h4><br>";
+        return "<h4>"+msg+'</h4>';
       }
 
 
@@ -492,17 +505,17 @@ p {
 
  
 
-        function onlyAllow30Words(event_name, txt)
+        function onlyAllow15Words(event_name, txt)
         {
             txt_array = txt.split(" ")
-            if (txt_array.length > 30)
+            if (txt_array.length > 15)
             {
 
                if (display_total_desc[event_name] == false)   //check here whether this event should display its entire description or not based on hash display_total_desc; default is false
                {
                   var show_txt = ""
                   var hidden_txt = ""
-                  for (var i=0; i<30; i++)
+                  for (var i=0; i<15; i++)
                   {
                     show_txt = show_txt + txt_array[i] + " "
                   }
@@ -551,13 +564,13 @@ p {
           {
             append_to = '<a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0">I Don\'t Want To Go</a>'
           }
-          description = onlyAllow30Words(event_name, description)
-          return ' <p><b>'+ event_name + ':</b>    '+description+'<br><b>Time: </b>'+event_time+'<br><b>Creator: </b>'+creator_name+'<br>'+append_to+' | <b><u><font color="blue"><span onclick="OpenWindow(&quot;' +
+          description = onlyAllow15Words(event_name, description)
+          return '<div id="trythis"> <h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4><h5>'+description+'<br></h3>'+append_to+' | <b><u><font color="blue"><span onclick="OpenWindow(&quot;' +
                     JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
                     JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
                     JSON.parse(xmlhttp.responseText)[i]["name"] + '&quot)"' +
                   'style="cursor: pointer">View Event On Map</span></b></u></font>' 
-                    '</p>'
+                    '</div>'
 
         }
 
@@ -575,7 +588,7 @@ p {
               }
 
               desc_window = new google.maps.InfoWindow({
-                    content: desc,
+                    content: '<a href="http://www.google.com">GOOGLE!</a>'+desc,
                     position: new google.maps.LatLng(lat, lng)
                  });
                desc_window.open(gMap);
@@ -598,7 +611,11 @@ p {
 <body>
 <div id="container">
 
+
+
  <div id="menuwrapper">
+  <%= link_to 'New Event', new_event_path %>
+
 <h4> <%= @status %></h4>
   <nav class="navbar navbar-default">
     
@@ -675,9 +692,5 @@ p {
 
 <div id="locationDiv" style="visibility:hidden"></div>
  
-
-
-<%= link_to 'New Event', new_event_path %>
-<%= link_to 'Back', root_path %>
 </body>
 </html>
