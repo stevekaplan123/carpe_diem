@@ -28,17 +28,17 @@ class EventsController < ApplicationController
   def signup
     event_id = params[:event_id]
     user_id = params[:user_id]
-    if params[:whatAction]=="1"       #1 for sign up, 0 for cancel                      
+    if params[:whatAction]=="1"       #1 for sign up, 0 for cancel
         Attendance.create(event_id: event_id, user_id: user_id)
         @event = Event.find_by(id: event_id)
-        redirect_to "/events?user_action=signed_up&eid="+EventsService.convert_words_to_uri(@event["name"])       
-    elsif params[:whatAction]=="0"                            
+        redirect_to "/events?user_action=signed_up&eid="+EventsService.convert_words_to_uri(@event["name"])
+    elsif params[:whatAction]=="0"
         attendances = Attendance.where(event_id: event_id, user_id: user_id)
         attendances.each do |att|
-          att.destroy 
+          att.destroy
         end
         @event = Event.find_by(id: event_id)
-        redirect_to "/events?user_action=cancelled&eid="+EventsService.convert_words_to_uri(@event["name"]) 
+        redirect_to "/events?user_action=cancelled&eid="+EventsService.convert_words_to_uri(@event["name"])
     end
   end
 
@@ -101,19 +101,19 @@ class EventsController < ApplicationController
   # PATCH/PUT /events/1
   # PATCH/PUT /events/1.json
   def update
-    @tags = Tag.all    
+    @tags = Tag.all
     time_occurrence_datetime = EventsService.create_time(params)
     new_tags_array = params[:tag_ids]
     tag_string = EventsService.get_tag_string(new_tags_array)
-    updated_params = {"name"=>params[:event][:name],   #does not update event tags, see code below 
-    "location"=>"", 
-    "longitude"=>params[:event][:longitude], 
-    "latitude"=>params[:event][:latitude], 
-    "description"=>params[:event][:description], 
-    "time_occurrence"=>time_occurrence_datetime, 
-    "tags"=>tag_string}    
+    updated_params = {"name"=>params[:event][:name],   #does not update event tags, see code below
+    "location"=>"",
+    "longitude"=>params[:event][:longitude],
+    "latitude"=>params[:event][:latitude],
+    "description"=>params[:event][:description],
+    "time_occurrence"=>time_occurrence_datetime,
+    "tags"=>tag_string}
     old_event_tags = EventTag.where(event_id: params[:id])
-    respond_to do |format| 
+    respond_to do |format|
       if @event.update(updated_params) #changed from event_params to updated_params
           UserMailer.update_event_email(@event).deliver_now
           EventsService.update_event_tags(params, @event, old_event_tags, new_tags_array)
@@ -130,13 +130,13 @@ class EventsController < ApplicationController
     end
   end
   # DELETE /events/1
-  # DELETE /events/1.json  
+  # DELETE /events/1.json
   def destroy
      e_id = @event["id"]
     attendances = Attendance.where(event_id: e_id)
     attendances.each do |att|
         att.destroy
-    end          
+    end
     event_tags = EventTag.where(event_id: e_id)
     event_tags.each do |etag|
       etag.destroy
@@ -147,6 +147,12 @@ class EventsController < ApplicationController
       format.html { redirect_to :back, alert: 'Event was successfully cancelled.' }
       format.json { head :no_content }
     end
+  end
+
+  def my_events
+    @user = current_user
+    @expired_events = ArchivedEvent.where('creator_id = ?', current_user.id)
+    render 'myEvents'
   end
 
   private

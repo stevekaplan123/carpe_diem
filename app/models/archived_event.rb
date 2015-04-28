@@ -1,4 +1,5 @@
 class ArchivedEvent < ActiveRecord::Base
+  belongs_to :user, :foreign_key => :creator_id
 
   # Moves expired events from events table to archived_events table.
   # Removes attendance of expired events

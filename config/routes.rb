@@ -16,17 +16,19 @@ Rails.application.routes.draw do
     get 'contact' => :contact
   end
 
-  post '/friendships/add_new_friend'
-  get 'signup' => 'users#new'
-  put 'events/signup'
-  get 'events/filter'
-
   resources :friendships
+  post '/friendships/add_new_friend'
+
   resources :events do
     resources :attendances
   end
+  put 'events/signup'
+  get 'events/filter'
+  get 'myEvents' => 'events#my_events'
+
   resources :attendances
   resources :users
+  get 'signup' => 'users#new'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
