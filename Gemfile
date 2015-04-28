@@ -35,6 +35,7 @@ gem 'bootstrap-sass'
 gem 'rails_admin'
 
 gem 'whenever'
+gem 'actionmailer'
 
 group :development, :test do
   # gem for generating fake data
@@ -53,6 +54,6 @@ group :development, :test do
 end
 
 group :production do
-  #gem 'pg'
+  gem 'pg'
   gem 'rails_12factor'
 end

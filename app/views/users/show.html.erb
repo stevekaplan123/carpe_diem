@@ -1,95 +1,17 @@
 <% provide(:title, @user.name) %>
 
-<div class="col-md-3">
-  <section class="user_info">
-    <h1>
-      <%= gravatar_for @user %>
-    </h1>
-  </section>
-  <p>
-    <strong>Name:</strong>
-    <%= @user.name %>
-  </p>
+<%= gravatar_for @user %>
 
-  <p>
-    <strong>Email:</strong>
-    <%= @user.email %>
-  </p>
+<strong>Name:</strong>
+<%= @user.name %>
 
-  <% if current_user?(@user) %>
-    <%= link_to 'Edit', edit_user_path(@user) %>
-  <% end %>
-</div>
+<br>
 
-<div class="col-md-9">
-  <ul class="nav nav-tabs">
-    <li class="active"><a data-toggle="tab" href="#home">Friends</a></li>
-    <li><a data-toggle="tab" href="#menu1"><%= user_person @user%> Events</a></li>
-  </ul>
+<strong>Email:</strong>
+<%= @user.email %>
 
-  <div class="tab-content">
-    <div id="home" class="tab-pane fade in active">
-      <div class="row">
-        <div class="col-md-5 col-md-offset-1">
-          <h1><%= user_person @user%> friends:</h1>
-          <% if @user.friendships.length==0 %>
-            <%= "You have yet to add any friends." %>
-          <% end %>
-          <ul>
-            <% @user.friendships.each do |friendship| %>
-              <li>
-                <%= link_to friendship['friend_name'], "/users/"+friendship['friend_id'].to_s %>
-                |
-                <%= link_to 'Delete', friendship, method: :delete, data: { confirm: 'Are you sure?' } %>
-              </li>
-            <% end %>
-          </ul>
-        </div>
-        <div class="col-md-5">
-          <%= form_tag("/friendships/add_new_friend", method: "post") do %>
-          <%= hidden_field_tag(:user_id, current_user.id) %>
-          <%= label_tag(:friend_name, "Name of friend:") %>
-          <%= text_field_tag(:friend_name) %>
-          <%= submit_tag("Add Friend") %>
-          <% end %>
-        </div>
-      </div>
-    </div>
+<br>
 
-    <div id="menu1" class="tab-pane fade">
-      <div class="col-md-5 col-md-offset-1">
-        <h1><%= user_person @user%> events:</h1>
-        <% if @user.events.length==0 %>
-          <%= "You have yet to sign up for any events." %>
-        <% end %>
-        <ul><% @user.events.each do |event| %>
-          <li>
-            <% temp = "collapseEvent#{event.id}" %>
-            <%= link_to event.name, "##{temp}", "data-toggle" => "collapse", 
-                                    "aria-expanded" => "false", "aria-controls" => temp %>
-
-            |
-
-            <% if current_user?(event.user) %>
-              <%= link_to 'Cancel', event, method: :delete, data: { confirm: 'Are you sure?' } %>
-            <% else %>
-              <%= link_to 'I\'m not going.', event.attendances.find_by(user_id: current_user.id), method: :delete, data: { confirm: 'Are you sure?' } %>
-            <% end %>
-
-            <div class="collapse" id="<%= temp %>">
-              <strong>Created by:</strong>
-              <%= link_to event.user.name, event.user %>
-              <br>
-              <strong>Time:</strong>
-              <%= event.time_occurrence.utc().to_formatted_s(:long) %>
-              <br>
-              <strong>Description:</strong>
-              <%= event.description %>
-            </div>
-          </li>
-          <% end %>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
+<% if current_user?(@user) %>
+  <%= link_to 'Edit', edit_user_path(@user) %>
+<% end %>
