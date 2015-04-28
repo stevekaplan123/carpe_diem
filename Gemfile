@@ -35,6 +35,7 @@ gem 'bootstrap-sass'
 gem 'rails_admin'
 
 gem 'whenever'
+gem 'actionmailer'
 
 group :development, :test do
   # gem for generating fake data
@@ -50,11 +51,9 @@ group :development, :test do
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
-  gem 'actionmailer'
 end
 
 group :production do
   gem 'pg'
   gem 'rails_12factor'
-  gem 'actionmailer'
 end
