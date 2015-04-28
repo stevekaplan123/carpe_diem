@@ -19,12 +19,14 @@ Rails.application.routes.draw do
   resources :friendships
   post '/friendships/add_new_friend'
 
-  resources :events do
-    resources :attendances
-  end
   put 'events/signup'
   get 'events/filter'
   get 'myEvents' => 'events#my_events'
+ 
+  resources :events do
+    resources :attendances
+  end
+
 
   resources :attendances
   resources :users

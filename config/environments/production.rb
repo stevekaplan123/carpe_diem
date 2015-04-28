@@ -30,7 +30,7 @@ Rails.application.configure do
     config.action_mailer.perform_deliveries = true
     config.action_mailer.default_options = {from: 'system@carpediem.com'}
     ActionMailer::Base.smtp_settings = {
-      :user_name => 'ralphxiaoz',
+      :user_name => 'lfzhou',
       :password => '1234@Sendgrid',
       :domain => 'www.carpediem.com',
       :address => 'smtp.sendgrid.net',
