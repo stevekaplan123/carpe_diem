@@ -99,6 +99,12 @@ class EventsController < ApplicationController
       end
     end
   end
+
+  def search
+    @events = Event.where('description LIKE ?' "%#{params[:search]}%")
+  end
+
+
   # PATCH/PUT /events/1
   # PATCH/PUT /events/1.json
   def update
