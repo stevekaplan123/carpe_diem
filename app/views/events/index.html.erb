@@ -674,6 +674,12 @@ body {
             <li onclick="setFilterArgs('friend', 'created'); sendFilterArgs()"><a href="#">Events my friends made</a></li>
           </ul>
        </li>
+
+       <span id = "search">
+          <%= text_field_tag :search, params[:search], placeholder: "Search for..." %>
+       </span>
+       <%= submit_tag "Search", :name => nil %>
+
     </ul>
   </div>
     </nav>

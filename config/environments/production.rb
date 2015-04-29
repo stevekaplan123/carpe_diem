@@ -30,13 +30,13 @@ Rails.application.configure do
     config.action_mailer.perform_deliveries = true
     config.action_mailer.default_options = {from: 'system@carpediem.com'}
     ActionMailer::Base.smtp_settings = {
-      :user_name => 'lfzhou',
-      :password => '1234@Sendgrid',
-      :domain => 'www.carpediem.com',
-      :address => 'smtp.sendgrid.net',
-      :port => 587,
-      :authentication => :plain,
-      :enable_starttls_auto => true
+      address:              'smtp.gmail.com',
+      port:                 587,
+      domain:               'carpediem.com',
+      user_name:            'systemcarpediem',
+      password:             'Brandeis2015',
+      authentication:       'plain',
+      enable_starttls_auto: true
     }
 
   # Compress JavaScripts and CSS.
