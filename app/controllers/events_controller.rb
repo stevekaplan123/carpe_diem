@@ -55,7 +55,7 @@ class EventsController < ApplicationController
 
   # GET /events/filter?args
   def filter
-       filter_events = Filter.new(current_user.id, params[:location], params[:near_me], params[:friendship], params[:time])
+       filter_events = Filter.new(current_user.id, params[:location], params[:near_me], params[:other], params[:time])
        @events = filter_events.events
        @attendances = Attendance.all
   end

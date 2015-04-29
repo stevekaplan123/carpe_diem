@@ -82,7 +82,7 @@ body {
 
         var locationReq = "0";
         var timeReq = "0";
-        var friendReq = "0";
+        var otherReq = "0";
         var users = new Object()
         var display_total_desc = new Object()
         var ne;
@@ -96,7 +96,7 @@ body {
             <% end %>
             locationReq = checkCookies("loc")
             timeReq = checkCookies("time")
-            friendReq = checkCookies("friends")
+            otherReq = checkCookies("friends")
             curr_zoom = 15
             var myOptions = {
                 center: new google.maps.LatLng(42.3654347, -71.258595),
@@ -137,7 +137,7 @@ body {
        }
 
 
-        function loadXMLDoc(locArg, timeArg, friendArg) {          
+        function loadXMLDoc(locArg, timeArg, otherArg) {          
           if (loc=="error") //if loc error and no value set on map
           {
               alert("In order to see events near you, either allow geolocation on your browser or select your position on the map.")
@@ -157,7 +157,7 @@ body {
                 gMap.setCenter(new google.maps.LatLng(42.3654347, -71.258595))
                 //clear out the old list of events
                 document.getElementById("below_menu").innerHTML = ""
-                document.getElementById("below_menu").innerHTML = filteredHTMLTitle(locArg, timeArg, friendArg)
+                document.getElementById("below_menu").innerHTML = filteredHTMLTitle(locArg, timeArg, otherArg)
                   //now show the filtered events
                 result = JSON.parse(xmlhttp.responseText);
 
@@ -196,7 +196,7 @@ body {
 
               }
             }
-          xmlhttp.open("GET","/events/filter.json?location="+loc+"&near_me="+locArg+"&friendship="+friendArg+"&time="+timeArg,true);
+          xmlhttp.open("GET","/events/filter.json?location="+loc+"&near_me="+locArg+"&other="+otherArg+"&time="+timeArg,true);
           xmlhttp.send();
         }
 
@@ -325,83 +325,84 @@ body {
         else if(type=="time") {
           timeReq = arg;
         }
-        else if(type=="friend") {
-          friendReq = arg;
+        else if(type=="other") {
+          otherReq = arg;
         }
         else {
-          friendReq = "0";
+          otherReq = "0";
         }
       }
 
       function sendFilterArgs() {
-        loadXMLDoc(locationReq, timeReq, friendReq);
+        loadXMLDoc(locationReq, timeReq, otherReq);
       }
 
-      function filteredHTMLTitle(locMsg, timeMsg, friendMsg){
-        var msg="";
-        // locMsg = locMsg.replace("250", "250m (3 min walk)")
-        // locMsg = locMsg.replace("750", "750m (10 min walk)")
-        // locMsg = locMsg.replace("1500", "1500m (20 min walk")
-        // locMsg = locMsg.replace("3000", "3000m (40 min walk)")
-        var tempTime = timeMsg;
-        if (tempTime == "30") {
-          tempTime = "30 mins";
+      function getTimeTxt(timeMsg)
+      {
+        var timeTxt=""
+        if (timeMsg=="30")
+        {
+          timeTxt="happening in less than 30 minutes"
         }
-        else if(tempTime == "0"){
-          //do nothing
+        else if (timeMsg!="0")
+        {
+          timeTxt = "happening in less than "+timeMsg+" hour(s)"
         }
-        else {
-          tempTime += " hour(s)";
-        }
+        return timeTxt;
+      }
 
-        if(locMsg=="0") {
-          if (tempTime =="0"){
-            if (friendMsg=="0") {
-              msg="All Events"
+      function getOtherTxt(otherMsg)
+      {
+            var msg=""
+            if (otherMsg=="0") {
+              msg=""
             }
-            else if (friendMsg=="going_to"){
-              msg="Events that my friends are going to"
+            else if (otherMsg=="going_to"){
+              msg="my friends are going to"
             }      
-            else {
-              msg="Events that my friends created"
+            else if (otherMsg=="created") {
+              msg="my friends created"
             }
-          }  
-          else {
-            if (friendMsg=="0") {
-              msg="Events happening in "+tempTime
+            else if (otherMsg=="i_created")
+            {
+              msg="I created"
             }
-            else if (friendMsg=="going_to"){
-              msg="Events happening in "+tempTime+" that my friends are going to"
-            }      
-            else {
-              msg="Events happening in "+tempTime+" that my friends created"
-            } 
-          }   
+            else if (otherMsg=="im_going")
+            {
+              msg="I'm going to"
+            }
+            return msg;
+      }
+
+      function getLocTxt(locMsg)
+      {
+        var locTxt=""
+        if (locMsg=="250")
+        {
+            locTxt = "within a 3 minute walk (250m)"
         }
-        else {
-          if (tempTime =="0"){
-            if (friendMsg=="0") {
-              msg="Events within "+locMsg+" meters"
-            }
-            else if (friendMsg=="going_to"){
-              msg="Events within "+locMsg+" that my friends are going to"
-            }      
-            else {
-              msg="Events within "+locMsg+" that my friends created"
-            }
-          }  
-          else {
-            if (friendMsg=="0") {
-              msg="Events within "+locMsg+" happening in "+tempTime
-            }
-            else if (friendMsg=="going_to"){
-              msg="Events within "+locMsg+" happening in "+tempTime+" that my friends are going to"
-            }      
-            else {
-              msg="Events within "+locMsg+" happening in "+tempTime+" that my friends created"
-            } 
-          }
-        } 
+        else if (locMsg=="750")
+        {
+            locTxt = "within a 10 minute walk (750m)"
+        }
+        else if (locMsg=="1500")
+        {
+            locTxt = "within a 20 minute walk (1500m)"
+        }
+        else if (locMsg=="3000")
+        {
+            locTxt = "within a 40 minute walk (3000m)"
+        }
+        return locTxt
+      }
+
+      function filteredHTMLTitle(locMsg, timeMsg, otherMsg){
+       
+        var timeTxt=getTimeTxt(timeMsg)
+        var locTxt=getLocTxt(locMsg)
+        var otherTxt=getOtherTxt(otherMsg)
+        
+        var msg = "Events "+" "+locTxt+" "+timeTxt+" that "+otherTxt
         return "<h4>"+msg+'</h4>';
       }
 
@@ -426,7 +427,7 @@ body {
          var latitude = loc[0]
          var longitude = loc[1]
          markMe(latitude, longitude)
-         loadXMLDoc(locationReq, timeReq, friendReq)  //use default params
+         loadXMLDoc(locationReq, timeReq, otherReq)  //use default params
 
        }
 
@@ -442,7 +443,7 @@ body {
               loc = lat.toString() + ", " + lng.toString()
               markMe(lat, lng)
           });
-          loadXMLDoc("0", timeReq, friendReq)
+          loadXMLDoc("0", timeReq, otherReq)
        }
 
 
@@ -638,7 +639,7 @@ body {
       
 
        <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u>Near me:</u>
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u>Where:</u>
           <span class="caret"></span>
         </a>
         <ul class="dropdown-menu" role="menu">
@@ -652,26 +653,29 @@ body {
 
 
        <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u>Happening In:</u>
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u>When::</u>
           <span class="caret"></span>
         </a>
         <ul class="dropdown-menu" role="menu">
           <li onclick="setFilterArgs('time', '0'); sendFilterArgs()"><a href="#">Anytime</a></li>
-          <li onclick="setFilterArgs('time', '30'); sendFilterArgs()"><a href="#">30 mins</a></li>
-          <li onclick="setFilterArgs('time', '1'); sendFilterArgs()"><a href="#">1 hour</a></li>
-          <li onclick="setFilterArgs('time', '2'); sendFilterArgs()"><a href="#">2 hours</a></li>
-          <li onclick="setFilterArgs('time', '5'); sendFilterArgs()"><a href="#">5 hours</a></li>
+          <li onclick="setFilterArgs('time', '30'); sendFilterArgs()"><a href="#">Within 30 mins</a></li>
+          <li onclick="setFilterArgs('time', '1'); sendFilterArgs()"><a href="#">Within 1 hour</a></li>
+          <li onclick="setFilterArgs('time', '2'); sendFilterArgs()"><a href="#">Within 2 hours</a></li>
+          <li onclick="setFilterArgs('time', '5'); sendFilterArgs()"><a href="#">Within 5 hours</a></li>
         </ul>
        </li>   
 
        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u>Friends:</u>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u>Other Options:</u>
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu" role="menu">
-            <li onclick="setFilterArgs('friend', '0'); sendFilterArgs()"><a href="#">Anyone</a></li>
-            <li onclick="setFilterArgs('friend', 'going_to'); sendFilterArgs()"><a href="#">Events my friends are going to</a></li>
-            <li onclick="setFilterArgs('friend', 'created'); sendFilterArgs()"><a href="#">Events my friends made</a></li>
+            <li onclick="setFilterArgs('other', '0'); sendFilterArgs()"><a href="#">Anyone's going</a></li>
+            <li onclick="setFilterArgs('other', 'i_created'); sendFilterArgs()"><a href="#">Events I created</a></li>
+            <li onclick="setFilterArgs('other', 'im_going'); sendFilterArgs()"><a href="#">Events I'm going to</a></li>
+            <li onclick="setFilterArgs('other', 'going_to'); sendFilterArgs()"><a href="#">Events my friends are going to</a></li>
+            <li onclick="setFilterArgs('other', 'created'); sendFilterArgs()"><a href="#">Events my friends made</a></li>
+ 
           </ul>
        </li>
     </ul>
