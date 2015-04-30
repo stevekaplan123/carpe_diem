@@ -21,7 +21,6 @@ class Filter
       lat, lng = location.split(",")
       @events = filterByLocation(@events, lat, lng, near_me)
     end
-
     @events = addAttendancestoEvents(@events)
 
 end

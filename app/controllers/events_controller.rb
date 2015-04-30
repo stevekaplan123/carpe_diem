@@ -152,12 +152,6 @@ class EventsController < ApplicationController
     end
   end
 
-  def my_events
-    @user = current_user
-    @expired_events = ArchivedEvent.where('creator_id = ?', current_user.id)
-    render 'myEvents'
-  end
-
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_event
