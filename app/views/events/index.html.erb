@@ -1,3 +1,4 @@
+<div class="container">
 <style>
 
 body {
@@ -6,7 +7,7 @@ body {
 }
 
 #content {
-  
+
   padding: 4px ;
   z-index: -1;
 }
@@ -82,7 +83,7 @@ body {
             {
               localStorage[ 'firstLoad' ] = true;
               window.location.reload()
-            }  
+            }
             else
               localStorage.removeItem( 'firstLoad' );
           }
@@ -93,7 +94,7 @@ body {
         var attendance_window = null;
         var desc_window = null;
         var markers = [];
-        var me_window =  null; 
+        var me_window =  null;
         var loc = null;
         var windows = [];
         var tag = null;
@@ -110,7 +111,7 @@ body {
         var display_total_att = new Object()
         var ne;
         var sw;
-        
+
         window.onload = function(){
             locationReq = checkCookies("loc")
             timeReq = checkCookies("time")
@@ -126,13 +127,13 @@ body {
             loadAttendances()
 
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(success, error); 
+                navigator.geolocation.getCurrentPosition(success, error);
 
-            } else { 
+            } else {
                 error();
             }
 
-            hide_and_seek_menus()  
+            hide_and_seek_menus()
 
        }
 
@@ -155,7 +156,7 @@ body {
        }
 
 
-        function loadXMLDoc(locArg, timeArg, otherArg) {          
+        function loadXMLDoc(locArg, timeArg, otherArg) {
           if (loc=="error") //if loc error and no value set on map
           {
               alert("In order to see events near you, either allow geolocation on your browser or select your position on the map.")
@@ -163,7 +164,7 @@ body {
           //first just gets the right xmlhttp based on browser
             var xmlhttp = loadXMLHTTP()
             //each time state changes, from 0 to 1 to 2 to 3 to 4, check if it finished (finished means state of 4)
-            //and check status is 200, if status != 200, then the server failed to respond correctly (404 or 500)  
+            //and check status is 200, if status != 200, then the server failed to respond correctly (404 or 500)
             xmlhttp.onreadystatechange=function()
             {
               if (xmlhttp.readyState==4 && xmlhttp.status==200)
@@ -182,7 +183,7 @@ body {
                 length = result.length;
                 if (length==0)
                 {
-                   document.getElementById("below_menu").innerHTML += "<h4><i>[NO RESULTS]</i></h4>" 
+                   document.getElementById("below_menu").innerHTML += "<h4><i>[NO RESULTS]</i></h4>"
 
                 }
                 for (i=0; i<length; i++)
@@ -207,8 +208,8 @@ body {
                       }
                       makeItFit(latitude, longitude) //zoom out if necessary to have all events on map
                       markEvents(latitude, longitude, event_name) //mark events on map that were result of filtering by 'type'
-                      document.getElementById("below_menu").innerHTML += eventHTML(event_id, event_name, creator_id, attendees, description, event_time, latitude, longitude) 
-                    }   
+                      document.getElementById("below_menu").innerHTML += eventHTML(event_id, event_name, creator_id, attendees, description, event_time, latitude, longitude)
+                    }
 
               }
             }
@@ -248,7 +249,7 @@ body {
                }
                if (js_date.getDate() != today.getDate())
                {
-                  readable_time = readable_time + " tomorrow" 
+                  readable_time = readable_time + " tomorrow"
                }
                else if (js_date.getDate() == today.getDate())
                {
@@ -328,7 +329,7 @@ body {
 
           return 0;
       }
-        
+
       function setFilterArgs(type, arg) {
         uid = '<%= current_user.id %>'
         setCookie(uid+"carpe_diem_preferences_"+type, arg, 30)
@@ -372,7 +373,7 @@ body {
             }
             else if (otherMsg=="going_to"){
               msg="My Friends Are Going To"
-            }      
+            }
             else if (otherMsg=="created") {
               msg="My Friends Created"
             }
@@ -410,12 +411,12 @@ body {
       }
 
       function filteredHTMLTitle(locMsg, timeMsg, otherMsg){
-       
+
         var timeTxt=getTimeTxt(timeMsg)
         var locTxt=getLocTxt(locMsg)
         var otherTxt=getOtherTxt(otherMsg)
         var msg=""
-        
+
         if (locTxt != "" || timeTxt != "")
         { msg = "Viewing Events "+" "+locTxt+" "+timeTxt;}
         else { msg = "Viewing All Events"; }
@@ -438,7 +439,7 @@ body {
 
 
       function success(position) {
-         document.getElementById("locationDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude; 
+         document.getElementById("locationDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude;
          loc = document.getElementById("locationDiv").innerHTML.split(", ")
          tag = ""
          var latitude = loc[0]
@@ -528,7 +529,7 @@ body {
                   title: event_name
               });
 
-              markers.push(marker) 
+              markers.push(marker)
 
 
         }
@@ -540,14 +541,14 @@ body {
           }
         }
 
- 
+
 
         function onlyAllow15Words(event_name, event_id, txt)
         {
             txt_array = txt.split(" ")
             event_str = event_name.split(" ")[0]+event_id
             if (txt_array.length > 15)
-            {  
+            {
                if (display_total_desc[event_str] == false)   //check here whether this event should display its entire description or not based on hash display_total_desc; default is false
                {
                   var show_txt = ""
@@ -566,12 +567,12 @@ body {
                   txt = txt + ' <a style="cursor: pointer" id=&quot;'+event_str+'&quot; onclick="setDescDisplay(this.id, false)"><b>(Collapse Description)</b></a> '
                 }
             }
-            else 
+            else
             {
               return txt;
             }
             return txt
-        } 
+        }
 
         function setDescDisplay(name, val)
         {
@@ -583,12 +584,12 @@ body {
 
         function eventHTML(event_id, event_name, creator_id, attendees, description, event_time, latitude, longitude)
         {
-          var append_to="";  
+          var append_to="";
           var current_name = '<%= current_user.name %>';
           var current_id = <%= current_user.id %>
-          var alreadyGoing = attendances.indexOf(event_id); 
+          var alreadyGoing = attendances.indexOf(event_id);
           if (current_id==creator_id || current_name=="admin")
-          { 
+          {
             append_to =  '<div align="right"><a style="font-size:x-small" data-confirm="Are you sure?" rel="nofollow"' +
                         'data-method="delete" href="/events/'+event_id+
                         '">Cancel Event</a> | ' +
@@ -611,13 +612,13 @@ body {
                   'style="cursor: pointer">View Event On Map</span></b></u></div>'
           description = onlyAllow15Words(event_name, event_id, description)
           return '<div id="event_box"> <h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+
-                  'Attending: '+attendees+'<br>'+append_to 
+                  'Attending: '+attendees+'<br>'+append_to
                     '</div><hr>'
 
         }
           function OpenWindow(event_info)
           {
-  
+
               var info=event_info.split("+")
               var lat=Number(info[0])
               var lng=Number(info[1])
@@ -633,11 +634,11 @@ body {
                  });
                desc_window.open(gMap);
                windows.push(desc_window)
-           
+
           }
 
           function clearWindows()
-          { 
+          {
               for (var i=0; i<windows.length; i++)
               {
                 windows[i].close()
@@ -660,9 +661,9 @@ body {
       <div id="below_menu"></div>
       </nav>
   </div><!-- close #menuwrapper-->
-  
 
-  
+
+
 
   <div id="search-and-map">
 
@@ -677,7 +678,7 @@ body {
             <div role="tabpanel" class="tab-pane active" id="searchbox">
                   <div style="line-height:50%;"><br></div>
 
-                  
+
                     <nav class="navbar navbar-default", id="nav-search">
                       <br>
 
@@ -690,7 +691,7 @@ body {
                       </span>
 
                     </nav>
-                  
+
             </div>
 
 
@@ -698,10 +699,10 @@ body {
             <div role="tabpanel" class="tab-pane" id="categories">
                     <div style="line-height:50%;"><br></div>
 
-                        
+
                           <nav class="navbar navbar-default">
 
-                            <div id="content">        
+                            <div id="content">
                               <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1"><div id="events_msg"></div>
                                 <span>   <ul class="nav navbar-nav" id="filter_buttons">
                                 <li class="dropdown">
@@ -728,11 +729,11 @@ body {
                                     <li onclick="setFilterArgs('time', '2'); sendFilterArgs()"><a href="#">Within 2 hours</a></li>
                                     <li onclick="setFilterArgs('time', '5'); sendFilterArgs()"><a href="#">Within 5 hours</a></li>
                                   </ul>
-                                 </li>   
+                                 </li>
 
                                 <li class="dropdown">
                                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">Tags<span class="caret"></span></button></u>
-                                    
+
                                   </a>
                                   <ul class="dropdown-menu" role="menu">
                                     <li onclick="setFilterArgs('other', '0'); sendFilterArgs()"><a href="#">Anyone's going</a></li>
@@ -740,13 +741,13 @@ body {
                                     <li onclick="setFilterArgs('other', 'im_going'); sendFilterArgs()"><a href="#">Events I'm going to</a></li>
                                     <li onclick="setFilterArgs('other', 'going_to'); sendFilterArgs()"><a href="#">Events my friends are going to</a></li>
                                     <li onclick="setFilterArgs('other', 'created'); sendFilterArgs()"><a href="#">Events my friends made</a></li>
-                         
+
                                   </ul>
                                 </li>
 
                                 <li class="dropdown">
                                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">Other Options <span class="caret"></span></button></u>
-                                   
+
                                   </a>
                                   <ul class="dropdown-menu" role="menu">
                                     <li onclick="setFilterArgs('other', '0'); sendFilterArgs()"><a href="#">Anyone's going</a></li>
@@ -757,7 +758,7 @@ body {
                                   </ul>
                                 </li>
                           </nav>
-                        
+
 
               </div>
           </div> <!-- #tab-content-->
@@ -765,13 +766,13 @@ body {
 
        <br>
 
-      <nav> 
+      <nav>
         <nav class="navbar navbar-default" id="map-group2">
           <div id="map_canvas" style="width: 560px; height: 440px"></div>
         </nav>
       </nav>
 
-  </div> <!-- #search-and-map-->   
+  </div> <!-- #search-and-map-->
 
 
 </div> <!-- #container-->
@@ -779,6 +780,7 @@ body {
 
 
 <div id="locationDiv" style="visibility:hidden"></div>
- 
+
 </body>
 </html>
+</div>
