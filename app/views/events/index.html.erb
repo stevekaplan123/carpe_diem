@@ -26,11 +26,13 @@ body {
 #event_box {
   margin-left: 3%;
   margin-right: 3%;
+    background-color: khaki;
+
 }
 
 #event_box:hover
 {
-  background-color: khaki;
+  background-color: ghostwhite;
 }
 
 
@@ -167,12 +169,6 @@ body {
                 }
                 for (i=0; i<length; i++)
                 {
-                    if (JSON.parse(xmlhttp.responseText)[i]["name"] == null)
-                    {
-                        addAttendance(JSON.parse(xmlhttp.responseText)[i])
-                    }
-                    else
-                    {
                       latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
                       longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
                       var event_id = JSON.parse(xmlhttp.responseText)[i]["id"].toString();
@@ -193,9 +189,8 @@ body {
                       }
                       makeItFit(latitude, longitude) //zoom out if necessary to have all events on map
                       markEvents(latitude, longitude, event_name) //mark events on map that were result of filtering by 'type'
-                      document.getElementById("below_menu").innerHTML += eventHTML(event_id, event_name, creator_id, attendees, description, event_time, xmlhttp) 
-                    }
-                }    
+                      document.getElementById("below_menu").innerHTML += eventHTML(event_id, event_name, creator_id, attendees, description, event_time, latitude, longitude) 
+                    }   
 
               }
             }
@@ -477,8 +472,8 @@ body {
 
         function markMe(latitude, longitude)
         {
-             var cityCircle;
-             var populationOptions = {
+             var little_circle;
+             var innerOptions = {
               strokeColor: 'blue',
               strokeOpacity: 1,
               strokeWeight: 2,
@@ -489,7 +484,21 @@ body {
               radius: 10
             };
             // Add the circle for this city to the map.
-            cityCircle = new google.maps.Circle(populationOptions);
+            little_circle = new google.maps.Circle(innerOptions);
+
+             var big_circle;
+             var outerOptions = {
+              strokeColor: 'blue',
+              strokeOpacity: 0.8,
+              strokeWeight: 2,
+              fillColor: 'blue',
+              fillOpacity: 0.3,
+              map: gMap,
+              center: new google.maps.LatLng(latitude, longitude),
+              radius: 40
+            };
+            // Add the circle for this city to the map.
+            big_circle = new google.maps.Circle(outerOptions);
         }
 
         function markEvents(latitude, longitude, event_name)
@@ -502,6 +511,8 @@ body {
               });
 
               markers.push(marker) 
+
+
         }
 
         function clearMarkers()
@@ -552,7 +563,7 @@ body {
           sendFilterArgs()
         }
 
-        function eventHTML(event_id, event_name, creator_id, attendees, description, event_time, xmlhttp)
+        function eventHTML(event_id, event_name, creator_id, attendees, description, event_time, latitude, longitude)
         {
           var append_to="";  
           var current_name = '<%= current_user.name %>';
@@ -576,14 +587,14 @@ body {
           }
 
           append_to = append_to + ' | <b><u><font color="blue"><span onclick="OpenWindow(&quot;' +
-                    JSON.parse(xmlhttp.responseText)[i]["latitude"].toString() + '+' +
-                    JSON.parse(xmlhttp.responseText)[i]["longitude"].toString() + '+' +
-                    JSON.parse(xmlhttp.responseText)[i]["name"] + '&quot)"' +
+                    latitude + '+' +
+                    longitude + '+' +
+                    event_name + '&quot)"' +
                   'style="cursor: pointer">View Event On Map</span></b></u></div>'
           description = onlyAllow15Words(event_name, event_id, description)
           return '<div id="event_box"> <h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+
                   'Attending: '+attendees+'<br>'+append_to 
-                    '</div><br><br><br>'
+                    '</div><hr>'
 
         }
           function OpenWindow(event_info)
@@ -631,7 +642,7 @@ body {
           <%= text_field_tag :search, params[:search], placeholder: "Search for..." %>
        </span>
        <%= submit_tag "Search", :name => nil %>
-    <nav class="navbar navbar-default" id="lower-group">
+    <nav  id="lower-group">
     <div id="below_menu"></div>
     </nav>
   </div><!-- close menuwrapper-->
