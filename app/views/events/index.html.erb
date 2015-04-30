@@ -6,16 +6,31 @@ body {
 }
 
 #content {
-  margin-left:  50%;
+  
   padding: 4px ;
   z-index: -1;
 }
+
+
 #menuwrapper {
   float: left;
   width: 50%;
   padding: 4px ;
 
 }
+
+#search-and-map {
+  float: right;
+  width: 50%;
+  padding: 4px ;
+
+}
+
+#nav-search{
+  padding:6px;
+}
+
+
 
 /*get all filter buttons in the same row*/
 #filter_buttons li{
@@ -35,19 +50,22 @@ body {
 
 
 #lower-group {
-  height: 500px;
+  height: 600px;
   overflow: scroll;
 }
 
-#map-group {
-  height: 572px;
-}
 
 
 /* Clear float */
 .clear{
     clear:both;
 }
+
+
+#tab-area{
+  height:150px;
+}
+
 </style>
 
 
@@ -407,7 +425,7 @@ body {
         { msg = "Viewing Events "+" "+locTxt+" "+timeTxt;}
         else { msg = "Viewing All Events"; }
         if (otherTxt != "")   { msg = msg + " That "+otherTxt;}
-        return '<span align="center"><h4>'+msg+'</h4></span>';
+        return '<span align="center"><h5>'+msg+'</h5></span>';
       }
 
 
@@ -620,98 +638,132 @@ body {
     </script>
 
 <body>
+
+
 <div id="container">
 
 
-
- <div id="menuwrapper">
-
-<h4> <%= @status %></h4>
-    <nav class="navbar navbar-default" id="lower-group">
-    <div id="below_menu"></div>
-    </nav>
-  </div><!-- close menuwrapper-->
+  <div id="menuwrapper">
+    <h4> <%= @status %></h4>
+      <nav class="navbar navbar-default" id="lower-group">
+      <div id="below_menu"></div>
+      </nav>
+  </div><!-- close #menuwrapper-->
   
-  <div id="content">  
-    <nav id="map-group"> 
-<nav class="navbar navbar-default">
-      
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1"><div id="events_msg"></div>
+  
 
-    <span>   <ul class="nav navbar-nav" id="filter_buttons">
-    <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">Where<span class="caret"></span>
-</button></u>
-        </a>
-        <ul class="dropdown-menu" role="menu">
-            <li onclick="setFilterArgs('loc', '0'); sendFilterArgs()"><a href="#">Anywhere</a></li>
-            <li onclick="setFilterArgs('loc', '250'); sendFilterArgs()"><a href="#">250m (3 min walk)</a></li>
-            <li onclick="setFilterArgs('loc', '750'); sendFilterArgs()"><a href="#">750m (10 min walk)</a></li>
-            <li onclick="setFilterArgs('loc', '1500'); sendFilterArgs()"><a href="#">1500m (20 min walk)</a></li>
-            <li onclick="setFilterArgs('loc', '3000'); sendFilterArgs()"><a href="#">3000m (40 min walk)</a></li>
-        </ul>
-       </li>
+  <div id="search-and-map">
 
-
-       <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">When<span class="caret"></span>
-</button></u>
-        </a>
-        <ul class="dropdown-menu" role="menu">
-          <li onclick="setFilterArgs('time', '0'); sendFilterArgs()"><a href="#">Anytime</a></li>
-          <li onclick="setFilterArgs('time', '30'); sendFilterArgs()"><a href="#">Within 30 mins</a></li>
-          <li onclick="setFilterArgs('time', '1'); sendFilterArgs()"><a href="#">Within 1 hour</a></li>
-          <li onclick="setFilterArgs('time', '2'); sendFilterArgs()"><a href="#">Within 2 hours</a></li>
-          <li onclick="setFilterArgs('time', '5'); sendFilterArgs()"><a href="#">Within 5 hours</a></li>
-        </ul>
-       </li>   
-
-         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">Tags<span class="caret"></span></button></u>
-            
-          </a>
-          <ul class="dropdown-menu" role="menu">
-            <li onclick="setFilterArgs('other', '0'); sendFilterArgs()"><a href="#">Anyone's going</a></li>
-            <li onclick="setFilterArgs('other', 'i_created'); sendFilterArgs()"><a href="#">Events I created</a></li>
-            <li onclick="setFilterArgs('other', 'im_going'); sendFilterArgs()"><a href="#">Events I'm going to</a></li>
-            <li onclick="setFilterArgs('other', 'going_to'); sendFilterArgs()"><a href="#">Events my friends are going to</a></li>
-            <li onclick="setFilterArgs('other', 'created'); sendFilterArgs()"><a href="#">Events my friends made</a></li>
- 
+      <div role="tabpanel" id="tab-area">
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#searchbox" aria-controls="searchbox" role="tab" data-toggle="tab">Search By Text</a></li>
+            <li role="presentation"><a href="#categories" aria-controls="categories" role="tab" data-toggle="tab">Search By Category</a></li>
           </ul>
-       </li>
-
-       <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">Other Options <span class="caret"></span></button></u>
-           
-          </a>
-          <ul class="dropdown-menu" role="menu">
-            <li onclick="setFilterArgs('other', '0'); sendFilterArgs()"><a href="#">Anyone's going</a></li>
-            <li onclick="setFilterArgs('other', 'i_created'); sendFilterArgs()"><a href="#">Events I created</a></li>
-            <li onclick="setFilterArgs('other', 'im_going'); sendFilterArgs()"><a href="#">Events I'm going to</a></li>
-            <li onclick="setFilterArgs('other', 'going_to'); sendFilterArgs()"><a href="#">Events my friends are going to</a></li>
-            <li onclick="setFilterArgs('other', 'created'); sendFilterArgs()"><a href="#">Events my friends made</a></li>
- 
-          </ul>
-       </li>
-
-       <%= form_tag({controller: "events", action: "search"}, :method => "get", id: "search-form") do %>
-          <span id = "search">
-          <%= text_field_tag :search, params[:search], placeholder: "Search for..." %>
-          </span>
-          <%= submit_tag "Search", :name => nil %>
-        <% end %>
-     </span>
+          <div class="tab-content">
 
 
-    <div id="map_canvas" style="width: 530px; height: 460px"></div>
+            <div role="tabpanel" class="tab-pane active" id="searchbox">
+                  <div style="line-height:50%;"><br></div>
 
-    </ul>
-  </div>
-    </nav>
+                  
+                    <nav class="navbar navbar-default", id="nav-search">
+                      <br>
 
-  </nav>
-  </div>
-</div>
+                      <%= form_tag({controller: "events", action: "search"}, :method => "get", id: "search-form") do %>
+                      <span id = "search">
+                      <%= text_field_tag :search, params[:search], placeholder: "Search for..." %>
+                      </span>
+                      <%= submit_tag "Search", :name => nil %>
+                      <% end %>
+                      </span>
+
+                    </nav>
+                  
+            </div>
+
+
+
+            <div role="tabpanel" class="tab-pane" id="categories">
+                    <div style="line-height:50%;"><br></div>
+
+                        
+                          <nav class="navbar navbar-default">
+
+                            <div id="content">        
+                              <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1"><div id="events_msg"></div>
+                                <span>   <ul class="nav navbar-nav" id="filter_buttons">
+                                <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">Where<span class="caret"></span>
+                                  </button></u>
+                                </a>
+                                  <ul class="dropdown-menu" role="menu">
+                                    <li onclick="setFilterArgs('loc', '0'); sendFilterArgs()"><a href="#">Anywhere</a></li>
+                                    <li onclick="setFilterArgs('loc', '250'); sendFilterArgs()"><a href="#">250m (3 min walk)</a></li>
+                                    <li onclick="setFilterArgs('loc', '750'); sendFilterArgs()"><a href="#">750m (10 min walk)</a></li>
+                                    <li onclick="setFilterArgs('loc', '1500'); sendFilterArgs()"><a href="#">1500m (20 min walk)</a></li>
+                                    <li onclick="setFilterArgs('loc', '3000'); sendFilterArgs()"><a href="#">3000m (40 min walk)</a></li>
+                                  </ul>
+                                </li>
+
+                                <li class="dropdown">
+                                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">When<span class="caret"></span>
+                                    </button></u>
+                                  </a>
+                                  <ul class="dropdown-menu" role="menu">
+                                    <li onclick="setFilterArgs('time', '0'); sendFilterArgs()"><a href="#">Anytime</a></li>
+                                    <li onclick="setFilterArgs('time', '30'); sendFilterArgs()"><a href="#">Within 30 mins</a></li>
+                                    <li onclick="setFilterArgs('time', '1'); sendFilterArgs()"><a href="#">Within 1 hour</a></li>
+                                    <li onclick="setFilterArgs('time', '2'); sendFilterArgs()"><a href="#">Within 2 hours</a></li>
+                                    <li onclick="setFilterArgs('time', '5'); sendFilterArgs()"><a href="#">Within 5 hours</a></li>
+                                  </ul>
+                                 </li>   
+
+                                <li class="dropdown">
+                                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">Tags<span class="caret"></span></button></u>
+                                    
+                                  </a>
+                                  <ul class="dropdown-menu" role="menu">
+                                    <li onclick="setFilterArgs('other', '0'); sendFilterArgs()"><a href="#">Anyone's going</a></li>
+                                    <li onclick="setFilterArgs('other', 'i_created'); sendFilterArgs()"><a href="#">Events I created</a></li>
+                                    <li onclick="setFilterArgs('other', 'im_going'); sendFilterArgs()"><a href="#">Events I'm going to</a></li>
+                                    <li onclick="setFilterArgs('other', 'going_to'); sendFilterArgs()"><a href="#">Events my friends are going to</a></li>
+                                    <li onclick="setFilterArgs('other', 'created'); sendFilterArgs()"><a href="#">Events my friends made</a></li>
+                         
+                                  </ul>
+                                </li>
+
+                                <li class="dropdown">
+                                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">Other Options <span class="caret"></span></button></u>
+                                   
+                                  </a>
+                                  <ul class="dropdown-menu" role="menu">
+                                    <li onclick="setFilterArgs('other', '0'); sendFilterArgs()"><a href="#">Anyone's going</a></li>
+                                    <li onclick="setFilterArgs('other', 'i_created'); sendFilterArgs()"><a href="#">Events I created</a></li>
+                                    <li onclick="setFilterArgs('other', 'im_going'); sendFilterArgs()"><a href="#">Events I'm going to</a></li>
+                                    <li onclick="setFilterArgs('other', 'going_to'); sendFilterArgs()"><a href="#">Events my friends are going to</a></li>
+                                    <li onclick="setFilterArgs('other', 'created'); sendFilterArgs()"><a href="#">Events my friends made</a></li
+                                  </ul>
+                                </li>
+                          </nav>
+                        
+
+              </div>
+          </div> <!-- #tab-content-->
+      </div> <!-- #tab-area-->
+
+       <br>
+
+      <nav> 
+        <nav class="navbar navbar-default" id="map-group2">
+          <div id="map_canvas" style="width: 560px; height: 440px"></div>
+        </nav>
+      </nav>
+
+  </div> <!-- #search-and-map-->   
+
+
+</div> <!-- #container-->
+
 
 
 <div id="locationDiv" style="visibility:hidden"></div>
