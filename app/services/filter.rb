@@ -1,3 +1,4 @@
+require 'byebug'
 class Filter
 
   attr_reader :events	
@@ -20,6 +21,9 @@ class Filter
       lat, lng = location.split(",")
       @events = filterByLocation(@events, lat, lng, near_me)
     end
+
+    @events = addAttendancestoEvents(@events)
+
 end
 
 def filterByOther(events, user_id, other)
@@ -68,6 +72,31 @@ def filterByOther(events, user_id, other)
   end
   friend_events
 end 
+                  
+def addAttendancestoEvents(events)
+  modifiedEvents = Array.new(events.length)
+  count=0
+  events.each do |event|
+    modifiedEvents[count] = Hash.new
+    modifiedEvents[count]["latitude"] = event["latitude"]
+    modifiedEvents[count]["longitude"] = event["longitude"]
+    modifiedEvents[count]["description"] = event["description"]
+    modifiedEvents[count]["creator_id"] = event["creator_id"]
+    modifiedEvents[count]["id"] = event["id"]
+    modifiedEvents[count]["name"] = event["name"]
+    modifiedEvents[count]["time_occurrence"] = event["time_occurrence"]
+    event_attendees = Attendance.all.where(event_id: event["id"])
+    attendees_names_joined = ""
+    event_attendees.each do |event_attendance|
+      attendees_names_joined = attendees_names_joined + User.find_by(id: event_attendance["user_id"])["name"].to_s + ", "
+    end
+    attendees_names_joined = attendees_names_joined.chop #remove the ", " so chop twice
+    attendees_names_joined = attendees_names_joined.chop
+    modifiedEvents[count]["attendees"] =  attendees_names_joined
+    count += 1
+  end
+  modifiedEvents
+end
 
 
 def convertLatLngToMeters(orig_coords, end_coords)
@@ -90,7 +119,7 @@ def filterByLocation(events, lat, lng, how_far)
       my_coords = [lat.to_f, lng.to_f]
       filtered_events = []
       events.each do |event|
-        event_coords = [event.latitude.to_f, event.longitude.to_f]
+        event_coords = [event["latitude"].to_f, event["longitude"].to_f]
         dist = convertLatLngToMeters(my_coords, event_coords)
         if dist <= how_far.to_f
           filtered_events.push(event)
