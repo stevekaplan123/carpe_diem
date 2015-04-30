@@ -1,57 +1,32 @@
+require 'byebug'
 class Filter
 
   attr_reader :events	
 
-  def initialize(user_id, location, near_me, friends, time)
+  def initialize(user_id, location, near_me, other, time)
     @events = Event.all
-
     if time != '0'
       if time == '30'
         @events = @events.where(time_occurrence: (Time.now-4.hours)..(Time.now-4.hours+time.to_i.minutes))
       else
         @events = @events.where(time_occurrence: (Time.now-4.hours)..(Time.now-4.hours+time.to_i.hours))
       end
-      if (@events.first.nil?)
-         puts "time - events is nil"
-       else
-         puts @events.first.name
-      end
    end
 
-   if friends != '0'
-      @events = filterByFriends(@events, user_id, friends)
-      if (@events.first.nil?)
-       puts "friend - events is nil"
-      else
-       puts @events.first.name
-     end
+   if other != '0'
+      @events = filterByOther(@events, user_id, other)
    end
 
    if near_me != '0'
       lat, lng = location.split(",")
       @events = filterByLocation(@events, lat, lng, near_me)
-
-      puts "location filtered"
-      puts @events.length
-      if (@events.first.nil?)
-       puts "loc - events is nil"
-     else
-       puts @events.first.name
-      end
     end
 
-    puts "end of filter"
-    puts @events
-    puts @events.length
-    if (@events.first.nil?)
-      puts "end - events is nil"
-    else
-      puts @events.first.name
-    end
-    puts "-----"
+    @events = addAttendancestoEvents(@events)
+
 end
 
-def filterByFriends(events, user_id, friends)
+def filterByOther(events, user_id, other)
   friend_events = []
   my_friends = []
 
@@ -63,7 +38,7 @@ def filterByFriends(events, user_id, friends)
     end
   end 
 
-  if friends=='going_to'
+  if other=='going_to'
     my_friends.each do |friend|
       friend_attendances = Attendance.where(user_id: friend["id"])
       friend_attendances.each do |fa|
@@ -73,17 +48,55 @@ def filterByFriends(events, user_id, friends)
        end
      end
    end
- elsif friends=='created'
+ elsif other=='created'
   my_friends.each do |friend|
     puts "friend ="+friend["id"].to_s
     friend_creations = events.where(creator_id: friend["id"])
     friend_creations.each do |fc|
       friend_events.push(fc)
     end
-  end   
-end
-friend_events
+  end 
+  elsif other=="i_created"
+    @created_events = events.where(creator_id: user_id)
+    @created_events.each do |ce|
+      friend_events.push(ce)
+    end
+  elsif other=="im_going" 
+    my_attendances = [] 
+    events.each do |event|
+       temp_attendances = event.attendances.where(user_id: user_id)
+       temp_attendances.each do |temp_att|
+          friend_events.push(events.find_by(id: temp_att["event_id"]))
+       end
+    end
+  end
+  friend_events
 end 
+                  
+def addAttendancestoEvents(events)
+  modifiedEvents = Array.new(events.length)
+  count=0
+  events.each do |event|
+    modifiedEvents[count] = Hash.new
+    modifiedEvents[count]["latitude"] = event["latitude"]
+    modifiedEvents[count]["longitude"] = event["longitude"]
+    modifiedEvents[count]["description"] = event["description"]
+    modifiedEvents[count]["creator_id"] = event["creator_id"]
+    modifiedEvents[count]["id"] = event["id"]
+    modifiedEvents[count]["name"] = event["name"]
+    modifiedEvents[count]["time_occurrence"] = event["time_occurrence"]
+    event_attendees = Attendance.all.where(event_id: event["id"])
+    attendees_names_joined = ""
+    event_attendees.each do |event_attendance|
+      attendees_names_joined = attendees_names_joined + User.find_by(id: event_attendance["user_id"])["name"].to_s + ", "
+    end
+    attendees_names_joined = attendees_names_joined.chop #remove the ", " so chop twice
+    attendees_names_joined = attendees_names_joined.chop
+    modifiedEvents[count]["attendees"] =  attendees_names_joined
+    count += 1
+  end
+  modifiedEvents
+end
 
 
 def convertLatLngToMeters(orig_coords, end_coords)
@@ -102,18 +115,12 @@ def convertLatLngToMeters(orig_coords, end_coords)
 end
 
 def filterByLocation(events, lat, lng, how_far)
-      #  0.008 is distance from North to Theater
-      #  0.002 is distance from North to Usdan
-      #  0.0036 is distance from Gosman Gym to Usdan
-      #  a reasonable distance to use to discern whether I am "close" to an event
-      #  is a distance of 0.0045
 
       my_coords = [lat.to_f, lng.to_f]
       filtered_events = []
       events.each do |event|
-        event_coords = [event.latitude.to_f, event.longitude.to_f]
+        event_coords = [event["latitude"].to_f, event["longitude"].to_f]
         dist = convertLatLngToMeters(my_coords, event_coords)
-        puts "dist is: #{}", dist
         if dist <= how_far.to_f
           filtered_events.push(event)
         end

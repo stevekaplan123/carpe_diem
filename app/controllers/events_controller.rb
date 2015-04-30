@@ -8,11 +8,6 @@ class EventsController < ApplicationController
   # GET /events.json
   def index
     @events = Event.all
-    @users = {}
-    @events.each do |event|
-      uid = event["creator_id"]
-      @users[uid] = User.find_by(id: uid)["name"]
-    end
     eid = params[:eid]
     if params[:user_action] != nil and params[:user_action] == "cancelled"
       @status = "You are no longer signed up for '"+eid+"'."
@@ -55,7 +50,7 @@ class EventsController < ApplicationController
 
   # GET /events/filter?args
   def filter
-       filter_events = Filter.new(current_user.id, params[:location], params[:near_me], params[:friendship], params[:time])
+       filter_events = Filter.new(current_user.id, params[:location], params[:near_me], params[:other], params[:time])
        @events = filter_events.events
        @attendances = Attendance.all
   end
