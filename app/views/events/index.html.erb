@@ -675,10 +675,12 @@ body {
           </ul>
        </li>
 
-       <span id = "search">
+       <%= form_tag({controller: "events", action: "search"}, :method => "get", id: "search-form") do %>
+          <span id = "search">
           <%= text_field_tag :search, params[:search], placeholder: "Search for..." %>
-       </span>
-       <%= submit_tag "Search", :name => nil %>
+          </span>
+          <%= submit_tag "Search", :name => nil %>
+        <% end %>
 
     </ul>
   </div>

@@ -25,6 +25,9 @@ Rails.application.routes.draw do
  
   resources :events do
     resources :attendances
+    collection do
+      get 'search'
+    end
   end
 
 
