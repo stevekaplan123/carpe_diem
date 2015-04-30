@@ -167,12 +167,7 @@ body {
                 }
                 for (i=0; i<length; i++)
                 {
-                    if (JSON.parse(xmlhttp.responseText)[i]["name"] == null)
-                    {
-                        addAttendance(JSON.parse(xmlhttp.responseText)[i])
-                    }
-                    else
-                    {
+                    
                       latitude=JSON.parse(xmlhttp.responseText)[i]["latitude"];
                       longitude=JSON.parse(xmlhttp.responseText)[i]["longitude"];
                       var event_id = JSON.parse(xmlhttp.responseText)[i]["id"].toString();
@@ -194,7 +189,7 @@ body {
                       makeItFit(latitude, longitude) //zoom out if necessary to have all events on map
                       markEvents(latitude, longitude, event_name) //mark events on map that were result of filtering by 'type'
                       document.getElementById("below_menu").innerHTML += eventHTML(event_id, event_name, creator_id, attendees, description, event_time, xmlhttp) 
-                    }
+                    
                 }    
 
               }
@@ -334,7 +329,7 @@ body {
       }
 
       function sendFilterArgs() {
-        loadXMLDoc(locationReq, timeReq, otherReq);
+        // loadXMLDoc(locationReq, timeReq, otherReq);
       }
 
       function getTimeTxt(timeMsg)
@@ -431,7 +426,7 @@ body {
          var latitude = loc[0]
          var longitude = loc[1]
          markMe(latitude, longitude)
-         loadXMLDoc(locationReq, timeReq, otherReq)  //use default params
+         // loadXMLDoc(locationReq, timeReq, otherReq)  //use default params
 
        }
 
@@ -447,7 +442,7 @@ body {
               loc = lat.toString() + ", " + lng.toString()
               markMe(lat, lng)
           });
-          loadXMLDoc("0", timeReq, otherReq)
+          // loadXMLDoc("0", timeReq, otherReq)
        }
 
 
