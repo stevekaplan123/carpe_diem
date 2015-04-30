@@ -97,7 +97,7 @@ class EventsController < ApplicationController
 
   def search
     @events = Event.where('description LIKE ?', "%#{params[:search]}%")
-    render action: "index"
+    redirect_to "index/?search=true"
   end
 
 
