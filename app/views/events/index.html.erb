@@ -638,11 +638,6 @@ body {
  <div id="menuwrapper">
 
 <h4> <%= @status %></h4>
-      <span id = "search">
-          <%= text_field_tag :search, params[:search], placeholder: "Search for..." %>
-       </span>
-       <%= submit_tag "Search", :name => nil %>
-    <nav  id="lower-group">
     <div id="below_menu"></div>
     </nav>
   </div><!-- close menuwrapper-->
@@ -709,8 +704,12 @@ body {
           </ul>
        </li>
 
-
-
+       <%= form_tag({controller: "events", action: "search"}, :method => "get", id: "search-form") do %>
+          <span id = "search">
+          <%= text_field_tag :search, params[:search], placeholder: "Search for..." %>
+          </span>
+          <%= submit_tag "Search", :name => nil %>
+        <% end %>
      </span>
 
 
