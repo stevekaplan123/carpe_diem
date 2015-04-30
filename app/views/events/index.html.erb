@@ -70,7 +70,7 @@ body {
           }
         })();
 
-
+        var rad=10;
         var gMap = null;
         var attendance_window = null;
         var desc_window = null;
@@ -137,7 +137,7 @@ body {
        }
 
 
-        function loadXMLDoc(locArg, timeArg, otherArg) {          
+        function loadXMLDoc(locArg, timeArg, otherArg, search, searchValue) {          
           if (loc=="error") //if loc error and no value set on map
           {
               alert("In order to see events near you, either allow geolocation on your browser or select your position on the map.")
@@ -152,6 +152,8 @@ body {
               {
                 clearMarkers()        //first clear old event markers and clear out table of events
                 clearWindows()
+                rad = 10
+               // markMe()
                 curr_zoom = 15            //reset zoom and center to brandeis campus
                 gMap.setZoom(curr_zoom)
                 gMap.setCenter(new google.maps.LatLng(42.3654347, -71.258595))
@@ -193,12 +195,11 @@ body {
                     }   
 
               }
-            }
-          xmlhttp.open("GET","/events/filter.json?location="+loc+"&near_me="+locArg+"&other="+otherArg+"&time="+timeArg,true);
+            } 
+
+          xmlhttp.open("GET","/events/filter.json?location="+loc+"&near_me="+locArg+"&other="+otherArg+"&time="+timeArg+"&search="+search+"&searchValue="+searchValue,true);
           xmlhttp.send();
         }
-
-
 
         function makeRailsDateReadable(event_time)
         {
@@ -252,6 +253,13 @@ body {
             }
             else
             {
+              loc = document.getElementById("locationDiv").innerHTML.split(", ")
+              var my_lat = loc[0]
+              var my_lng = loc[1]
+              rad = rad*4
+              markMe(my_lat, my_lng)
+
+
               curr_zoom = curr_zoom - 2;
               gMap.setZoom(curr_zoom)
               makeItFit(lat, lng)
@@ -328,8 +336,8 @@ body {
         }
       }
 
-      function sendFilterArgs() {
-        loadXMLDoc(locationReq, timeReq, otherReq);
+      function sendFilterArgs(search, searchValue) {
+        loadXMLDoc(locationReq, timeReq, otherReq, search, searchValue);
       }
 
       function getTimeTxt(timeMsg)
@@ -418,7 +426,6 @@ body {
        }
 
 
-
       function success(position) {
          document.getElementById("locationDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude; 
          loc = document.getElementById("locationDiv").innerHTML.split(", ")
@@ -440,7 +447,7 @@ body {
               var lat = event.latLng.lat()
               var lng = event.latLng.lng()
               loc = lat.toString() + ", " + lng.toString()
-              markMe(lat, lng)
+              markMe(lat, lng, 10)
           });
           loadXMLDoc("0", timeReq, otherReq)
        }
@@ -481,7 +488,7 @@ body {
               fillOpacity: 1,
               map: gMap,
               center: new google.maps.LatLng(latitude, longitude),
-              radius: 10
+              radius: rad
             };
             // Add the circle for this city to the map.
             little_circle = new google.maps.Circle(innerOptions);
@@ -495,7 +502,7 @@ body {
               fillOpacity: 0.3,
               map: gMap,
               center: new google.maps.LatLng(latitude, longitude),
-              radius: 40
+              radius: rad*4
             };
             // Add the circle for this city to the map.
             big_circle = new google.maps.Circle(outerOptions);
@@ -560,7 +567,7 @@ body {
           name = name.replace("\"", "")
           name = name.replace("\"", "")
           display_total_desc[name] = val
-          sendFilterArgs()
+          sendFilterArgs('false', 'empty')
         }
 
         function eventHTML(event_id, event_name, creator_id, attendees, description, event_time, latitude, longitude)
@@ -654,11 +661,11 @@ body {
 </button></u>
         </a>
         <ul class="dropdown-menu" role="menu">
-            <li onclick="setFilterArgs('loc', '0'); sendFilterArgs()"><a href="#">Anywhere</a></li>
-            <li onclick="setFilterArgs('loc', '250'); sendFilterArgs()"><a href="#">250m (3 min walk)</a></li>
-            <li onclick="setFilterArgs('loc', '750'); sendFilterArgs()"><a href="#">750m (10 min walk)</a></li>
-            <li onclick="setFilterArgs('loc', '1500'); sendFilterArgs()"><a href="#">1500m (20 min walk)</a></li>
-            <li onclick="setFilterArgs('loc', '3000'); sendFilterArgs()"><a href="#">3000m (40 min walk)</a></li>
+            <li onclick="setFilterArgs('loc', '0'); sendFilterArgs('false', 'empty')"><a href="#">Anywhere</a></li>
+            <li onclick="setFilterArgs('loc', '250'); sendFilterArgs('false', 'empty')"><a href="#">250m (3 min walk)</a></li>
+            <li onclick="setFilterArgs('loc', '750'); sendFilterArgs('false', 'empty')"><a href="#">750m (10 min walk)</a></li>
+            <li onclick="setFilterArgs('loc', '1500'); sendFilterArgs('false', 'empty')"><a href="#">1500m (20 min walk)</a></li>
+            <li onclick="setFilterArgs('loc', '3000'); sendFilterArgs('false', 'empty')"><a href="#">3000m (40 min walk)</a></li>
         </ul>
        </li>
 
@@ -668,11 +675,11 @@ body {
 </button></u>
         </a>
         <ul class="dropdown-menu" role="menu">
-          <li onclick="setFilterArgs('time', '0'); sendFilterArgs()"><a href="#">Anytime</a></li>
-          <li onclick="setFilterArgs('time', '30'); sendFilterArgs()"><a href="#">Within 30 mins</a></li>
-          <li onclick="setFilterArgs('time', '1'); sendFilterArgs()"><a href="#">Within 1 hour</a></li>
-          <li onclick="setFilterArgs('time', '2'); sendFilterArgs()"><a href="#">Within 2 hours</a></li>
-          <li onclick="setFilterArgs('time', '5'); sendFilterArgs()"><a href="#">Within 5 hours</a></li>
+          <li onclick="setFilterArgs('time', '0'); sendFilterArgs('false', 'empty')"><a href="#">Anytime</a></li>
+          <li onclick="setFilterArgs('time', '30'); sendFilterArgs('false', 'empty')"><a href="#">Within 30 mins</a></li>
+          <li onclick="setFilterArgs('time', '1'); sendFilterArgs('false', 'empty')"><a href="#">Within 1 hour</a></li>
+          <li onclick="setFilterArgs('time', '2'); sendFilterArgs('false', 'empty')"><a href="#">Within 2 hours</a></li>
+          <li onclick="setFilterArgs('time', '5'); sendFilterArgs('false', 'empty')"><a href="#">Within 5 hours</a></li>
         </ul>
        </li>   
 
@@ -681,11 +688,11 @@ body {
             
           </a>
           <ul class="dropdown-menu" role="menu">
-            <li onclick="setFilterArgs('other', '0'); sendFilterArgs()"><a href="#">Anyone's going</a></li>
-            <li onclick="setFilterArgs('other', 'i_created'); sendFilterArgs()"><a href="#">Events I created</a></li>
-            <li onclick="setFilterArgs('other', 'im_going'); sendFilterArgs()"><a href="#">Events I'm going to</a></li>
-            <li onclick="setFilterArgs('other', 'going_to'); sendFilterArgs()"><a href="#">Events my friends are going to</a></li>
-            <li onclick="setFilterArgs('other', 'created'); sendFilterArgs()"><a href="#">Events my friends made</a></li>
+            <li onclick="setFilterArgs('other', '0'); sendFilterArgs('false', 'empty')"><a href="#">Anyone's going</a></li>
+            <li onclick="setFilterArgs('other', 'i_created'); sendFilterArgs('false', 'empty')"><a href="#">Events I created</a></li>
+            <li onclick="setFilterArgs('other', 'im_going'); sendFilterArgs('false', 'empty')"><a href="#">Events I'm going to</a></li>
+            <li onclick="setFilterArgs('other', 'going_to'); sendFilterArgs('false', 'empty')"><a href="#">Events my friends are going to</a></li>
+            <li onclick="setFilterArgs('other', 'created'); sendFilterArgs('false', 'empty')"><a href="#">Events my friends made</a></li>
  
           </ul>
        </li>
@@ -695,21 +702,16 @@ body {
            
           </a>
           <ul class="dropdown-menu" role="menu">
-            <li onclick="setFilterArgs('other', '0'); sendFilterArgs()"><a href="#">Anyone's going</a></li>
-            <li onclick="setFilterArgs('other', 'i_created'); sendFilterArgs()"><a href="#">Events I created</a></li>
-            <li onclick="setFilterArgs('other', 'im_going'); sendFilterArgs()"><a href="#">Events I'm going to</a></li>
-            <li onclick="setFilterArgs('other', 'going_to'); sendFilterArgs()"><a href="#">Events my friends are going to</a></li>
-            <li onclick="setFilterArgs('other', 'created'); sendFilterArgs()"><a href="#">Events my friends made</a></li>
+            <li onclick="setFilterArgs('other', '0'); sendFilterArgs('false', 'empty')"><a href="#">Anyone's going</a></li>
+            <li onclick="setFilterArgs('other', 'i_created'); sendFilterArgs('false', 'empty')"><a href="#">Events I created</a></li>
+            <li onclick="setFilterArgs('other', 'im_going'); sendFilterArgs('false', 'empty')"><a href="#">Events I'm going to</a></li>
+            <li onclick="setFilterArgs('other', 'going_to'); sendFilterArgs('false', 'empty')"><a href="#">Events my friends are going to</a></li>
+            <li onclick="setFilterArgs('other', 'created'); sendFilterArgs('false', 'empty')"><a href="#">Events my friends made</a></li>
  
           </ul>
        </li>
 
-       <%= form_tag({controller: "events", action: "search"}, :method => "get", id: "search-form") do %>
-          <span id = "search">
-          <%= text_field_tag :search, params[:search], placeholder: "Search for..." %>
-          </span>
-          <%= submit_tag "Search", :name => nil %>
-        <% end %>
+       <input type="button" value="Search!" onclick="sendFilterArgs('true', 'yea')"/>
      </span>
 
 

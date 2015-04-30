@@ -21,7 +21,7 @@ class Filter
       lat, lng = location.split(",")
       @events = filterByLocation(@events, lat, lng, near_me)
     end
-    @events = addAttendancestoEvents(@events)
+    @events = Filter.addAttendancestoEvents(@events)
 
 end
 
@@ -72,7 +72,7 @@ def filterByOther(events, user_id, other)
   friend_events
 end 
                   
-def addAttendancestoEvents(events)
+def self.addAttendancestoEvents(events)
   modifiedEvents = Array.new(events.length)
   count=0
   events.each do |event|
@@ -96,7 +96,6 @@ def addAttendancestoEvents(events)
   end
   modifiedEvents
 end
-
 
 def convertLatLngToMeters(orig_coords, end_coords)
   lat1 = orig_coords[0]
