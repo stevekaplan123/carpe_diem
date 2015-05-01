@@ -52,10 +52,9 @@ class EventsController < ApplicationController
   # GET /events/filter?args
   def filter
        if params[:search]!="false"
-            @events = Event.where('description LIKE ?', "%#{params[:searchValue]}%")
-            @events = Filter.addAttendancestoEvents(@events)
+           @events = Filter.search(params[:searchValue])
         else
-           filter_events = Filter.new(current_user.id, params[:location], params[:near_me], params[:other], params[:time])
+           filter_events = Filter.new(current_user.id, params[:location], params[:near_me], params[:other], params[:time], params[:tags])
            @events = filter_events.events
            @attendances = Attendance.all
       end
@@ -156,12 +155,6 @@ class EventsController < ApplicationController
       format.html { redirect_to :back, alert: 'Event was successfully cancelled.' }
       format.json { head :no_content }
     end
-  end
-
-  def my_events
-    @user = current_user
-    @expired_events = ArchivedEvent.where('creator_id = ?', current_user.id)
-    render 'myEvents'
   end
 
   private

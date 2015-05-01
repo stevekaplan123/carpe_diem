@@ -6,10 +6,12 @@ body {
 }
 
 #content {
-  margin-left:  50%;
+  
   padding: 4px ;
   z-index: -1;
 }
+
+
 #menuwrapper {
   float: left;
   width: 50%;
@@ -17,39 +19,55 @@ body {
 
 }
 
+#search-and-map {
+  float: right;
+  width: 50%;
+  padding: 4px ;
+
+}
+
+#nav-search{
+  padding:6px;
+}
+
+
+
 /*get all filter buttons in the same row*/
 #filter_buttons li{
   font-size: 1.15em;
   display: inline;
 }
 
-#event_box {
+.event_box {
   margin-left: 3%;
   margin-right: 3%;
-    background-color: khaki;
+  background-color: ghostwhite;
 
 }
 
-#event_box:hover
+.event_box:hover
 {
-  background-color: ghostwhite;
+  background-color: khaki;
 }
 
 
 #lower-group {
-  height: 500px;
+  height: 600px;
   overflow: scroll;
 }
 
-#map-group {
-  height: 572px;
-}
 
 
 /* Clear float */
 .clear{
     clear:both;
 }
+
+
+#tab-area{
+  height:150px;
+}
+
 </style>
 
 
@@ -70,7 +88,7 @@ body {
           }
         })();
 
-        var rad=10;
+        var rad=5;
         var gMap = null;
         var attendance_window = null;
         var desc_window = null;
@@ -88,6 +106,7 @@ body {
         var locationReq = "0";
         var timeReq = "0";
         var otherReq = "0";
+        var tagsReq = "0"
         var display_total_desc = new Object()
         var display_total_att = new Object()
         var ne;
@@ -97,6 +116,7 @@ body {
             locationReq = checkCookies("loc")
             timeReq = checkCookies("time")
             otherReq = checkCookies("friends")
+            tagsReq = checkCookies("tags")
             curr_zoom = 15
             var myOptions = {
                 center: new google.maps.LatLng(42.3654347, -71.258595),
@@ -137,7 +157,7 @@ body {
        }
 
 
-        function loadXMLDoc(locArg, timeArg, otherArg, search, searchValue) {          
+        function loadXMLDoc(locArg, timeArg, otherArg, tagsArg, search) {          
           if (loc=="error") //if loc error and no value set on map
           {
               alert("In order to see events near you, either allow geolocation on your browser or select your position on the map.")
@@ -152,8 +172,11 @@ body {
               {
                 clearMarkers()        //first clear old event markers and clear out table of events
                 clearWindows()
-                rad = 10
-               // markMe()
+                 rad = 5
+                 loc = document.getElementById("locationDiv").innerHTML.split(", ")
+                 var latitude = loc[0]
+                 var longitude = loc[1]
+                 markMe(latitude, longitude)
                 curr_zoom = 15            //reset zoom and center to brandeis campus
                 gMap.setZoom(curr_zoom)
                 gMap.setCenter(new google.maps.LatLng(42.3654347, -71.258595))
@@ -196,8 +219,9 @@ body {
 
               }
             } 
-
-          xmlhttp.open("GET","/events/filter.json?location="+loc+"&near_me="+locArg+"&other="+otherArg+"&time="+timeArg+"&search="+search+"&searchValue="+searchValue,true);
+          searchValue = document.getElementById("search_box").value
+          xmlhttp.open("GET","/events/filter.json?location="+loc+"&near_me="+locArg+"&other="+otherArg+"&time="+timeArg+
+            "&tags="+tagsArg+"&search="+search+"&searchValue="+searchValue,true);
           xmlhttp.send();
         }
 
@@ -311,6 +335,14 @@ body {
                 return time_pref
              }
           }
+          else if (type == "tags")
+          {
+             var tag_pref = getCookie(uid+"carpe_diem_preferences_tags");
+             if (tag_pref != "" && tag_pref != null)
+             {
+                return tag_pref
+             }
+          }
           else
           {
              return 0;
@@ -331,13 +363,17 @@ body {
         else if(type=="other") {
           otherReq = arg;
         }
+        else if(type=="tags") {
+          tagsReq = arg;
+        }
         else {
           otherReq = "0";
         }
       }
 
-      function sendFilterArgs(search, searchValue) {
-        loadXMLDoc(locationReq, timeReq, otherReq, search, searchValue);
+      function sendFilterArgs(search) {
+        document.getElementById("status").innerHTML = ""
+        loadXMLDoc(locationReq, timeReq, otherReq, tagsReq, search);
       }
 
       function getTimeTxt(timeMsg)
@@ -410,7 +446,7 @@ body {
         { msg = "Viewing Events "+" "+locTxt+" "+timeTxt;}
         else { msg = "Viewing All Events"; }
         if (otherTxt != "")   { msg = msg + " That "+otherTxt;}
-        return '<span align="center"><h4>'+msg+'</h4></span>';
+        return '<span align="center"><h5>'+msg+'</h5></span>';
       }
 
 
@@ -432,8 +468,9 @@ body {
          tag = ""
          var latitude = loc[0]
          var longitude = loc[1]
+         rad=5
          markMe(latitude, longitude)
-         loadXMLDoc(locationReq, timeReq, otherReq)  //use default params
+         loadXMLDoc(locationReq, timeReq, otherReq, tagsReq, "true")  //use default params
 
        }
 
@@ -447,9 +484,10 @@ body {
               var lat = event.latLng.lat()
               var lng = event.latLng.lng()
               loc = lat.toString() + ", " + lng.toString()
-              markMe(lat, lng, 10)
+              markMe(lat, lng)
           });
-          loadXMLDoc("0", timeReq, otherReq)
+          rad=5
+          loadXMLDoc("0", timeReq, otherReq, tagsReq, "true")
        }
 
 
@@ -502,7 +540,7 @@ body {
               fillOpacity: 0.3,
               map: gMap,
               center: new google.maps.LatLng(latitude, longitude),
-              radius: rad*4
+              radius: rad*1.5
             };
             // Add the circle for this city to the map.
             big_circle = new google.maps.Circle(outerOptions);
@@ -518,6 +556,11 @@ body {
               });
 
               markers.push(marker) 
+              var curr_length = markers.length
+
+               google.maps.event.addListener(marker, 'click', function() {
+                   // document.getElementById(markers[curr_length-1].title).style.backgroundColor = "lightsteelblue"
+                });
 
 
         }
@@ -567,11 +610,27 @@ body {
           name = name.replace("\"", "")
           name = name.replace("\"", "")
           display_total_desc[name] = val
-          sendFilterArgs('false', 'empty')
+          sendFilterArgs('false')
+        }
+
+        function convertNamesIntoLinks(attendees)
+        {
+            attendance_html = ""
+            att_array = attendees.split(", ")
+            for (var i=0; i<att_array.length; i++)
+            {
+              user_id = att_array[i].split(":")[0]
+              user_name = att_array[i].split(":")[1]
+              url = "/users/"+user_id
+              attendance_html += '<a href='+url+'>'+user_name+'</a>, '
+            }
+            attendance_html = attendance_html.slice(0,attendance_html.length-2); //chop off the last comma and space
+            return attendance_html;
         }
 
         function eventHTML(event_id, event_name, creator_id, attendees, description, event_time, latitude, longitude)
         {
+          attendees = convertNamesIntoLinks(attendees)
           var append_to="";  
           var current_name = '<%= current_user.name %>';
           var current_id = <%= current_user.id %>
@@ -599,8 +658,7 @@ body {
                     event_name + '&quot)"' +
                   'style="cursor: pointer">View Event On Map</span></b></u></div>'
           description = onlyAllow15Words(event_name, event_id, description)
-          return '<div id="event_box"> <h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+
-                  'Attending: '+attendees+'<br>'+append_to 
+          return '<div id="'+event_name+'"class="event_box"> <h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+'Attending: '+attendees+'<br>'+append_to 
                     '</div><hr>'
 
         }
@@ -638,34 +696,64 @@ body {
     </script>
 
 <body>
+
+
 <div id="container">
 
 
-
- <div id="menuwrapper">
-
-<h4> <%= @status %></h4>
-    <div id="below_menu"></div>
-    </nav>
-  </div><!-- close menuwrapper-->
+  <div id="menuwrapper">
+    <h4><div id="status"><%= @status %></div></h4>
+      <nav class="navbar navbar-default" id="lower-group">
+      <div id="below_menu"></div>
+      </nav>
+  </div><!-- close #menuwrapper-->
   
-  <div id="content">  
-    <nav id="map-group"> 
-<nav class="navbar navbar-default">
-      
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1"><div id="events_msg"></div>
+  
 
-    <span>   <ul class="nav navbar-nav" id="filter_buttons">
+  <div id="search-and-map">
+
+      <div role="tabpanel" id="tab-area">
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#searchbox" aria-controls="searchbox" role="tab" data-toggle="tab">Search By Text</a></li>
+            <li role="presentation"><a href="#categories" aria-controls="categories" role="tab" data-toggle="tab">Search By Category</a></li>
+          </ul>
+          <div class="tab-content">
+
+
+            <div role="tabpanel" class="tab-pane active" id="searchbox">
+                  <div style="line-height:50%;"><br></div>
+
+                  
+                    <nav class="navbar navbar-default", id="nav-search">
+                      <br>
+                      <input type="textbox" id="search_box"/>
+                      <input type="button" value="Search!" onclick="sendFilterArgs('true')">
+
+                    </nav>
+                  
+            </div>
+
+
+
+            <div role="tabpanel" class="tab-pane" id="categories">
+                    <div style="line-height:50%;"><br></div>
+
+                        
+                          <nav class="navbar navbar-default">
+
+                            <div id="content">        
+                              <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1"><div id="events_msg"></div>
+                                <span>   <ul class="nav navbar-nav" id="filter_buttons">
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">Where<span class="caret"></span>
 </button></u>
         </a>
         <ul class="dropdown-menu" role="menu">
-            <li onclick="setFilterArgs('loc', '0'); sendFilterArgs('false', 'empty')"><a href="#">Anywhere</a></li>
-            <li onclick="setFilterArgs('loc', '250'); sendFilterArgs('false', 'empty')"><a href="#">250m (3 min walk)</a></li>
-            <li onclick="setFilterArgs('loc', '750'); sendFilterArgs('false', 'empty')"><a href="#">750m (10 min walk)</a></li>
-            <li onclick="setFilterArgs('loc', '1500'); sendFilterArgs('false', 'empty')"><a href="#">1500m (20 min walk)</a></li>
-            <li onclick="setFilterArgs('loc', '3000'); sendFilterArgs('false', 'empty')"><a href="#">3000m (40 min walk)</a></li>
+            <li onclick="setFilterArgs('loc', '0'); sendFilterArgs('false')"><a href="#">Anywhere</a></li>
+            <li onclick="setFilterArgs('loc', '250'); sendFilterArgs('false')"><a href="#">250m (3 min walk)</a></li>
+            <li onclick="setFilterArgs('loc', '750'); sendFilterArgs('false')"><a href="#">750m (10 min walk)</a></li>
+            <li onclick="setFilterArgs('loc', '1500'); sendFilterArgs('false')"><a href="#">1500m (20 min walk)</a></li>
+            <li onclick="setFilterArgs('loc', '3000'); sendFilterArgs('false')"><a href="#">3000m (40 min walk)</a></li>
         </ul>
        </li>
 
@@ -675,25 +763,30 @@ body {
 </button></u>
         </a>
         <ul class="dropdown-menu" role="menu">
-          <li onclick="setFilterArgs('time', '0'); sendFilterArgs('false', 'empty')"><a href="#">Anytime</a></li>
-          <li onclick="setFilterArgs('time', '30'); sendFilterArgs('false', 'empty')"><a href="#">Within 30 mins</a></li>
-          <li onclick="setFilterArgs('time', '1'); sendFilterArgs('false', 'empty')"><a href="#">Within 1 hour</a></li>
-          <li onclick="setFilterArgs('time', '2'); sendFilterArgs('false', 'empty')"><a href="#">Within 2 hours</a></li>
-          <li onclick="setFilterArgs('time', '5'); sendFilterArgs('false', 'empty')"><a href="#">Within 5 hours</a></li>
+          <li onclick="setFilterArgs('time', '0'); sendFilterArgs('false')"><a href="#">Anytime</a></li>
+          <li onclick="setFilterArgs('time', '30'); sendFilterArgs('false')"><a href="#">Within 30 mins</a></li>
+          <li onclick="setFilterArgs('time', '1'); sendFilterArgs('false')"><a href="#">Within 1 hour</a></li>
+          <li onclick="setFilterArgs('time', '2'); sendFilterArgs('false')"><a href="#">Within 2 hours</a></li>
+          <li onclick="setFilterArgs('time', '5'); sendFilterArgs('false')"><a href="#">Within 5 hours</a></li>
         </ul>
        </li>   
+
 
          <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">Tags<span class="caret"></span></button></u>
             
           </a>
           <ul class="dropdown-menu" role="menu">
-            <li onclick="setFilterArgs('other', '0'); sendFilterArgs('false', 'empty')"><a href="#">Anyone's going</a></li>
-            <li onclick="setFilterArgs('other', 'i_created'); sendFilterArgs('false', 'empty')"><a href="#">Events I created</a></li>
-            <li onclick="setFilterArgs('other', 'im_going'); sendFilterArgs('false', 'empty')"><a href="#">Events I'm going to</a></li>
-            <li onclick="setFilterArgs('other', 'going_to'); sendFilterArgs('false', 'empty')"><a href="#">Events my friends are going to</a></li>
-            <li onclick="setFilterArgs('other', 'created'); sendFilterArgs('false', 'empty')"><a href="#">Events my friends made</a></li>
- 
+            <li onclick="setFilterArgs('tags', '0'); sendFilterArgs('false')"><a href="#">No Tags</a></li>
+            <li onclick="setFilterArgs('tags', '1'); sendFilterArgs('false')"><a href="#">Academic</a></li>
+            <li onclick="setFilterArgs('tags', '2'); sendFilterArgs('false')"><a href="#">Competition</a></li>
+            <li onclick="setFilterArgs('tags', '3'); sendFilterArgs('false')"><a href="#">Entertainment</a></li>
+            <li onclick="setFilterArgs('tags', '4'); sendFilterArgs('false')"><a href="#">Food</a></li>
+            <li onclick="setFilterArgs('tags', '5'); sendFilterArgs('false')"><a href="#">Game</a></li>
+             <li onclick="setFilterArgs('tags', '6'); sendFilterArgs('false')"><a href="#">Off-Campus</a></li>
+            <li onclick="setFilterArgs('tags', '7'); sendFilterArgs('false')"><a href="#">Music</a></li>
+             <li onclick="setFilterArgs('tags', '8'); sendFilterArgs('false')"><a href="#">Party</a></li>
+             <li onclick="setFilterArgs('tags', '9'); sendFilterArgs('false')"><a href="#">Sports</a></li>
           </ul>
        </li>
 
@@ -702,28 +795,38 @@ body {
            
           </a>
           <ul class="dropdown-menu" role="menu">
-            <li onclick="setFilterArgs('other', '0'); sendFilterArgs('false', 'empty')"><a href="#">Anyone's going</a></li>
-            <li onclick="setFilterArgs('other', 'i_created'); sendFilterArgs('false', 'empty')"><a href="#">Events I created</a></li>
-            <li onclick="setFilterArgs('other', 'im_going'); sendFilterArgs('false', 'empty')"><a href="#">Events I'm going to</a></li>
-            <li onclick="setFilterArgs('other', 'going_to'); sendFilterArgs('false', 'empty')"><a href="#">Events my friends are going to</a></li>
-            <li onclick="setFilterArgs('other', 'created'); sendFilterArgs('false', 'empty')"><a href="#">Events my friends made</a></li>
+            <li onclick="setFilterArgs('other', '0'); sendFilterArgs('false')"><a href="#">Anyone's Going</a></li>
+            <li onclick="setFilterArgs('other', 'i_created'); sendFilterArgs('false')"><a href="#">Events I created</a></li>
+            <li onclick="setFilterArgs('other', 'im_going'); sendFilterArgs('false')"><a href="#">Events I'm going to</a></li>
+            <li onclick="setFilterArgs('other', 'going_to'); sendFilterArgs('false')"><a href="#">Events my friends are going to</a></li>
+            <li onclick="setFilterArgs('other', 'created'); sendFilterArgs('false')"><a href="#">Events my friends made</a></li>
  
           </ul>
        </li>
 
-       <input type="button" value="Search!" onclick="sendFilterArgs('true', 'yea')"/>
      </span>
 
 
-    <div id="map_canvas" style="width: 530px; height: 460px"></div>
+                          </nav>
+                        
 
-    </ul>
-  </div>
-    </nav>
+              </div>
+          </div> <!-- #tab-content-->
+      </div> <!-- #tab-area-->
 
-  </nav>
-  </div>
-</div>
+       <br>
+
+      <nav> 
+        <nav class="navbar navbar-default" id="map-group2">
+          <div id="map_canvas" style="width: 560px; height: 440px"></div>
+        </nav>
+      </nav>
+
+  </div> <!-- #search-and-map-->   
+
+
+</div> <!-- #container-->
+
 
 
 <div id="locationDiv" style="visibility:hidden"></div>
