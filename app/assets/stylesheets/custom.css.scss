@@ -1,36 +1,6 @@
 @import "bootstrap-sprockets";
 @import "bootstrap";
 
-#fake-signup {
-  margin-top: 25%;
-}
-
-.hidden {
-  display: none;
-}
-
-.visible {
-  display: block;
-}
-
-.home-welcome {
-  padding-top: 80px;
-  padding-bottom: 80px;
-}
-
-#sign-in {
-  margin-top: 16px;
-  text-align: center;
-}
-
-#sign-in-modal {
-  top: 80px;
-  width: 400px;
-  margin: 0px 0px 0px -204px;
-  left: 50%;
-  position: fixed;
-}
-
 /* universal */
 
 section {
@@ -51,7 +21,6 @@ textarea {
 
 .navbar-brand{
   font-size: 45px
-
 }
 /* footer */
 

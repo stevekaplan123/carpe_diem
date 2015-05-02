@@ -13,6 +13,7 @@ class UsersController < ApplicationController
   # GET /users/1
   # GET /users/1.json
   def show
+    @friendships = @user.friendships
   end
 
   # GET /users/new
@@ -32,7 +33,7 @@ class UsersController < ApplicationController
     if @user.save
       log_in @user
       UserMailer.welcome_email(@user).deliver_now
-      flash.now[:success] = "Welcome to Carpe Diem" 
+      flash.now[:success] = "Welcome to Carpe Diem"
       redirect_to @user
     else
       render 'new'

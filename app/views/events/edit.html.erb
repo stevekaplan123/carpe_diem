@@ -1,3 +1,4 @@
+<div class="container">
 <h1>Editing Event</h1>
 
 <%= render 'form' %>
@@ -9,12 +10,12 @@
     <script type='text/javascript' src='//code.jquery.com/jquery-1.9.1.js'></script>
     <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script type='text/javascript'>
-   
+
 
     var marker = null;
     var map = null;
 
-    
+
     function markMe(latitude, longitude)
     {
         me_window = new google.maps.InfoWindow({
@@ -29,7 +30,7 @@
     //gets called by geolocation attempt with position of user
     function showPosition(position) {
            var str_loc = position.coords.latitude + ", " + position.coords.longitude;
-           var loc = str_loc.split(", "); 
+           var loc = str_loc.split(", ");
            var latitude = loc[0]
            var longitude = loc[1]
            markMe(latitude, longitude)
@@ -48,12 +49,12 @@
             mapTypeId: google.maps.MapTypeId.ROADMAP
         };
         gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
-  	   
+
         //find geolocation of user
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition); 
+            navigator.geolocation.getCurrentPosition(showPosition);
 
-        } else { 
+        } else {
             myDiv.innerHTML = "Geolocation is not supported by this browser.";
         }
 
@@ -83,6 +84,7 @@
 
     });
 
-    
+
 
     </script>
+</div>

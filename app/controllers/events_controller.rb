@@ -9,6 +9,7 @@ class EventsController < ApplicationController
   def index
     @events = Event.all
     eid = params[:eid]
+
     if params[:user_action] != nil and params[:user_action] == "cancelled"
       @status = "You are no longer signed up for '"+eid+"'."
     elsif params[:user_action] != nil and params[:user_action] == "signed_up"
@@ -51,9 +52,13 @@ class EventsController < ApplicationController
 
   # GET /events/filter?args
   def filter
-       filter_events = Filter.new(current_user.id, params[:location], params[:near_me], params[:other], params[:time])
-       @events = filter_events.events
-       @attendances = Attendance.all
+       if params[:search]!="false"
+           @events = Filter.search(params[:searchValue])
+        else
+           filter_events = Filter.new(current_user.id, params[:location], params[:near_me], params[:other], params[:time], params[:tags])
+           @events = filter_events.events
+           @attendances = Attendance.all
+      end
   end
   # GET /events/new
   def new
