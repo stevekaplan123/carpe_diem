@@ -1,52 +1,56 @@
-<div class="container">
-<div class="jumbotron">
-  <div class="home-welcome">
-    <div class="row">
-      <div class=col-md-6>
-        <h1>Seize the day.</h1>
-        <p>Today is <%= Time.now.strftime("%A, %B %d, %Y (EDT)") %>. There are <%= Event.count %> events happening right now at Brandeis.</p>
-      </div>
-
-      <div class="col-md-6">
+<header class="intro">
+  <div class="intro-body">
+    <div class="container">
         <div class="row">
-          <div class="col-md-6 col-md-offset-3">
-            <%= form_for(:user, url: '/users', html: { class: "hidden" }) do |f| %>
-              <%= f.text_field :name, class: 'form-control', placeholder: 'Username' %>
-
-              <%= f.email_field :email, class: 'form-control', placeholder: "Email" %>
-
-              <%= f.password_field :password, class: 'form-control', placeholder: "Password" %>
-
-              <%= f.submit "Sign up", class: "btn btn-primary" %>
-            <% end %>
-
-            <input type="button" value="Sign up" class="btn btn-primary" id="fake-signup"/>
-
-            <div id="sign-in">
-              or
-              <%= link_to "Sign in", "#login", "data-toggle" => "modal", "data-target" => "#sign-in-modal" %>
-            </div>
+          <div class="col-md-8 col-md-offset-2">
+            <h1 class="brand-heading">Carpe Diem</h1>
+            <p class="intro-text">Ad-hoc spontaneous activities.<br>Ever wonder if there is free food right now?</p>
+            <a href="#about" class="btn btn-circle page-scroll">
+              <i class="fa fa-angle-double-down animated"></i>
+            </a>
           </div>
         </div>
+    </div>
+  </div>
+</header>
+
+<!-- About Section -->
+<section id="about" class="container content-section text-center">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2">
+      <h2>About Carpe Diem</h2>
+      <p>A group project by 4 Brandeis students (Steve, Viet, Vladimir and Leifeng) for COSI 166b</p>
+    </div>
+  </div>
+</section>
+
+<!-- Our Team Section -->
+<section id="why" class="content-section text-center">
+  <div class="download-section">
+    <div class="container">
+      <div class="col-lg-8 col-lg-offset-2">
+        <h2>Why you'll love Carpe Diem</h2>
+        <p>Create events, find events happening right now at Brandeis campus.</p>
       </div>
     </div>
   </div>
-</div>
+</section>
 
-<div class="modal fade" id="sign-in-modal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-content">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      <h2 class="modal-title">Sign in</h2>
-    </div>
-    <div class="modal-body">
-      <%= form_for(:session, url: login_path) do |f| %>
-        <%= f.text_field :name, class: 'form-control', placeholder: 'Username' %>
-        <%= f.password_field :password, class: 'form-control', placeholder: 'Password' %>
-        <%= f.submit "Log in", class: "btn btn-primary" %>
-      <% end %>
+<!-- Contact Us Section -->
+<section id="contact" class="container content-section text-center">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2">
+      <h2>Contact Carpe Diem</h2>
+      <p>Feel free to email us to provide some feedback, or to just say hello!</p>
+      <p><a href="mailto:a@carpediem.com">a@carpediem.com</a>
+      </p>
+      <ul class="list-inline banner-social-buttons">
+        <li>
+          <a href="https://github.com/stevekaplan123/carpe_diem" class="btn btn-default btn-lg">
+            <i class="fa fa-github fa-fw"></i> <span class="network-name">Github</span>
+          </a>
+        </li>
+      </ul>
     </div>
   </div>
-</div>
-</div>
-</div>
+</section>
