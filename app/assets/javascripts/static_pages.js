@@ -5,6 +5,7 @@
  */
 
 $(function() {
+    $("a.navbar-brand").attr("href", "#page-top")
     $(".navbar").removeClass("navbar-default").addClass("navbar-custom navbar-fixed-top");
 });
 
