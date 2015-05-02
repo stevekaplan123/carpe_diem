@@ -26,6 +26,7 @@ class EventsController < ApplicationController
     if params[:whatAction]=="1"       #1 for sign up, 0 for cancel
         Attendance.create(event_id: event_id, user_id: user_id)
         @event = Event.find_by(id: event_id)
+        UserMailer.signup_event_email(current_user, @event).deliver_now
         redirect_to "/events?user_action=signed_up&eid="+EventsService.convert_words_to_uri(@event["name"])
     elsif params[:whatAction]=="0"
         attendances = Attendance.where(event_id: event_id, user_id: user_id)
