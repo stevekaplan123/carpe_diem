@@ -200,7 +200,7 @@ end
       tag_count = [0,0,0,0,0,0,0,0,0]
       recommended_events = []
 
-      @attendances = Attendance.where(user_id: user_id)
+      @attendances = ArchivedAttendance.where(user_id: user_id)
 
 
       @attendances.each do |attendance|
