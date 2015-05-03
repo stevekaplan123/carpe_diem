@@ -23,16 +23,21 @@ class Event < ActiveRecord::Base
     temp = DateTime.now
     #now = temp.change(min: temp.min - 1)
     now = DateTime.new(temp.year, temp.month, temp.day, temp.hour, temp.min - 1, temp.sec)
-    puts now
-    puts time_occurrence
+    puts "Now: #{now}"
+    puts "Time Occurrence: #{time_occurrence}"
 
-    if time_occurrence < now
-      self.errors.add :start_time, 'event cannot occur in the past!'
-      #validates event doesn't occur more than 24 hours in the future
-      #now.utc_offset
-    elsif time_occurrence >= DateTime.now+1
-      self.errors.add :start_time, 'event cannot occur more than 24 hours in the future'
+    if !time_occurrence.nil?
+      if time_occurrence < now
+        self.errors.add :start_time, 'event cannot occur in the past!'
+        #validates event doesn't occur more than 24 hours in the future
+        #now.utc_offset
+      elsif time_occurrence >= DateTime.now+1
+        self.errors.add :start_time, 'event cannot occur more than 24 hours in the future'
+      end
+    else
+      self.errors.add :date_not_selected, 'please select a date'
     end
+
   end
 
   def num_tags

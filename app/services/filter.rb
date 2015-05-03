@@ -149,11 +149,14 @@ def self.addAttendancestoEvents(events)
     modifiedEvents[count]["id"] = event["id"]
     modifiedEvents[count]["name"] = event["name"]
     modifiedEvents[count]["time_occurrence"] = event["time_occurrence"]
+    modifiedEvents[count]["tags"] = event["tags"]
+
     event_attendees = event.users
     attendees_names_joined = ""
     event_attendees.each do |event_attendee|
       attendees_names_joined = attendees_names_joined + event_attendee["id"].to_s + ":" + event_attendee["name"] + ", "
     end
+
     attendees_names_joined = attendees_names_joined.chop #remove the ", " so chop twice
     attendees_names_joined = attendees_names_joined.chop
     modifiedEvents[count]["attendees"] =  attendees_names_joined
@@ -267,10 +270,11 @@ end
        end
       end
 
-      topThreeHash = {key1 => val1, key2 => val2, key3 => val3}
-      score1 = val1 / (val1 + val2 + val3)
-      score2 = val2 / (val1 + val2 + val3)
-      score3 = val3 / (val1 + val2 + val3)
+
+      #topThreeHash = {key1 => val1, key2 => val2, key3 => val3}
+      #score1 = val1 / (val1 + val2 + val3)
+      #score2 = val2 / (val1 + val2 + val3)
+      #score3 = val3 / (val1 + val2 + val3)
 
       events.each do |event|
         tags_string = event.tags

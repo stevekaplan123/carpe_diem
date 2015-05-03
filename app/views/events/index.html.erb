@@ -31,6 +31,12 @@ body {
   padding:6px;
 }
 
+#nav-rec{
+  padding:6px;
+  padding-top:30px;
+  padding-bottom:30px;
+}
+
 
 
 /*get all filter buttons in the same row*/
@@ -95,6 +101,7 @@ body {
         var desc_window = null;
         var markers = [];
         var me_window =  null;
+        var me_marker = null
         var loc = null;
         var windows = [];
         var tag = null;
@@ -160,6 +167,21 @@ body {
        }
 
 
+       function convertTagsFromNumbersIntoWords(tags)
+       {
+
+          var tags = tags.replace("1", " academic")
+          tags = tags.replace("2", " competition")
+          tags = tags.replace("3", " entertainment")
+          tags = tags.replace("4", " food")
+          tags = tags.replace("5", " game")
+          tags = tags.replace("6", " off-campus")
+          tags = tags.replace("7", " music")
+          tags = tags.replace("8", " party")
+          tags = tags.replace("9", " sports")
+          return tags
+       }
+
         function loadXMLDoc(locArg, timeArg, otherArg, tagsArg, search, recommendationArg) {          
           if (loc=="error") //if loc error and no value set on map
           {
@@ -205,6 +227,8 @@ body {
                       var creator_id=JSON.parse(xmlhttp.responseText)[i]["creator_id"];
                       var description = JSON.parse(xmlhttp.responseText)[i]["description"]
                       var attendees = JSON.parse(xmlhttp.responseText)[i]["attendees"]
+                      var event_tags = JSON.parse(xmlhttp.responseText)[i]["tags"]
+                      event_tags = convertTagsFromNumbersIntoWords(event_tags);
                       event_time = makeRailsDateReadable(event_time)
                       var event_str = event_name.split(" ")[0]+event_id
                       if (display_total_desc[event_str] == null)
@@ -217,7 +241,7 @@ body {
                       }
                       makeItFit(latitude, longitude) //zoom out if necessary to have all events on map
                       markEvents(latitude, longitude, event_name) //mark events on map that were result of filtering by 'type'
-                      document.getElementById("below_menu").innerHTML += eventHTML(event_id, event_name, creator_id, attendees, description, event_time, latitude, longitude)
+                      document.getElementById("below_menu").innerHTML += eventHTML(event_id, event_name, event_tags, creator_id, attendees, description, event_time, latitude, longitude)
                     }
 
               }
@@ -537,34 +561,14 @@ body {
           }
 
         function markMe(latitude, longitude)
-        {
-             var little_circle;
-             var innerOptions = {
-              strokeColor: 'blue',
-              strokeOpacity: 1,
-              strokeWeight: 2,
-              fillColor: 'blue',
-              fillOpacity: 1,
-              map: gMap,
-              center: new google.maps.LatLng(latitude, longitude),
-              radius: rad
-            };
-            // Add the circle for this city to the map.
-            little_circle = new google.maps.Circle(innerOptions);
-
-             var big_circle;
-             var outerOptions = {
-              strokeColor: 'blue',
-              strokeOpacity: 0.8,
-              strokeWeight: 2,
-              fillColor: 'blue',
-              fillOpacity: 0.3,
-              map: gMap,
-              center: new google.maps.LatLng(latitude, longitude),
-              radius: rad*1.5
-            };
-            // Add the circle for this city to the map.
-            big_circle = new google.maps.Circle(outerOptions);
+        {          
+            var temp_latlng = new google.maps.LatLng(latitude, longitude);
+            me_marker = new google.maps.Marker({
+                position: temp_latlng,
+                map: gMap,
+                title: "You are here!",
+                icon: "<%= asset_path( 'TrackingDot.png' ) %>"
+            });
         }
 
 
@@ -649,38 +653,47 @@ body {
             return attendance_html;
         }
 
-        function eventHTML(event_id, event_name, creator_id, attendees, description, event_time, latitude, longitude)
-        {
-          attendees = convertNamesIntoLinks(attendees)
-          var append_to="";  
-          var current_name = '<%= current_user.name %>';
-          var current_id = <%= current_user.id %>
-          var alreadyGoing = attendances.indexOf(event_id);
-          if (current_id==creator_id || current_name=="admin")
+        function eventHTML(event_id, event_name, event_tags,creator_id, attendees, description, event_time, latitude, longitude)
           {
-            append_to =  '<div align="right"><a style="font-size:x-small" data-confirm="Are you sure?" rel="nofollow"' +
-                        'data-method="delete" href="/events/'+event_id+
-                        '">Cancel Event</a> | ' +
-                        '<a style="font-size:x-small" href="/events/'+event_id+
-                        '/edit">Edit</a>'
-          }
-          else if (alreadyGoing < 0)
-          {
-            append_to = '<div align="right"><a style="font-size:x-small;" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=1">Sign up!</a>'
-          }
-          else if (alreadyGoing >= 0)
-          {
-            append_to = '<div align="right"><a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0">I Don\'t Want To Go</a>'
-          }
+            attendees = convertNamesIntoLinks(attendees)
+            var append_to="";  
+            var current_name = '<%= current_user.name %>';
+            var current_id = <%= current_user.id %>
+            var alreadyGoing = attendances.indexOf(event_id);
+            if (current_id==creator_id || current_name=="admin")
+            {
+              append_to =  '<div align="right"><a style="font-size:x-small" data-confirm="Are you sure?" rel="nofollow"' +
+                          'data-method="delete" href="/events/'+event_id+
+                          '">Cancel Event</a> | ' +
+                          '<a style="font-size:x-small" href="/events/'+event_id+
+                          '/edit">Edit</a>'
+            }
+            else if (alreadyGoing < 0)
+            {
+              append_to = '<div align="right"><a style="font-size:x-small;" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=1">Sign up!</a>'
+            }
+            else if (alreadyGoing >= 0)
+            {
+              append_to = '<div align="right"><a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0">I Don\'t Want To Go</a>'
+            }
 
-          append_to = append_to + ' | <b><u><font color="blue"><span onclick="OpenWindow(&quot;' +
-                    latitude + '+' +
-                    longitude + '+' +
-                    event_name + '&quot)"' +
-                  'style="cursor: pointer">View Event On Map</span></b></u></div>'
-          description = onlyAllow15Words(event_name, event_id, description)
-          return '<div id="'+event_name+'"class="event_box"> <h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+'Attending: '+attendees+'<br>'+append_to 
-                    '</div><hr>'
+            append_to = append_to + ' | <b><u><font color="blue"><span onclick="OpenWindow(&quot;' +
+                      latitude + '+' +
+                      longitude + '+' +
+                      event_name + '&quot)"' +
+                    'style="cursor: pointer">View Event On Map</span></b></u></div>'
+            description = onlyAllow15Words(event_name, event_id, description)
+            if (event_tags.length == 0)
+            {
+                return '<div id="'+event_name+'"class="event_box"> <h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+'Attending: '+attendees+'<br>'+append_to 
+                      '</div>'
+            }
+            else
+            {
+                return '<div id="'+event_name+'"class="event_box"> <h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+'Attending: '+attendees+'<br>Tags: '+event_tags+'<br>'+append_to 
+                      '</div>'
+            }
+
 
           }
 
@@ -842,10 +855,12 @@ body {
 
               </div>
 
-              <div role="tabpanel" class="tab-pane" id="recommendations">
-                  <button type="button" class="btn btn-primary" aria-label="Left Align" onclick="setRecommendationFlag(); sendFilterArgs('false'); resetRecommendationFlag()">
-                    <span aria-hidden="true">Find Recommendations!</span>
+              <div role="tabpanel" class="tab-pane" id="recommendations"  align="center">
+                <div style="line-height:50%;"><br></div>
+                <nav class="navbar navbar-default" id="nav-rec">
+                  <button type="button" class="btn btn-primary" onclick="setRecommendationFlag(); sendFilterArgs('false'); resetRecommendationFlag()">Find Recommendations!
                   </button>
+                </nav>
 
 
               </div>
