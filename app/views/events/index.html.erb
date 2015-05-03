@@ -113,6 +113,8 @@ body {
         var ne;
         var sw;
 
+        var recommendationReq = false;
+        
         window.onload = function(){
             locationReq = checkCookies("loc")
             timeReq = checkCookies("time")
@@ -158,7 +160,7 @@ body {
        }
 
 
-        function loadXMLDoc(locArg, timeArg, otherArg, tagsArg, search) {          
+        function loadXMLDoc(locArg, timeArg, otherArg, tagsArg, search, recommendationArg) {          
           if (loc=="error") //if loc error and no value set on map
           {
               alert("In order to see events near you, either allow geolocation on your browser or select your position on the map.")
@@ -222,7 +224,7 @@ body {
             } 
           searchValue = document.getElementById("search_box").value
           xmlhttp.open("GET","/events/filter.json?location="+loc+"&near_me="+locArg+"&other="+otherArg+"&time="+timeArg+
-            "&tags="+tagsArg+"&search="+search+"&searchValue="+searchValue,true);
+            "&tags="+tagsArg+"&search="+search+"&searchValue="+searchValue+"&recommend="+recommendationArg,true);
           xmlhttp.send();
         }
 
@@ -304,14 +306,14 @@ body {
             }
         }
 
-      function setCookie(cname,cvalue,exdays) {
+        function setCookie(cname,cvalue,exdays) {
             var d = new Date();
             d.setTime(d.getTime() + (exdays*24*60*60*1000));
             var expires = "expires=" + d.toGMTString();
             document.cookie = cname+"="+cvalue+"; "+expires;
         }
 
-      function checkCookies(type) {
+        function checkCookies(type) {
           uid = '<%= current_user.id %>'
           if (type == "friends")
           {
@@ -351,6 +353,7 @@ body {
           }
 
           return 0;
+
       }
 
       function setFilterArgs(type, arg) {
@@ -373,69 +376,72 @@ body {
         }
       }
 
+
       function sendFilterArgs(search) {
         document.getElementById("status").innerHTML = ""
-        loadXMLDoc(locationReq, timeReq, otherReq, tagsReq, search);
+        loadXMLDoc(locationReq, timeReq, otherReq, tagsReq, search, recommendationReq);
       }
 
-      function getTimeTxt(timeMsg)
-      {
-        var timeTxt=""
-        if (timeMsg=="30")
+        function getTimeTxt(timeMsg)
         {
-          timeTxt="Happening In Less Than 30 Minutes"
+          var timeTxt=""
+          if (timeMsg=="30")
+          {
+            timeTxt="Happening In Less Than 30 Minutes"
+          }
+          else if (timeMsg!="0")
+          {
+            timeTxt = "Happening In Less Than "+timeMsg+" Hour(s)"
+          }
+          return timeTxt;
         }
-        else if (timeMsg!="0")
-        {
-          timeTxt = "Happening In Less Than "+timeMsg+" Hour(s)"
-        }
-        return timeTxt;
-      }
 
-      function getOtherTxt(otherMsg)
-      {
-            var msg=""
-            if (otherMsg=="0") {
-              msg=""
-            }
-            else if (otherMsg=="going_to"){
-              msg="My Friends Are Going To"
-            }
-            else if (otherMsg=="created") {
-              msg="My Friends Created"
-            }
-            else if (otherMsg=="i_created")
-            {
-              msg="I Created"
-            }
-            else if (otherMsg=="im_going")
-            {
-              msg="I'm Going To"
-            }
-            return msg;
-      }
+        function getOtherTxt(otherMsg)
+        {
+              var msg=""
+              if (otherMsg=="0") {
+                msg=""
+              }
+              else if (otherMsg=="going_to"){
+                msg="My Friends Are Going To"
+              }      
+              else if (otherMsg=="created") {
+                msg="My Friends Created"
+              }
+              else if (otherMsg=="i_created")
+              {
+                msg="I Created"
+              }
+              else if (otherMsg=="im_going")
+              {
+                msg="I'm Going To"
+              }
+              return msg;
+        }
 
-      function getLocTxt(locMsg)
-      {
-        var locTxt=""
-        if (locMsg=="250")
+        function getLocTxt(locMsg)
         {
-            locTxt = "Within a 3 Minute Walk (250m)"
+          var locTxt=""
+          if (locMsg=="250")
+          {
+              locTxt = "Within a 3 Minute Walk (250m)"
+          }
+          else if (locMsg=="750")
+          {
+              locTxt = "Within a 10 Minute Walk (750m)"
+          }
+          else if (locMsg=="1500")
+          {
+              locTxt = "Within a 20 Minute Walk (1500m)"
+          }
+          else if (locMsg=="3000")
+          {
+              locTxt = "Within a 40 Minute Walk (3000m)"
+          }
+          return locTxt
         }
-        else if (locMsg=="750")
-        {
-            locTxt = "Within a 10 Minute Walk (750m)"
-        }
-        else if (locMsg=="1500")
-        {
-            locTxt = "Within a 20 Minute Walk (1500m)"
-        }
-        else if (locMsg=="3000")
-        {
-            locTxt = "Within a 40 Minute Walk (3000m)"
-        }
-        return locTxt
-      }
+
+
 
       function filteredHTMLTitle(locMsg, timeMsg, otherMsg){
 
@@ -453,15 +459,29 @@ body {
 
 
 
+        function filteredHTMLTitle(locMsg, timeMsg, otherMsg){
+         
+          var timeTxt=getTimeTxt(timeMsg)
+          var locTxt=getLocTxt(locMsg)
+          var otherTxt=getOtherTxt(otherMsg)
+          var msg=""
+          
+          if (locTxt != "" || timeTxt != "")
+          { msg = "Viewing Events "+" "+locTxt+" "+timeTxt;}
+          else { msg = "Viewing All Events"; }
+          if (otherTxt != "")   { msg = msg + " That "+otherTxt;}
+          return '<span align="center"><h5>'+msg+'</h5></span>';
+        }
 
-      function hide_menus()
-       {
+        function hide_menus()
+        {
           var ULs = document.getElementsByClassName("dropdown-menu");
           for (var i=0; i<ULs.length; i++)
           {
                 ULs[i].style.visibility = "hidden";
           }
-       }
+        }
+
 
 
       function success(position) {
@@ -472,14 +492,13 @@ body {
          var longitude = loc[1]
          rad=5
          markMe(latitude, longitude)
-         loadXMLDoc(locationReq, timeReq, otherReq, tagsReq, "true")  //use default params
+         loadXMLDoc(locationReq, timeReq, otherReq, tagsReq, "true", recommendationReq)  //use default params
+         }
 
-       }
 
-
-       function error() {
-          document.getElementById("locationDiv").innerHTML = "error"
-          loc = "error"
+         function error() {
+            document.getElementById("locationDiv").innerHTML = "error"
+            loc = "error"
 
           //user needs to be able to click on map
           google.maps.event.addListener(gMap, 'click', function(event) {
@@ -489,33 +508,33 @@ body {
               markMe(lat, lng)
           });
           rad=5
-          loadXMLDoc("0", timeReq, otherReq, tagsReq, "true")
+          loadXMLDoc("0", timeReq, otherReq, tagsReq, "true", recommendationReq)
        }
 
 
-        function loadAttendances()
-        {
-          var event_id;
-          <% current_user.attendances.each do |attending| %>
-               event_id = '<%= attending['event_id'] %>'
-               attendances.push(event_id)
-          <% end %>
-        }
+          function loadAttendances()
+          {
+            var event_id;
+            <% current_user.attendances.each do |attending| %>
+                 event_id = '<%= attending['event_id'] %>'
+                 attendances.push(event_id)
+            <% end %>
+          }
 
 
-        function loadXMLHTTP()
-        {
-          var xmlhttp;
-           if (window.XMLHttpRequest)
-              {// code for IE7+, Firefox, Chrome, Opera, Safari
-              xmlhttp=new XMLHttpRequest();
-              }
-            else
-              {// code for IE6, IE5
-              xmlhttp=new hoverXObject("Microsoft.XMLHTTP");
-              }
-          return xmlhttp;
-        }
+          function loadXMLHTTP()
+          {
+            var xmlhttp;
+             if (window.XMLHttpRequest)
+                {// code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp=new XMLHttpRequest();
+                }
+              else
+                {// code for IE6, IE5
+                xmlhttp=new hoverXObject("Microsoft.XMLHTTP");
+                }
+            return xmlhttp;
+          }
 
         function markMe(latitude, longitude)
         {
@@ -548,65 +567,64 @@ body {
             big_circle = new google.maps.Circle(outerOptions);*/
         }
 
+
         function markEvents(latitude, longitude, event_name)
         {
-              var temp_latlng = new google.maps.LatLng(latitude, longitude);
-              marker = new google.maps.Marker({
-                  position: temp_latlng,
-                  map: gMap,
-                  title: event_name
+            var temp_latlng = new google.maps.LatLng(latitude, longitude);
+            marker = new google.maps.Marker({
+                position: temp_latlng,
+                map: gMap,
+                title: event_name
+            });
+            markers.push(marker) 
+            var curr_length = markers.length
+             google.maps.event.addListener(marker, 'click', function() {
+                 // document.getElementById(markers[curr_length-1].title).style.backgroundColor = "lightsteelblue"
               });
-
-              markers.push(marker) 
-              var curr_length = markers.length
-
-               google.maps.event.addListener(marker, 'click', function() {
-                   // document.getElementById(markers[curr_length-1].title).style.backgroundColor = "lightsteelblue"
-                });
-
-
-
         }
 
-        function clearMarkers()
-        {
-            for (var i = 0; i < markers.length; i++) {
-              markers[i].setMap(null);
+
+
+          function clearMarkers()
+          {
+              for (var i = 0; i < markers.length; i++) {
+                markers[i].setMap(null);
+            }
           }
-        }
 
 
-
-        function onlyAllow15Words(event_name, event_id, txt)
-        {
-            txt_array = txt.split(" ")
-            event_str = event_name.split(" ")[0]+event_id
-            if (txt_array.length > 15)
-            {
-               if (display_total_desc[event_str] == false)   //check here whether this event should display its entire description or not based on hash display_total_desc; default is false
-               {
-                  var show_txt = ""
-                  var hidden_txt = ""
-                  for (var i=0; i<15; i++)
-                  {
-                    show_txt = show_txt + txt_array[i] + " "
+          function onlyAllow15Words(event_name, event_id, txt)
+          {
+              txt_array = txt.split(" ")
+              event_str = event_name.split(" ")[0]+event_id
+              if (txt_array.length > 15)
+              {
+                 if (display_total_desc[event_str] == false)   //check here whether this event should display its entire description or not based on hash display_total_desc; default is false
+                 {
+                    var show_txt = ""
+                    var hidden_txt = ""
+                    for (var i=0; i<15; i++)
+                    {
+                      show_txt = show_txt + txt_array[i] + " "
+                    }
+                    curr_event_name = event_name
+                    show_txt = show_txt + ' <a style="cursor: pointer" id=&quot;'+event_str+'&quot; onclick="setDescDisplay(this.id, true)"><b>(...)</b></a>'
+                    return show_txt;
                   }
-                  curr_event_name = event_name
-                  show_txt = show_txt + ' <a style="cursor: pointer" id=&quot;'+event_str+'&quot; onclick="setDescDisplay(this.id, true)"><b>(...)</b></a>'
-                  return show_txt;
-                }
-                else
-                {
-                  curr_event_name = event_name
-                  txt = txt + ' <a style="cursor: pointer" id=&quot;'+event_str+'&quot; onclick="setDescDisplay(this.id, false)"><b>(Collapse Description)</b></a> '
-                }
-            }
-            else
-            {
-              return txt;
-            }
-            return txt
-        }
+                  else
+                  {
+                    curr_event_name = event_name
+                    txt = txt + ' <a style="cursor: pointer" id=&quot;'+event_str+'&quot; onclick="setDescDisplay(this.id, false)"><b>(Collapse Description)</b></a> '
+                  }
+              }
+              else
+              {
+                return txt;
+              }
+              return txt
+          }
+
+          
 
         function setDescDisplay(name, val)
         {
@@ -664,7 +682,8 @@ body {
           return '<div id="'+event_name+'"class="event_box"> <h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+'Attending: '+attendees+'<br>'+append_to 
                     '</div><hr>'
 
-        }
+          }
+
           function OpenWindow(event_info)
           {
 
@@ -696,6 +715,16 @@ body {
 
 
 
+          function setRecommendationFlag() {
+            recommendationReq = true;
+          }
+
+          function resetRecommendationFlag() {
+            recommendationReq = false;
+          }
+
+
+
     </script>
 
 <body>
@@ -718,6 +747,7 @@ body {
           <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active"><a href="#searchbox" aria-controls="searchbox" role="tab" data-toggle="tab">Search By Text</a></li>
             <li role="presentation"><a href="#categories" aria-controls="categories" role="tab" data-toggle="tab">Search By Category</a></li>
+            <li role="presentation"><a href="#recommendations" aria-controls="recommendations" role="tab" data-toggle="tab">Recommended For Me</a></li>
           </ul>
           <div class="tab-content">
 
@@ -811,6 +841,15 @@ body {
 
 
               </div>
+
+              <div role="tabpanel" class="tab-pane" id="recommendations">
+                  <button type="button" class="btn btn-primary" aria-label="Left Align" onclick="setRecommendationFlag(); sendFilterArgs('false'); resetRecommendationFlag()">
+                    <span aria-hidden="true">Find Recommendations!</span>
+                  </button>
+
+
+              </div>
+
           </div> <!-- #tab-content-->
       </div> <!-- #tab-area-->
 

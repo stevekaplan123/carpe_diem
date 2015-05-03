@@ -55,7 +55,7 @@ class EventsController < ApplicationController
        if params[:search]!="false"
            @events = Filter.search(params[:searchValue])
         else
-           filter_events = Filter.new(current_user.id, params[:location], params[:near_me], params[:other], params[:time], params[:tags])
+           filter_events = Filter.new(current_user.id, params[:location], params[:near_me], params[:other], params[:time], params[:tags], params[:recommend])
            @events = filter_events.events
            @attendances = Attendance.all
       end
