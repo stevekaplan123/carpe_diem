@@ -184,7 +184,13 @@ div#checkboxcol3 {
   <div id="map_canvas" style="width: 725px; height: 400px;"></div>
 </div>
 
-  <button type="submit" class="btn btn-primary btn-lg btn-block">Create!</button>
+  <button type="submit" class="btn btn-primary btn-lg btn-block">
+    <% if request.original_url.split("/").last == "edit"%>
+      Update!
+    <% else %>
+      Create!
+    <% end %>
+  </button>
 
 <div hidden>
   <div class="field">
