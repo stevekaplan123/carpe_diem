@@ -1,3 +1,4 @@
+<div class="container">
 <style>
 
 body {
@@ -6,7 +7,7 @@ body {
 }
 
 #content {
-  
+
   padding: 4px ;
   z-index: -1;
 }
@@ -38,14 +39,14 @@ body {
   display: inline;
 }
 
-#event_box {
+.event_box {
   margin-left: 3%;
   margin-right: 3%;
-    background-color: ghostwhite;
+  background-color: ghostwhite;
 
 }
 
-#event_box:hover
+.event_box:hover
 {
   background-color: khaki;
 }
@@ -82,18 +83,18 @@ body {
             {
               localStorage[ 'firstLoad' ] = true;
               window.location.reload()
-            }  
+            }
             else
               localStorage.removeItem( 'firstLoad' );
           }
         })();
 
-
+        var rad=5;
         var gMap = null;
         var attendance_window = null;
         var desc_window = null;
         var markers = [];
-        var me_window =  null; 
+        var me_window =  null;
         var loc = null;
         var windows = [];
         var tag = null;
@@ -106,6 +107,7 @@ body {
         var locationReq = "0";
         var timeReq = "0";
         var otherReq = "0";
+        var tagsReq = "0"
         var display_total_desc = new Object()
         var display_total_att = new Object()
         var ne;
@@ -117,6 +119,7 @@ body {
             locationReq = checkCookies("loc")
             timeReq = checkCookies("time")
             otherReq = checkCookies("friends")
+            tagsReq = checkCookies("tags")
             curr_zoom = 15
             var myOptions = {
                 center: new google.maps.LatLng(42.3654347, -71.258595),
@@ -128,13 +131,13 @@ body {
             loadAttendances()
 
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(success, error); 
+                navigator.geolocation.getCurrentPosition(success, error);
 
-            } else { 
+            } else {
                 error();
             }
 
-            hide_and_seek_menus()  
+            hide_and_seek_menus()
 
        }
 
@@ -157,7 +160,7 @@ body {
        }
 
 
-        function loadXMLDoc(locArg, timeArg, otherArg, recommendationArg) {          
+        function loadXMLDoc(locArg, timeArg, otherArg, tagsArg, search, recommendationArg) {          
           if (loc=="error") //if loc error and no value set on map
           {
               alert("In order to see events near you, either allow geolocation on your browser or select your position on the map.")
@@ -165,13 +168,18 @@ body {
           //first just gets the right xmlhttp based on browser
             var xmlhttp = loadXMLHTTP()
             //each time state changes, from 0 to 1 to 2 to 3 to 4, check if it finished (finished means state of 4)
-            //and check status is 200, if status != 200, then the server failed to respond correctly (404 or 500)  
+            //and check status is 200, if status != 200, then the server failed to respond correctly (404 or 500)
             xmlhttp.onreadystatechange=function()
             {
               if (xmlhttp.readyState==4 && xmlhttp.status==200)
               {
                 clearMarkers()        //first clear old event markers and clear out table of events
                 clearWindows()
+                 rad = 5
+                 loc = document.getElementById("locationDiv").innerHTML.split(", ")
+                 var latitude = loc[0]
+                 var longitude = loc[1]
+                 markMe(latitude, longitude)
                 curr_zoom = 15            //reset zoom and center to brandeis campus
                 gMap.setZoom(curr_zoom)
                 gMap.setCenter(new google.maps.LatLng(42.3654347, -71.258595))
@@ -184,7 +192,7 @@ body {
                 length = result.length;
                 if (length==0)
                 {
-                   document.getElementById("below_menu").innerHTML += "<h4><i>[NO RESULTS]</i></h4>" 
+                   document.getElementById("below_menu").innerHTML += "<h4><i>[NO RESULTS]</i></h4>"
 
                 }
                 for (i=0; i<length; i++)
@@ -209,16 +217,16 @@ body {
                       }
                       makeItFit(latitude, longitude) //zoom out if necessary to have all events on map
                       markEvents(latitude, longitude, event_name) //mark events on map that were result of filtering by 'type'
-                      document.getElementById("below_menu").innerHTML += eventHTML(event_id, event_name, creator_id, attendees, description, event_time, latitude, longitude) 
-                    }   
+                      document.getElementById("below_menu").innerHTML += eventHTML(event_id, event_name, creator_id, attendees, description, event_time, latitude, longitude)
+                    }
 
               }
-            }
-          xmlhttp.open("GET","/events/filter.json?location="+loc+"&near_me="+locArg+"&other="+otherArg+"&time="+timeArg+"&recommend="+recommendationArg,true);
+            } 
+          searchValue = document.getElementById("search_box").value
+          xmlhttp.open("GET","/events/filter.json?location="+loc+"&near_me="+locArg+"&other="+otherArg+"&time="+timeArg+
+            "&tags="+tagsArg+"&recommend="+recommendationArg,true);
           xmlhttp.send();
         }
-
-
 
         function makeRailsDateReadable(event_time)
         {
@@ -250,7 +258,7 @@ body {
                }
                if (js_date.getDate() != today.getDate())
                {
-                  readable_time = readable_time + " tomorrow" 
+                  readable_time = readable_time + " tomorrow"
                }
                else if (js_date.getDate() == today.getDate())
                {
@@ -272,6 +280,13 @@ body {
             }
             else
             {
+              loc = document.getElementById("locationDiv").innerHTML.split(", ")
+              var my_lat = loc[0]
+              var my_lng = loc[1]
+              rad = rad*4
+              markMe(my_lat, my_lng)
+
+
               curr_zoom = curr_zoom - 2;
               gMap.setZoom(curr_zoom)
               makeItFit(lat, lng)
@@ -323,34 +338,48 @@ body {
                 return time_pref
              }
           }
+          else if (type == "tags")
+          {
+             var tag_pref = getCookie(uid+"carpe_diem_preferences_tags");
+             if (tag_pref != "" && tag_pref != null)
+             {
+                return tag_pref
+             }
+          }
           else
           {
              return 0;
           }
 
           return 0;
-        }
-        
-        function setFilterArgs(type, arg) {
-          uid = '<%= current_user.id %>'
-          setCookie(uid+"carpe_diem_preferences_"+type, arg, 30)
-          if(type=="loc"){
-            locationReq = arg;
-          }
-          else if(type=="time") {
-            timeReq = arg;
-          }
-          else if(type=="other") {
-            otherReq = arg;
-          }
-          else {
-            otherReq = "0";
-          }
-        }
 
-        function sendFilterArgs() {
-          loadXMLDoc(locationReq, timeReq, otherReq, recommendationReq);
+      }
+
+      function setFilterArgs(type, arg) {
+        uid = '<%= current_user.id %>'
+        setCookie(uid+"carpe_diem_preferences_"+type, arg, 30)
+        if(type=="loc"){
+          locationReq = arg;
         }
+        else if(type=="time") {
+          timeReq = arg;
+        }
+        else if(type=="other") {
+          otherReq = arg;
+        }
+        else if(type=="tags") {
+          tagsReq = arg;
+        }
+        else {
+          otherReq = "0";
+        }
+      }
+
+
+      function sendFilterArgs(search) {
+        document.getElementById("status").innerHTML = ""
+        loadXMLDoc(locationReq, timeReq, otherReq, tagsReq, search, recommendationReq);
+      }
 
         function getTimeTxt(timeMsg)
         {
@@ -411,6 +440,24 @@ body {
           return locTxt
         }
 
+
+
+      function filteredHTMLTitle(locMsg, timeMsg, otherMsg){
+
+        var timeTxt=getTimeTxt(timeMsg)
+        var locTxt=getLocTxt(locMsg)
+        var otherTxt=getOtherTxt(otherMsg)
+        var msg=""
+
+        if (locTxt != "" || timeTxt != "")
+        { msg = "Viewing Events "+" "+locTxt+" "+timeTxt;}
+        else { msg = "Viewing All Events"; }
+        if (otherTxt != "")   { msg = msg + " That "+otherTxt;}
+        return '<span align="center"><h5>'+msg+'</h5></span>';
+      }
+
+
+
         function filteredHTMLTitle(locMsg, timeMsg, otherMsg){
          
           var timeTxt=getTimeTxt(timeMsg)
@@ -436,15 +483,15 @@ body {
 
 
 
-        function success(position) {
-           document.getElementById("locationDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude; 
-           loc = document.getElementById("locationDiv").innerHTML.split(", ")
-           tag = ""
-           var latitude = loc[0]
-           var longitude = loc[1]
-           markMe(latitude, longitude)
-           loadXMLDoc(locationReq, timeReq, otherReq, recommendationReq)  //use default params
-
+      function success(position) {
+         document.getElementById("locationDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude;
+         loc = document.getElementById("locationDiv").innerHTML.split(", ")
+         tag = ""
+         var latitude = loc[0]
+         var longitude = loc[1]
+         rad=5
+         markMe(latitude, longitude)
+         loadXMLDoc(locationReq, timeReq, otherReq, tagsReq, "true", recommendationReq)  //use default params
          }
 
 
@@ -452,15 +499,16 @@ body {
             document.getElementById("locationDiv").innerHTML = "error"
             loc = "error"
 
-            //user needs to be able to click on map
-            google.maps.event.addListener(gMap, 'click', function(event) {
-                var lat = event.latLng.lat()
-                var lng = event.latLng.lng()
-                loc = lat.toString() + ", " + lng.toString()
-                markMe(lat, lng)
-            });
-            loadXMLDoc("0", timeReq, otherReq, recommendationReq)
-         }
+          //user needs to be able to click on map
+          google.maps.event.addListener(gMap, 'click', function(event) {
+              var lat = event.latLng.lat()
+              var lng = event.latLng.lng()
+              loc = lat.toString() + ", " + lng.toString()
+              markMe(lat, lng)
+          });
+          rad=5
+          loadXMLDoc("0", timeReq, otherReq, tagsReq, "true", recommendationReq)
+       }
 
 
           function loadAttendances()
@@ -487,50 +535,54 @@ body {
             return xmlhttp;
           }
 
-          function markMe(latitude, longitude)
-          {
-               var little_circle;
-               var innerOptions = {
-                strokeColor: 'blue',
-                strokeOpacity: 1,
-                strokeWeight: 2,
-                fillColor: 'blue',
-                fillOpacity: 1,
+        function markMe(latitude, longitude)
+        {
+             var little_circle;
+             var innerOptions = {
+              strokeColor: 'blue',
+              strokeOpacity: 1,
+              strokeWeight: 2,
+              fillColor: 'blue',
+              fillOpacity: 1,
+              map: gMap,
+              center: new google.maps.LatLng(latitude, longitude),
+              radius: rad
+            };
+            // Add the circle for this city to the map.
+            little_circle = new google.maps.Circle(innerOptions);
+
+             var big_circle;
+             var outerOptions = {
+              strokeColor: 'blue',
+              strokeOpacity: 0.8,
+              strokeWeight: 2,
+              fillColor: 'blue',
+              fillOpacity: 0.3,
+              map: gMap,
+              center: new google.maps.LatLng(latitude, longitude),
+              radius: rad*1.5
+            };
+            // Add the circle for this city to the map.
+            big_circle = new google.maps.Circle(outerOptions);
+        }
+
+
+        function markEvents(latitude, longitude, event_name)
+        {
+            var temp_latlng = new google.maps.LatLng(latitude, longitude);
+            marker = new google.maps.Marker({
+                position: temp_latlng,
                 map: gMap,
-                center: new google.maps.LatLng(latitude, longitude),
-                radius: 10
-              };
-              // Add the circle for this city to the map.
-              little_circle = new google.maps.Circle(innerOptions);
-
-               var big_circle;
-               var outerOptions = {
-                strokeColor: 'blue',
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: 'blue',
-                fillOpacity: 0.3,
-                map: gMap,
-                center: new google.maps.LatLng(latitude, longitude),
-                radius: 40
-              };
-              // Add the circle for this city to the map.
-              big_circle = new google.maps.Circle(outerOptions);
-          }
-
-          function markEvents(latitude, longitude, event_name)
-          {
-                var temp_latlng = new google.maps.LatLng(latitude, longitude);
-                marker = new google.maps.Marker({
-                    position: temp_latlng,
-                    map: gMap,
-                    title: event_name
-                });
-
-                markers.push(marker) 
+                title: event_name
+            });
+            markers.push(marker) 
+            var curr_length = markers.length
+             google.maps.event.addListener(marker, 'click', function() {
+                 // document.getElementById(markers[curr_length-1].title).style.backgroundColor = "lightsteelblue"
+              });
+        }
 
 
-          }
 
           function clearMarkers()
           {
@@ -539,13 +591,13 @@ body {
             }
           }
 
- 
+
           function onlyAllow15Words(event_name, event_id, txt)
           {
               txt_array = txt.split(" ")
               event_str = event_name.split(" ")[0]+event_id
               if (txt_array.length > 15)
-              {  
+              {
                  if (display_total_desc[event_str] == false)   //check here whether this event should display its entire description or not based on hash display_total_desc; default is false
                  {
                     var show_txt = ""
@@ -564,59 +616,76 @@ body {
                     txt = txt + ' <a style="cursor: pointer" id=&quot;'+event_str+'&quot; onclick="setDescDisplay(this.id, false)"><b>(Collapse Description)</b></a> '
                   }
               }
-              else 
+              else
               {
                 return txt;
               }
               return txt
-          } 
-
-          function setDescDisplay(name, val)
-          {
-            name = name.replace("\"", "")
-            name = name.replace("\"", "")
-            display_total_desc[name] = val
-            sendFilterArgs()
           }
 
-          function eventHTML(event_id, event_name, creator_id, attendees, description, event_time, latitude, longitude)
-          {
-            var append_to="";  
-            var current_name = '<%= current_user.name %>';
-            var current_id = <%= current_user.id %>
-            var alreadyGoing = attendances.indexOf(event_id); 
-            if (current_id==creator_id || current_name=="admin")
-            { 
-              append_to =  '<div align="right"><a style="font-size:x-small" data-confirm="Are you sure?" rel="nofollow"' +
-                          'data-method="delete" href="/events/'+event_id+
-                          '">Cancel Event</a> | ' +
-                          '<a style="font-size:x-small" href="/events/'+event_id+
-                          '/edit">Edit</a>'
-            }
-            else if (alreadyGoing < 0)
-            {
-              append_to = '<div align="right"><a style="font-size:x-small;" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=1">Sign up!</a>'
-            }
-            else if (alreadyGoing >= 0)
-            {
-              append_to = '<div align="right"><a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0">I Don\'t Want To Go</a>'
-            }
+          
 
-            append_to = append_to + ' | <b><u><font color="blue"><span onclick="OpenWindow(&quot;' +
-                      latitude + '+' +
-                      longitude + '+' +
-                      event_name + '&quot)"' +
-                    'style="cursor: pointer">View Event On Map</span></b></u></div>'
-            description = onlyAllow15Words(event_name, event_id, description)
-            return '<div id="event_box"> <h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+
-                    'Attending: '+attendees+'<br>'+append_to 
-                      '</div><hr>'
+        function setDescDisplay(name, val)
+        {
+          name = name.replace("\"", "")
+          name = name.replace("\"", "")
+          display_total_desc[name] = val
+          sendFilterArgs('false')
+        }
+
+        function convertNamesIntoLinks(attendees)
+        {
+            attendance_html = ""
+            att_array = attendees.split(", ")
+            for (var i=0; i<att_array.length; i++)
+            {
+              user_id = att_array[i].split(":")[0]
+              user_name = att_array[i].split(":")[1]
+              url = "/users/"+user_id
+              attendance_html += '<a href='+url+'>'+user_name+'</a>, '
+            }
+            attendance_html = attendance_html.slice(0,attendance_html.length-2); //chop off the last comma and space
+            return attendance_html;
+        }
+
+        function eventHTML(event_id, event_name, creator_id, attendees, description, event_time, latitude, longitude)
+        {
+          attendees = convertNamesIntoLinks(attendees)
+          var append_to="";  
+          var current_name = '<%= current_user.name %>';
+          var current_id = <%= current_user.id %>
+          var alreadyGoing = attendances.indexOf(event_id);
+          if (current_id==creator_id || current_name=="admin")
+          {
+            append_to =  '<div align="right"><a style="font-size:x-small" data-confirm="Are you sure?" rel="nofollow"' +
+                        'data-method="delete" href="/events/'+event_id+
+                        '">Cancel Event</a> | ' +
+                        '<a style="font-size:x-small" href="/events/'+event_id+
+                        '/edit">Edit</a>'
+          }
+          else if (alreadyGoing < 0)
+          {
+            append_to = '<div align="right"><a style="font-size:x-small;" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=1">Sign up!</a>'
+          }
+          else if (alreadyGoing >= 0)
+          {
+            append_to = '<div align="right"><a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0">I Don\'t Want To Go</a>'
+          }
+
+          append_to = append_to + ' | <b><u><font color="blue"><span onclick="OpenWindow(&quot;' +
+                    latitude + '+' +
+                    longitude + '+' +
+                    event_name + '&quot)"' +
+                  'style="cursor: pointer">View Event On Map</span></b></u></div>'
+          description = onlyAllow15Words(event_name, event_id, description)
+          return '<div id="'+event_name+'"class="event_box"> <h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+'Attending: '+attendees+'<br>'+append_to 
+                    '</div><hr>'
 
           }
 
           function OpenWindow(event_info)
           {
-  
+
               var info=event_info.split("+")
               var lat=Number(info[0])
               var lng=Number(info[1])
@@ -632,11 +701,11 @@ body {
                  });
                desc_window.open(gMap);
                windows.push(desc_window)
-           
+
           }
 
           function clearWindows()
-          { 
+          {
               for (var i=0; i<windows.length; i++)
               {
                 windows[i].close()
@@ -664,14 +733,12 @@ body {
 
 
   <div id="menuwrapper">
-    <h4> <%= @status %></h4>
+    <h4><div id="status"><%= @status %></div></h4>
       <nav class="navbar navbar-default" id="lower-group">
       <div id="below_menu"></div>
       </nav>
   </div><!-- close #menuwrapper-->
-  
 
-  
 
   <div id="search-and-map">
 
@@ -687,20 +754,14 @@ body {
             <div role="tabpanel" class="tab-pane active" id="searchbox">
                   <div style="line-height:50%;"><br></div>
 
-                  
+
                     <nav class="navbar navbar-default", id="nav-search">
                       <br>
-
-                      <%= form_tag({controller: "events", action: "search"}, :method => "get", id: "search-form") do %>
-                      <span id = "search">
-                      <%= text_field_tag :search, params[:search], placeholder: "Search for..." %>
-                      </span>
-                      <%= submit_tag "Search", :name => nil %>
-                      <% end %>
-                      </span>
+                      <input type="textbox" id="search_box"/>
+                      <input type="button" value="Search!" onclick="sendFilterArgs('true')">
 
                     </nav>
-                  
+
             </div>
 
 
@@ -708,71 +769,80 @@ body {
             <div role="tabpanel" class="tab-pane" id="categories">
                     <div style="line-height:50%;"><br></div>
 
-                        
+
                           <nav class="navbar navbar-default">
 
-                            <div id="content">        
+                            <div id="content">
                               <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1"><div id="events_msg"></div>
                                 <span>   <ul class="nav navbar-nav" id="filter_buttons">
-                                <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">Where<span class="caret"></span>
-                                  </button></u>
-                                </a>
-                                  <ul class="dropdown-menu" role="menu">
-                                    <li onclick="setFilterArgs('loc', '0'); sendFilterArgs()"><a href="#">Anywhere</a></li>
-                                    <li onclick="setFilterArgs('loc', '250'); sendFilterArgs()"><a href="#">250m (3 min walk)</a></li>
-                                    <li onclick="setFilterArgs('loc', '750'); sendFilterArgs()"><a href="#">750m (10 min walk)</a></li>
-                                    <li onclick="setFilterArgs('loc', '1500'); sendFilterArgs()"><a href="#">1500m (20 min walk)</a></li>
-                                    <li onclick="setFilterArgs('loc', '3000'); sendFilterArgs()"><a href="#">3000m (40 min walk)</a></li>
-                                  </ul>
-                                </li>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">Where<span class="caret"></span>
+</button></u>
+        </a>
+        <ul class="dropdown-menu" role="menu">
+            <li onclick="setFilterArgs('loc', '0'); sendFilterArgs('false')"><a href="#">Anywhere</a></li>
+            <li onclick="setFilterArgs('loc', '250'); sendFilterArgs('false')"><a href="#">250m (3 min walk)</a></li>
+            <li onclick="setFilterArgs('loc', '750'); sendFilterArgs('false')"><a href="#">750m (10 min walk)</a></li>
+            <li onclick="setFilterArgs('loc', '1500'); sendFilterArgs('false')"><a href="#">1500m (20 min walk)</a></li>
+            <li onclick="setFilterArgs('loc', '3000'); sendFilterArgs('false')"><a href="#">3000m (40 min walk)</a></li>
+        </ul>
+       </li>
 
-                                <li class="dropdown">
-                                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">When<span class="caret"></span>
-                                    </button></u>
-                                  </a>
-                                  <ul class="dropdown-menu" role="menu">
-                                    <li onclick="setFilterArgs('time', '0'); sendFilterArgs()"><a href="#">Anytime</a></li>
-                                    <li onclick="setFilterArgs('time', '30'); sendFilterArgs()"><a href="#">Within 30 mins</a></li>
-                                    <li onclick="setFilterArgs('time', '1'); sendFilterArgs()"><a href="#">Within 1 hour</a></li>
-                                    <li onclick="setFilterArgs('time', '2'); sendFilterArgs()"><a href="#">Within 2 hours</a></li>
-                                    <li onclick="setFilterArgs('time', '5'); sendFilterArgs()"><a href="#">Within 5 hours</a></li>
-                                  </ul>
-                                 </li>   
 
-                                <li class="dropdown">
-                                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">Tags<span class="caret"></span></button></u>
-                                    
-                                  </a>
-                                  <ul class="dropdown-menu" role="menu">
-                                    <li onclick="setFilterArgs('other', '0'); sendFilterArgs()"><a href="#">Anyone's going</a></li>
-                                    <li onclick="setFilterArgs('other', 'i_created'); sendFilterArgs()"><a href="#">Events I created</a></li>
-                                    <li onclick="setFilterArgs('other', 'im_going'); sendFilterArgs()"><a href="#">Events I'm going to</a></li>
-                                    <li onclick="setFilterArgs('other', 'going_to'); sendFilterArgs()"><a href="#">Events my friends are going to</a></li>
-                                    <li onclick="setFilterArgs('other', 'created'); sendFilterArgs()"><a href="#">Events my friends made</a></li>
-                         
-                                  </ul>
-                                </li>
+       <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">When<span class="caret"></span>
+</button></u>
+        </a>
+        <ul class="dropdown-menu" role="menu">
+          <li onclick="setFilterArgs('time', '0'); sendFilterArgs('false')"><a href="#">Anytime</a></li>
+          <li onclick="setFilterArgs('time', '30'); sendFilterArgs('false')"><a href="#">Within 30 mins</a></li>
+          <li onclick="setFilterArgs('time', '1'); sendFilterArgs('false')"><a href="#">Within 1 hour</a></li>
+          <li onclick="setFilterArgs('time', '2'); sendFilterArgs('false')"><a href="#">Within 2 hours</a></li>
+          <li onclick="setFilterArgs('time', '5'); sendFilterArgs('false')"><a href="#">Within 5 hours</a></li>
+        </ul>
+       </li>   
 
-                                <li class="dropdown">
-                                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">Other Options <span class="caret"></span></button></u>
-                                   
-                                  </a>
-                                  <ul class="dropdown-menu" role="menu">
-                                    <li onclick="setFilterArgs('other', '0'); sendFilterArgs()"><a href="#">Anyone's going</a></li>
-                                    <li onclick="setFilterArgs('other', 'i_created'); sendFilterArgs()"><a href="#">Events I created</a></li>
-                                    <li onclick="setFilterArgs('other', 'im_going'); sendFilterArgs()"><a href="#">Events I'm going to</a></li>
-                                    <li onclick="setFilterArgs('other', 'going_to'); sendFilterArgs()"><a href="#">Events my friends are going to</a></li>
-                                    <li onclick="setFilterArgs('other', 'created'); sendFilterArgs()"><a href="#">Events my friends made</a></li
-                                  </ul>
-                                </li>
+
+         <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">Tags<span class="caret"></span></button></u>
+            
+          </a>
+          <ul class="dropdown-menu" role="menu">
+            <li onclick="setFilterArgs('tags', '0'); sendFilterArgs('false')"><a href="#">No Tags</a></li>
+            <li onclick="setFilterArgs('tags', '1'); sendFilterArgs('false')"><a href="#">Academic</a></li>
+            <li onclick="setFilterArgs('tags', '2'); sendFilterArgs('false')"><a href="#">Competition</a></li>
+            <li onclick="setFilterArgs('tags', '3'); sendFilterArgs('false')"><a href="#">Entertainment</a></li>
+            <li onclick="setFilterArgs('tags', '4'); sendFilterArgs('false')"><a href="#">Food</a></li>
+            <li onclick="setFilterArgs('tags', '5'); sendFilterArgs('false')"><a href="#">Game</a></li>
+             <li onclick="setFilterArgs('tags', '6'); sendFilterArgs('false')"><a href="#">Off-Campus</a></li>
+            <li onclick="setFilterArgs('tags', '7'); sendFilterArgs('false')"><a href="#">Music</a></li>
+             <li onclick="setFilterArgs('tags', '8'); sendFilterArgs('false')"><a href="#">Party</a></li>
+             <li onclick="setFilterArgs('tags', '9'); sendFilterArgs('false')"><a href="#">Sports</a></li>
+          </ul>
+       </li>
+
+       <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">Other Options <span class="caret"></span></button></u>
+           
+          </a>
+          <ul class="dropdown-menu" role="menu">
+            <li onclick="setFilterArgs('other', '0'); sendFilterArgs('false')"><a href="#">Anyone's Going</a></li>
+            <li onclick="setFilterArgs('other', 'i_created'); sendFilterArgs('false')"><a href="#">Events I created</a></li>
+            <li onclick="setFilterArgs('other', 'im_going'); sendFilterArgs('false')"><a href="#">Events I'm going to</a></li>
+            <li onclick="setFilterArgs('other', 'going_to'); sendFilterArgs('false')"><a href="#">Events my friends are going to</a></li>
+            <li onclick="setFilterArgs('other', 'created'); sendFilterArgs('false')"><a href="#">Events my friends made</a></li>
+ 
+          </ul>
+       </li>
+
+     </span>
                           </nav>
-                        
+
 
               </div>
 
               <div role="tabpanel" class="tab-pane" id="recommendations">
-                  <button type="button" class="btn btn-primary" aria-label="Left Align" onclick="setRecommendationFlag(); sendFilterArgs(); resetRecommendationFlag()">
+                  <button type="button" class="btn btn-primary" aria-label="Left Align" onclick="setRecommendationFlag(); sendFilterArgs('false'); resetRecommendationFlag()">
                     <span aria-hidden="true">Find Recommendations!</span>
                   </button>
 
@@ -784,13 +854,13 @@ body {
 
        <br>
 
-      <nav> 
+      <nav>
         <nav class="navbar navbar-default" id="map-group2">
           <div id="map_canvas" style="width: 560px; height: 440px"></div>
         </nav>
       </nav>
 
-  </div> <!-- #search-and-map-->   
+  </div> <!-- #search-and-map-->
 
 
 </div> <!-- #container-->
@@ -798,6 +868,7 @@ body {
 
 
 <div id="locationDiv" style="visibility:hidden"></div>
- 
+
 </body>
 </html>
+</div>

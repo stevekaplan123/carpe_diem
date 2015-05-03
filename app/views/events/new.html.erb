@@ -1,10 +1,7 @@
+<div class="container">
 <h1>New Event</h1>
 
-
-
 <%= render 'form' %>
-
-<%= link_to 'Back', events_path %>
 
     <script type='text/javascript' src='//code.jquery.com/jquery-1.9.1.js'></script>
     <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
@@ -27,7 +24,7 @@
     //gets called by geolocation attempt with position of user
     function showPosition(position) {
            var str_loc = position.coords.latitude + ", " + position.coords.longitude;
-           var loc = str_loc.split(", "); 
+           var loc = str_loc.split(", ");
            var latitude = loc[0]
            var longitude = loc[1]
            markMe(latitude, longitude)
@@ -49,9 +46,9 @@
 
         //find geolocation of user
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition); 
+            navigator.geolocation.getCurrentPosition(showPosition);
 
-        } else { 
+        } else {
             myDiv.innerHTML = "Geolocation is not supported by this browser.";
         }
 
@@ -73,6 +70,7 @@
 
     });
 
-    
+
 
     </script>
+</div>

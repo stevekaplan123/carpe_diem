@@ -11,6 +11,12 @@ class UserMailer < ApplicationMailer
       mail(to: User.find(event.creator_id).email, subject: 'Event created successfully!')
     end
 
+    def signup_event_email(user, event)
+      @event = event
+      @user = user
+      mail(to: user.email, subject: 'Event Signup!')
+    end
+
     def update_event_email(event)
       @event = event
       emails = [User.find(event.creator_id).email]

@@ -2,7 +2,18 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-.user_container {
-  padding-left: 200px;
-  padding-right: 25px;
+.profile-container {
+  background-color: rgb(252, 252, 252);
+  box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+  border: thin solid #D8D8D8;
+}
+
+.inner-container {
+  background-color: #FCFCFC;
+  border-right: thin solid #E7E8EA;
+  border-bottom: thin solid #E7E8EA;
+}
+
+body {
+  background-color: #F0F0F2;
 }

@@ -9,6 +9,7 @@ class EventsController < ApplicationController
   def index
     @events = Event.all
     eid = params[:eid]
+
     if params[:user_action] != nil and params[:user_action] == "cancelled"
       @status = "You are no longer signed up for '"+eid+"'."
     elsif params[:user_action] != nil and params[:user_action] == "signed_up"
@@ -26,6 +27,7 @@ class EventsController < ApplicationController
     if params[:whatAction]=="1"       #1 for sign up, 0 for cancel
         Attendance.create(event_id: event_id, user_id: user_id)
         @event = Event.find_by(id: event_id)
+        UserMailer.signup_event_email(current_user, @event).deliver_now
         redirect_to "/events?user_action=signed_up&eid="+EventsService.convert_words_to_uri(@event["name"])
     elsif params[:whatAction]=="0"
         attendances = Attendance.where(event_id: event_id, user_id: user_id)
@@ -50,9 +52,13 @@ class EventsController < ApplicationController
 
   # GET /events/filter?args
   def filter
-       filter_events = Filter.new(current_user.id, params[:location], params[:near_me], params[:other], params[:time], params[:recommend])
-       @events = filter_events.events
-       @attendances = Attendance.all
+       if params[:search]!="false"
+           @events = Filter.search(params[:searchValue])
+        else
+           filter_events = Filter.new(current_user.id, params[:location], params[:near_me], params[:other], params[:time], params[:tags], params[:recommend])
+           @events = filter_events.events
+           @attendances = Attendance.all
+      end
   end
   # GET /events/new
   def new

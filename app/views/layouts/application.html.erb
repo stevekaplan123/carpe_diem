@@ -2,14 +2,20 @@
 <html>
   <head>
     <title><%= full_title(yield(:title)) %></title>
-    <%= stylesheet_link_tag 'application', media: 'all',
+    <%= stylesheet_link_tag 'application', params[:controller], :media => 'all',
                                            'data-turbolinks-track' => true %>
-    <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+    <%= javascript_include_tag 'application', params[:controller], 'data-turbolinks-track' => true %>
     <%= csrf_meta_tags %>
+
+    <!-- Custom Fonts -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link href="http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+
     <%= render 'layouts/shim' %>
   </head>
-  <body>
-    <%= render 'layouts/header' %>
+  <body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
+    <%= render 'layouts/navbar' %>
 
     <div class="container">
       <% flash.each do |message_type, message| %>
@@ -17,12 +23,10 @@
           <%= message %>
         </div>
       <% end %>
-
-      <%= yield %>
     </div>
 
-    <%= render 'layouts/footer' %>
-    <%= debug(params) if Rails.env.development? %>
+    <%= yield %>
 
+    <%= render 'layouts/footer' %>
   </body>
 </html>
