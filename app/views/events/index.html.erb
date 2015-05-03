@@ -172,15 +172,15 @@ body {
        function convertTagsFromNumbersIntoWords(tags)
        {
 
-          var tags = tags.replace("1", " academic")
-          tags = tags.replace("2", " competition")
-          tags = tags.replace("3", " entertainment")
-          tags = tags.replace("4", " food")
-          tags = tags.replace("5", " game")
-          tags = tags.replace("6", " off-campus")
-          tags = tags.replace("7", " music")
-          tags = tags.replace("8", " party")
-          tags = tags.replace("9", " sports")
+          var tags = tags.replace("1", " Academic")
+          tags = tags.replace("2", " Competition")
+          tags = tags.replace("3", " Entertainment")
+          tags = tags.replace("4", " Food")
+          tags = tags.replace("5", " Game")
+          tags = tags.replace("6", " Off-Campus")
+          tags = tags.replace("7", " Music")
+          tags = tags.replace("8", " Party")
+          tags = tags.replace("9", " Sports")
           return tags
        }
 
@@ -209,7 +209,7 @@ body {
                 gMap.setCenter(new google.maps.LatLng(42.3654347, -71.258595))
                 //clear out the old list of events
                 document.getElementById("below_menu").innerHTML = ""
-                document.getElementById("events_msg").innerHTML = filteredHTMLTitle(locArg, timeArg, otherArg)
+                document.getElementById("events_msg").innerHTML = filteredHTMLTitle(locArg, timeArg, otherArg, tagsArg)
                   //now show the filtered events
                 result = JSON.parse(xmlhttp.responseText);
 
@@ -467,37 +467,31 @@ body {
           return locTxt
         }
 
+        function getTagsTxt(tagsMsg)
+        {
+          var tagsTxt = ""
+          tagsTxt = convertTagsFromNumbersIntoWords(tagsMsg)
+          return tagsTxt;
+          
 
+        }
 
-      function filteredHTMLTitle(locMsg, timeMsg, otherMsg){
+      function filteredHTMLTitle(locMsg, timeMsg, otherMsg, tagsMsg){
 
         var timeTxt=getTimeTxt(timeMsg)
         var locTxt=getLocTxt(locMsg)
         var otherTxt=getOtherTxt(otherMsg)
+        var tagsTxt=getTagsTxt(tagsMsg)
         var msg=""
 
         if (locTxt != "" || timeTxt != "")
         { msg = "Viewing Events "+" "+locTxt+" "+timeTxt;}
         else { msg = "Viewing All Events"; }
         if (otherTxt != "")   { msg = msg + " That "+otherTxt;}
+        if (tagsTxt != "0") { msg = msg + " In the Category of "+tagsTxt;}
         return '<span align="center"><h5>'+msg+'</h5></span>';
       }
 
-
-
-        function filteredHTMLTitle(locMsg, timeMsg, otherMsg){
-         
-          var timeTxt=getTimeTxt(timeMsg)
-          var locTxt=getLocTxt(locMsg)
-          var otherTxt=getOtherTxt(otherMsg)
-          var msg=""
-          
-          if (locTxt != "" || timeTxt != "")
-          { msg = "Viewing Events "+" "+locTxt+" "+timeTxt;}
-          else { msg = "Viewing All Events"; }
-          if (otherTxt != "")   { msg = msg + " That "+otherTxt;}
-          return '<span align="center"><h5>'+msg+'</h5></span>';
-        }
 
         function hide_menus()
         {

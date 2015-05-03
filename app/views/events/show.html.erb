@@ -1,15 +1,29 @@
-<div id="showcontainer">
+<style>
+div#map_canvas {
+  margin-left:  35%;
+  padding: 4px ;
 
-<div id="showtext">
-  <p>
 
-<%= link_to 'Edit', edit_event_path(@event) %> |
-<%= link_to 'Back to Campus Events', events_path %>
-  </p>
+}
+div#main_form {
+  float: left;
+  width: 35%;
+  padding: 4px ;
+
+}
+
+
+
+</style>
+
+
+<div id="main_form">
+<div align="center">
+
   
 <p>
 
-  <strong><%= @event.name %></strong>
+  <strong><%= @event.name %> @ <%= @event.time_occurrence.utc().to_formatted_s(:long) %> </strong>
 </p>
 
 <p>
@@ -18,13 +32,9 @@
 </p>
 
 <p>
-  <strong>Time:</strong>
-  <%= @event.time_occurrence.utc().to_formatted_s(:long) %>
-</p>
-
-<p>
-  <strong>Description:</strong>
+  <strong>
   <%= @event.description %>
+</strong>
 </p>
 
 <p>
@@ -38,13 +48,20 @@
 	<strong>Tags:</strong>
 	<%= @event_tags.join(", ") %>	
 </p>
+
+  <p>
+
+<%= link_to 'Edit', edit_event_path(@event) %> |
+<%= link_to 'Back to Campus Events', events_path %>
+  </p>
+  <br><br><br><br>
+</div>
 </div>
 
 <%= content_tag :div, class: "location_class", data: {latitude: @event.latitude, longitude: @event.longitude, event_id: @event.name} do %>
 <% end %>
 
 
-<div id="showmap">
 <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script type='text/javascript'>
         //the following function causes page to refresh
@@ -264,6 +281,4 @@
 
 
   		<div id="map_canvas" style="width: 725px; height: 400px;"></div>
-</div>
-
 </div>
