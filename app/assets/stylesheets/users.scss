@@ -3,7 +3,7 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 .profile-container {
-  background-color: rgb(252, 252, 252);
+  background-color: #FCFCFC;
   box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
   border: thin solid #D8D8D8;
 }
@@ -17,8 +17,7 @@
   margin-bottom: 10px;
 }
 
-.inner-container {
-  background-color: #FCFCFC;
+.left-container {
   border-right: thin solid #E7E8EA;
   border-bottom: thin solid #E7E8EA;
 }
@@ -32,5 +31,9 @@ body {
 }
 
 #box2 {
+  margin-bottom: 10px;
+}
+
+.input-group {
   margin-bottom: 10px;
 }
