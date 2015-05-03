@@ -1,16 +1,28 @@
+/*!
+ * Start Bootstrap - Grayscale Bootstrap Theme (http://startbootstrap.com)
+ * Code licensed under the Apache License v2.0.
+ * For details, see http://www.apache.org/licenses/LICENSE-2.0.
+ */
+
 #sign-in-modal {
-  top: 80px;
+  top: 30%;
   width: 400px;
   margin: 0px 0px 0px -204px;
   left: 50%;
   position: fixed;
 }
 
-/*!
- * Start Bootstrap - Grayscale Bootstrap Theme (http://startbootstrap.com)
- * Code licensed under the Apache License v2.0.
- * For details, see http://www.apache.org/licenses/LICENSE-2.0.
- */
+.modal-title {
+  color: #000;
+}
+
+.box1 {
+  margin-bottom: 5px;
+}
+
+#box2 {
+  margin-bottom: 10px;
+}
 
 body {
     width: 100%;
