@@ -1,4 +1,3 @@
-require 'byebug'
 class Filter
 
 attr_reader :events	
