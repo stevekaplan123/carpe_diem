@@ -31,6 +31,12 @@ body {
   padding:6px;
 }
 
+#nav-rec{
+  padding:6px;
+  padding-top:30px;
+  padding-bottom:30px;
+}
+
 
 
 /*get all filter buttons in the same row*/
@@ -849,9 +855,12 @@ body {
 
               </div>
 
-              <div role="tabpanel" class="tab-pane" id="recommendations"  align="center"><br>
+              <div role="tabpanel" class="tab-pane" id="recommendations"  align="center">
+                <div style="line-height:50%;"><br></div>
+                <nav class="navbar navbar-default" id="nav-rec">
                   <button type="button" class="btn btn-primary" onclick="setRecommendationFlag(); sendFilterArgs('false'); resetRecommendationFlag()">Find Recommendations!
                   </button>
+                </nav>
 
 
               </div>
