@@ -13,11 +13,36 @@ class EventsService
 
   def self.create_time(params)
     puts "called"
-    day_int = params[:event_day].to_date
-    event_day = DateTime.new(day_int.year, day_int.month, day_int.day, 1, 1, 1)
-    thehour = params[:usertime]["hourmin(4i)"].to_i
-    themin = params[:usertime]["hourmin(5i)"].to_i
-    DateTime.new(event_day.year, event_day.month, event_day.day, thehour, themin, 59)
+
+    if (params[:event_day].nil?)
+      day_int = nil
+      event_day = nil
+    else
+      
+      day_int = params[:event_day].to_date
+      event_day = DateTime.new(day_int.year, day_int.month, day_int.day, 1, 1, 1)
+    end
+ 
+    if (params[:usertime]["hourmin(4i)"].nil?)
+      thehour = nil
+    else
+      thehour = params[:usertime]["hourmin(4i)"].to_i
+    end
+
+    if (params[:usertime]["hourmin(5i)"].nil?)
+      themin = nil
+    else
+      themin = params[:usertime]["hourmin(5i)"].to_i
+    end
+
+    if (event_day.nil? || thehour.nil? || themin.nil?)
+      return nil
+    else
+      return DateTime.new(event_day.year, event_day.month, event_day.day, thehour, themin, 59)
+    end
+
+    
+    
   end
 
   def self.get_tag_string(tag_array)
