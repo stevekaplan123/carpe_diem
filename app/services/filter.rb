@@ -14,7 +14,6 @@ def initialize(user_id, location, near_me, other, time, tag, recommend)
         @events = Filter.addAttendancestoEvents(@events)
       
   else
-
       if time != '0'
         if time == '30'
           @events = @events.where(time_occurrence: (Time.now-4.hours)..(Time.now-4.hours+time.to_i.minutes))
@@ -22,11 +21,11 @@ def initialize(user_id, location, near_me, other, time, tag, recommend)
           @events = @events.where(time_occurrence: (Time.now-4.hours)..(Time.now-4.hours+time.to_i.hours))
         end
       end
-      if tag != '0'
-        @events = filterByTags(@events, tag)
-      end
       if other != '0'
         @events = filterByOther(@events, user_id, other)
+      end
+      if tag != '0'
+        @events = filterByTags(@events, tag)
       end
       if near_me != '0'
         lat, lng = location.split(",")
