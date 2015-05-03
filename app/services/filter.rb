@@ -138,6 +138,10 @@ end
                   
 
 def self.addAttendancestoEvents(events)
+  puts "ADD ATTENDANCES CALLED"
+  puts "ADD ATTENDANCES CALLED"
+  puts "ADD ATTENDANCES CALLED"
+
   modifiedEvents = Array.new(events.length)
   count=0
   events.each do |event|
@@ -154,6 +158,7 @@ def self.addAttendancestoEvents(events)
     event_attendees.each do |event_attendee|
       attendees_names_joined = attendees_names_joined + event_attendee["id"].to_s + ":" + event_attendee["name"] + ", "
     end
+    modifiedEvents[count]["attendees"] = attendees_names_joined
     modifiedEvents
   end
 end
