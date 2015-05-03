@@ -69,7 +69,11 @@ def self.search(searchValue)
       @events = []
       all_events = Event.all
       all_events.each do |event|
+          puts "HERE: #{event["description"]}"
+          puts "is null? #{event["description"].nil?}"
+          puts "search null? #{searchValue.nil?}"
           if event["description"].include? searchValue
+              puts "entered desc"
               @events.push(event)
           elsif event["name"].include? searchValue
               @events.push(event)
@@ -152,6 +156,7 @@ def self.addAttendancestoEvents(events)
     end
     modifiedEvents
   end
+end
 
 
 def convertLatLngToMeters(orig_coords, end_coords)
@@ -199,8 +204,6 @@ end
       end
 
       events_attended.each do |eventID|
-
-
         prelim_events = Event.where(id: eventID)
         prelim_events.each do |pre_event|
         tags_list.push(pre_event.tags)

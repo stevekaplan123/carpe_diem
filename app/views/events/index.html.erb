@@ -224,7 +224,7 @@ body {
             } 
           searchValue = document.getElementById("search_box").value
           xmlhttp.open("GET","/events/filter.json?location="+loc+"&near_me="+locArg+"&other="+otherArg+"&time="+timeArg+
-            "&tags="+tagsArg+"&recommend="+recommendationArg,true);
+            "&tags="+tagsArg+"&search="+search+"&searchValue="+searchValue+"&recommend="+recommendationArg,true);
           xmlhttp.send();
         }
 
