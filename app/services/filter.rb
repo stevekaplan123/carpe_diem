@@ -202,7 +202,7 @@ end
       tag_count = [0,0,0,0,0,0,0,0,0]
       recommended_events = []
 
-      @attendances = ArchivedAttendance.where(user_id: user_id)
+      @attendances = Attendance.where(user_id: user_id)
 
 
       @attendances.each do |attendance|
@@ -269,10 +269,11 @@ end
        end
       end
 
-      topThreeHash = {key1 => val1, key2 => val2, key3 => val3}
-      score1 = val1 / (val1 + val2 + val3)
-      score2 = val2 / (val1 + val2 + val3)
-      score3 = val3 / (val1 + val2 + val3)
+
+      #topThreeHash = {key1 => val1, key2 => val2, key3 => val3}
+      #score1 = val1 / (val1 + val2 + val3)
+      #score2 = val2 / (val1 + val2 + val3)
+      #score3 = val3 / (val1 + val2 + val3)
 
       events.each do |event|
         tags_string = event.tags

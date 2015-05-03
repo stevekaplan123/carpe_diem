@@ -31,6 +31,12 @@ body {
   padding:6px;
 }
 
+#nav-rec{
+  padding:6px;
+  padding-top:30px;
+  padding-bottom:30px;
+}
+
 
 
 /*get all filter buttons in the same row*/
@@ -68,6 +74,8 @@ body {
 #tab-area{
   height:150px;
 }
+
+
 
 </style>
 
@@ -760,8 +768,7 @@ body {
                     <nav class="navbar navbar-default", id="nav-search">
                       <br>
                       <input type="textbox" id="search_box"/>
-                      <input type="button" value="Search!" onclick="sendFilterArgs('true')">
-
+                      <input type = "button" class="btn btn-primary btn-sm btn-block" value="Search!" onclick="sendFilterArgs('true')">
                     </nav>
 
             </div>
@@ -810,7 +817,7 @@ body {
             
           </a>
           <ul class="dropdown-menu" role="menu">
-            <li onclick="setFilterArgs('tags', '0'); sendFilterArgs('false')"><a href="#">No Tags</a></li>
+            <li onclick="setFilterArgs('tags', '0'); sendFilterArgs('false')"><a href="#">Any Tags</a></li>
             <li onclick="setFilterArgs('tags', '1'); sendFilterArgs('false')"><a href="#">Academic</a></li>
             <li onclick="setFilterArgs('tags', '2'); sendFilterArgs('false')"><a href="#">Competition</a></li>
             <li onclick="setFilterArgs('tags', '3'); sendFilterArgs('false')"><a href="#">Entertainment</a></li>
@@ -843,9 +850,12 @@ body {
 
               </div>
 
-              <div role="tabpanel" class="tab-pane" id="recommendations"  align="center"><br>
+              <div role="tabpanel" class="tab-pane" id="recommendations"  align="center">
+                <div style="line-height:50%;"><br></div>
+                <nav class="navbar navbar-default" id="nav-rec">
                   <button type="button" class="btn btn-primary" onclick="setRecommendationFlag(); sendFilterArgs('false'); resetRecommendationFlag()">Find Recommendations!
                   </button>
+                </nav>
 
 
               </div>

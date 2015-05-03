@@ -30,14 +30,16 @@
         <% end %>
       </ul>
 
-      <%= form_tag("/friendships/add_new_friend", method: "post", class: "form-inline", id: "add-form") do %>
-        <div class="form-group">
-          <div class="input-group">
-            <%= hidden_field_tag :user_id, current_user.id %>
-            <%= text_field_tag :friend_name, nil, placeholder: "Add friend", class: "form-control" %>
-            <span class="input-group-addon"><a id="add-link" href="#"><i class="fa fa-user-plus fa-fx"></i></a></span>
+      <% if current_user?(@user) %>
+        <%= form_tag("/friendships/add_new_friend", method: "post", class: "form-inline", id: "add-form") do %>
+          <div class="form-group">
+            <div class="input-group">
+              <%= hidden_field_tag :user_id, current_user.id %>
+              <%= text_field_tag :friend_name, nil, placeholder: "Add friend", class: "form-control" %>
+              <span class="input-group-addon"><a id="add-link" href="#"><i class="fa fa-user-plus fa-fx"></i></a></span>
+            </div>
           </div>
-        </div>
+        <% end %>
       <% end %>
     </div>
   </div>
