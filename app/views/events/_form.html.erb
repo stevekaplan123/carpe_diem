@@ -89,6 +89,7 @@ div#checkboxcol3 {
     </div>
   <% end %>
 
+
   <div class="field">
     <%= f.label :event_name %><br>
     <%= f.text_field :name %>
@@ -135,10 +136,6 @@ div#checkboxcol3 {
   		<%= f.radio_button :time_occurrence, @date_tom %>
   		<%= label :choose_tomorrow, "Tomorrow, #{Date::MONTHNAMES[@date_tom.month]} #{@date_tom.day}" %>
   		-->
-    	
-    	
-    	<!--2nd Option-->
-    	<!-- <%= select_hour(@date_today.hour) %> -->    	
   </div>	
   
   <div class="field">
@@ -187,9 +184,7 @@ div#checkboxcol3 {
   <div id="map_canvas" style="width: 725px; height: 400px;"></div>
 </div>
 
-  <div class="actions">
-    <%= f.submit %>
-  </div>
+  <button type="submit" class="btn btn-primary btn-lg btn-block">Create!</button>
 
 <div hidden>
   <div class="field">
