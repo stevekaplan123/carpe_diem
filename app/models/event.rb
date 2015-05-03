@@ -35,7 +35,7 @@ class Event < ActiveRecord::Base
         self.errors.add :start_time, 'event cannot occur more than 24 hours in the future'
       end
     else
-      self.errors.add :date_not_present, 'please select a date'
+      self.errors.add :date_not_selected, 'please select a date'
     end
 
   end
