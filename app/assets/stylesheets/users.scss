@@ -8,6 +8,15 @@
   border: thin solid #D8D8D8;
 }
 
+.profile-container h1 {
+  padding-bottom: 5px;
+  border-bottom: thin solid #E7E8EA;
+}
+
+.profile-container input {
+  margin-bottom: 10px;
+}
+
 .inner-container {
   background-color: #FCFCFC;
   border-right: thin solid #E7E8EA;
@@ -16,4 +25,12 @@
 
 body {
   background-color: #F0F0F2;
+}
+
+.box1 {
+  margin-bottom: 5px;
+}
+
+#box2 {
+  margin-bottom: 10px;
 }
