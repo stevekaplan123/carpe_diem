@@ -158,9 +158,13 @@ def self.addAttendancestoEvents(events)
     event_attendees.each do |event_attendee|
       attendees_names_joined = attendees_names_joined + event_attendee["id"].to_s + ":" + event_attendee["name"] + ", "
     end
-    modifiedEvents[count]["attendees"] = attendees_names_joined
-    modifiedEvents
+
+    attendees_names_joined = attendees_names_joined.chop #remove the ", " so chop twice
+    attendees_names_joined = attendees_names_joined.chop
+    modifiedEvents[count]["attendees"] =  attendees_names_joined
+    count += 1
   end
+  modifiedEvents
 end
 
 
