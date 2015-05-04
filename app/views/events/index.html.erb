@@ -112,6 +112,7 @@ body {
         var curr_zoom = 0
         var curr_event_name = ""
         var search = true
+        var searchValue = ""
 
 
         var locationReq = "0";
@@ -211,7 +212,7 @@ body {
                 gMap.setCenter(new google.maps.LatLng(42.3654347, -71.258595))
                 //clear out the old list of events
                 document.getElementById("below_menu").innerHTML = ""
-                document.getElementById("events_msg").innerHTML = filteredHTMLTitle(locArg, timeArg, otherArg, tagsArg)
+                document.getElementById("events_msg").innerHTML = filteredHTMLTitle(recommendationArg, locArg, timeArg, otherArg, tagsArg)
                   //now show the filtered events
                 result = JSON.parse(xmlhttp.responseText);
 
@@ -255,8 +256,8 @@ body {
             "&tags="+tagsArg+"&search="+search+"&searchValue="+searchValue+"&recommend="+recommendationArg,true);
           xmlhttp.send();
         }
-
-        function makeRailsDateReadable(event_time)
+        
+      function makeRailsDateReadable(event_time)
         {
                var readable_time = ""
                event_time = event_time.replace(":59.000-04:00","")
@@ -267,27 +268,27 @@ body {
                date = date.replace("-", "/")
                var js_date = new Date(Date.parse(date))
                var today = new Date()
-               var hour = Number(time.split(":")[0]) + 4
-               var min = time.split(":")[1]
+               var orig_hour = (Number(time.split(":")[0])+4)
+               var hour = orig_hour % 24
                if (hour == 12)
                {
-                   readable_time = readable_time + hour + ":" + min + " noon"
+                   readable_time = readable_time + hour + " noon"
                }
-               else if (hour == 24)
+               else if (hour == 0)
                {
-                   readable_time = readable_time + hour + ":" + min + "midnight"
+                   readable_time = readable_time + "12 midnight"
                }
                else if (hour < 12)
                {
-                    readable_time = readable_time + hour + ":" + min + " A.M."
+                    readable_time = readable_time + hour + " A.M."
                }
                else if (hour > 12)
                {
-                    readable_time = readable_time + ((Number(hour) - 12).toString()) + ":" + min + " P.M."
+                    readable_time = readable_time + ((Number(hour) - 12).toString()) + " P.M."
                }
-               if (js_date.getDate() != today.getDate())
+               if (js_date.getDate() != today.getDate() || orig_hour >= 24)
                {
-                  readable_time = readable_time + " tomorrow"
+                  readable_time = readable_time + " tomorrow" 
                }
                else if (js_date.getDate() == today.getDate())
                {
@@ -295,6 +296,7 @@ body {
                }
                return readable_time
         }
+
 
         function makeItFit(lat, lng)
         {
@@ -480,20 +482,34 @@ body {
 
         }
 
-      function filteredHTMLTitle(locMsg, timeMsg, otherMsg, tagsMsg){
+      function filteredHTMLTitle(rec, locMsg, timeMsg, otherMsg, tagsMsg){
+        var msg = ""
+        if (search=="true")
+        {
+            if (searchValue == "")
+              {msg = "Viewing All Events"}
+            else
+              {msg = "Viewing Events According to Search Criteria <i>'"+searchValue+"'</i>"}
+        }
+        else if (rec == true)
+        {
+            msg = "Viewing Recommended Events"
+        }
+        else
+        {
+            var timeTxt=getTimeTxt(timeMsg)
+            var locTxt=getLocTxt(locMsg)
+            var otherTxt=getOtherTxt(otherMsg)
+            var tagsTxt=getTagsTxt(tagsMsg)
 
-        var timeTxt=getTimeTxt(timeMsg)
-        var locTxt=getLocTxt(locMsg)
-        var otherTxt=getOtherTxt(otherMsg)
-        var tagsTxt=getTagsTxt(tagsMsg)
-        var msg=""
+            if (locTxt != "" || timeTxt != "")
+            { msg = "Viewing Events "+" "+locTxt+" "+timeTxt;}
+            else { msg = "Viewing All Events"; }
+            if (otherTxt != "")   { msg = msg + " That "+otherTxt;}
+            if (tagsTxt != "0") { msg = msg + " In the Category of "+tagsTxt;}
+        }
+        return '<div><h4>'+msg+'</h4></div>';
 
-        if (locTxt != "" || timeTxt != "")
-        { msg = "Viewing Events "+" "+locTxt+" "+timeTxt;}
-        else { msg = "Viewing All Events"; }
-        if (otherTxt != "")   { msg = msg + " That "+otherTxt;}
-        if (tagsTxt != "0") { msg = msg + " In the Category of "+tagsTxt;}
-        return '<span align="center"><h5>'+msg+'</h5></span>';
       }
 
 
@@ -516,7 +532,8 @@ body {
          var longitude = loc[1]
          rad=5
          markMe(latitude, longitude)
-         loadXMLDoc(locationReq, timeReq, otherReq, tagsReq, "true", recommendationReq)  //use default params
+         search="true"
+         loadXMLDoc(locationReq, timeReq, otherReq, tagsReq, recommendationReq)  //use default params
          }
 
 
@@ -532,7 +549,8 @@ body {
               markMe(lat, lng)
           });
           rad=5
-          loadXMLDoc("0", timeReq, otherReq, tagsReq, "true", recommendationReq)
+          search="true"
+          loadXMLDoc("0", timeReq, otherReq, tagsReq, recommendationReq)
        }
 
 
@@ -741,7 +759,7 @@ body {
     </script>
 
 <body>
-
+<div align="left" id="events_msg"></div>
 
 <div id="container">
 
@@ -786,7 +804,7 @@ body {
                           <nav class="navbar navbar-default">
 
                             <div id="content">
-                              <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1"><div id="events_msg"></div>
+                              <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                                 <span>   <ul class="nav navbar-nav" id="filter_buttons">
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><u><button type="button" class="btn btn-primary">Where<span class="caret"></span>

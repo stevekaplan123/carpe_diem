@@ -8,6 +8,7 @@ def initialize(user_id, location, near_me, other, time, tag, recommend)
 
   @events = Event.all
 
+
   if recommend == "true" 
         @events = filterByRecommendations(@events, user_id)
         @events = Filter.addAttendancestoEvents(@events)
@@ -31,7 +32,11 @@ def initialize(user_id, location, near_me, other, time, tag, recommend)
         @events = filterByLocation(@events, lat, lng, near_me)
       end
       @events = Filter.addAttendancestoEvents(@events)
+              puts "HELLO"
+        puts "HELLO"
+        puts "HELLO"
 
+      @events = @events.sort_by! {   |event| event["time_occurrence"]      }
 
   end
 
@@ -67,11 +72,7 @@ def self.search(searchValue)
       @events = []
       all_events = Event.all
       all_events.each do |event|
-          puts "HERE: #{event["description"]}"
-          puts "is null? #{event["description"].nil?}"
-          puts "search null? #{searchValue.nil?}"
           if event["description"].downcase.include? searchValue.downcase
-              puts "entered desc"
               @events.push(event)
           elsif event["name"].downcase.include? searchValue.downcase
               @events.push(event)
