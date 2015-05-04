@@ -70,14 +70,14 @@ def self.search(searchValue)
           puts "HERE: #{event["description"]}"
           puts "is null? #{event["description"].nil?}"
           puts "search null? #{searchValue.nil?}"
-          if event["description"].include? searchValue
+          if event["description"].downcase.include? searchValue.downcase
               puts "entered desc"
               @events.push(event)
-          elsif event["name"].include? searchValue
+          elsif event["name"].downcase.include? searchValue.downcase
               @events.push(event)
           else
               tags = Filter.convertNumberIntoTag(event["tags"])
-              if tags.include? searchValue
+              if tags.downcase.include? searchValue.downcase
                 @events.push(event)
               end
           end
@@ -285,8 +285,15 @@ end
           end
         end
       end
-      puts "length is: #{recommended_events.length}"
-      recommended_events
+
+      recommended_events2 = []
+      recommended_events.each do |event2|
+        if !(event2.creator_id == user_id)
+          recommended_events2.push(event2)
+        end
+      end
+
+      recommended_events2
   end
 
 
