@@ -128,7 +128,7 @@ body {
         window.onload = function(){
             locationReq = checkCookies("loc")
             timeReq = checkCookies("time")
-            otherReq = checkCookies("friends")
+            otherReq = checkCookies("other")
             tagsReq = checkCookies("tags")
             curr_zoom = 15
             var myOptions = {
@@ -324,7 +324,7 @@ body {
        function getCookie(cname) {
             var name = cname + "=";
             var ca = document.cookie.split(';');
-            for(var i=0; i<ca.length; i++) {
+            for(var i=ca.length-1; i>=0; i--) {
                 var c = ca[i];
                 while (c.charAt(0)==' ') c = c.substring(1);
                 if (c.indexOf(name) == 0) {
@@ -342,9 +342,9 @@ body {
 
         function checkCookies(type) {
           uid = '<%= current_user.id %>'
-          if (type == "friends")
+          if (type == "other")
           {
-             var friends_pref = getCookie(uid+"carpe_diem_preferences_friend");
+             var friends_pref = getCookie(uid+"carpe_diem_preferences_other");
              if (friends_pref != "" && friends_pref != null)
              {
                 return friends_pref
