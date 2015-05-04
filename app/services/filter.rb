@@ -285,8 +285,17 @@ end
           end
         end
       end
-      puts "length is: #{recommended_events.length}"
-      recommended_events
+      puts "1st length is: #{recommended_events.length}"
+
+      recommended_events2 = []
+      recommended_events.each do |event2|
+        if !(event2.creator_id == user_id)
+          recommended_events2.push(event2)
+        end
+      end
+
+      puts "2nd length is: #{recommended_events2.length}"
+      recommended_events2
   end
 
 
