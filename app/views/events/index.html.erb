@@ -172,8 +172,9 @@ body {
 
        function convertTagsFromNumbersIntoWords(tags)
        {
-
-          var tags = tags.replace("1", " Academic")
+          if (tags == "0")
+            { return "0" }
+          tags = tags.replace("1", " Academic")
           tags = tags.replace("2", " Competition")
           tags = tags.replace("3", " Entertainment")
           tags = tags.replace("4", " Food")

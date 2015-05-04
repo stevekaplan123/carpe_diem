@@ -18,12 +18,13 @@
 
     function markMe(latitude, longitude)
     {
-        me_window = new google.maps.InfoWindow({
-            content: "You are here",
-            position: new google.maps.LatLng(latitude, longitude),
-         });
-
-        me_window.open(gMap);
+         var temp_latlng = new google.maps.LatLng(latitude, longitude);
+            me_marker = new google.maps.Marker({
+                position: temp_latlng,
+                map: gMap,
+                title: "You are here!",
+                icon: "<%= asset_path( 'TrackingDot.png' ) %>"
+            });
     }
 
 
