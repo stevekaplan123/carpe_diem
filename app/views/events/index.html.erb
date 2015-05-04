@@ -312,6 +312,7 @@ body {
 
         function makeItFit(lat, lng)
         {
+            while (gMap.getBounds() == null){}
             var bounds = gMap.getBounds();
             ne = bounds.getNorthEast(); // LatLng of the north-east corner 73, 180
             sw = bounds.getSouthWest(); // LatLng of the south-west corder -85, -180
