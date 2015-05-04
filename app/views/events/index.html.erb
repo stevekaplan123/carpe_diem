@@ -111,6 +111,7 @@ body {
         var count=0
         var curr_zoom = 0
         var curr_event_name = ""
+        var search = true
 
 
         var locationReq = "0";
@@ -184,7 +185,7 @@ body {
           return tags
        }
 
-        function loadXMLDoc(locArg, timeArg, otherArg, tagsArg, search, recommendationArg) {          
+        function loadXMLDoc(locArg, timeArg, otherArg, tagsArg, recommendationArg) {          
           if (loc=="error") //if loc error and no value set on map
           {
               alert("In order to see events near you, either allow geolocation on your browser or select your position on the map.")
@@ -383,6 +384,7 @@ body {
       }
 
       function setFilterArgs(type, arg) {
+        resetRecommendationFlag()
         uid = '<%= current_user.id %>'
         setCookie(uid+"carpe_diem_preferences_"+type, arg, 30)
         if(type=="loc"){
@@ -403,9 +405,10 @@ body {
       }
 
 
-      function sendFilterArgs(search) {
+      function sendFilterArgs(searchBool) {
+        search = searchBool
         document.getElementById("status").innerHTML = ""
-        loadXMLDoc(locationReq, timeReq, otherReq, tagsReq, search, recommendationReq);
+        loadXMLDoc(locationReq, timeReq, otherReq, tagsReq, recommendationReq);
       }
 
         function getTimeTxt(timeMsg)
@@ -631,7 +634,7 @@ body {
           name = name.replace("\"", "")
           name = name.replace("\"", "")
           display_total_desc[name] = val
-          sendFilterArgs('false')
+          sendFilterArgs(search)
         }
 
         function convertNamesIntoLinks(attendees)
@@ -768,7 +771,7 @@ body {
                     <nav class="navbar navbar-default", id="nav-search">
                       <br>
                       <input type="textbox" id="search_box"/>
-                      <input type = "button" class="btn btn-primary btn-sm btn-block" value="Search!" onclick="sendFilterArgs('true')">
+                      <input type = "button" class="btn btn-primary btn-sm btn-block" value="Search!" onclick="resetRecommendationFlag(); sendFilterArgs('true')">
                     </nav>
 
             </div>
@@ -853,7 +856,7 @@ body {
               <div role="tabpanel" class="tab-pane" id="recommendations"  align="center">
                 <div style="line-height:50%;"><br></div>
                 <nav class="navbar navbar-default" id="nav-rec">
-                  <button type="button" class="btn btn-primary" onclick="setRecommendationFlag(); sendFilterArgs('false'); resetRecommendationFlag()">Find Recommendations!
+                  <button type="button" class="btn btn-primary" onclick="setRecommendationFlag(); sendFilterArgs('false');">Find Recommendations!
                   </button>
                 </nav>
 
