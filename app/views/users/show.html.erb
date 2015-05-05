@@ -14,7 +14,7 @@
     </div>
 
     <div class="col-md-7 right-container">
-      <strong>Friends</strong>
+      <strong>Following</strong>
       (<%= @friendships.length %>)
 
       <% if current_user?(@user) %>
@@ -22,7 +22,7 @@
           <div class="form-group">
             <div class="input-group">
               <%= hidden_field_tag :user_id, current_user.id %>
-              <%= text_field_tag :friend_name, nil, placeholder: "Add friend", class: "form-control" %>
+              <%= text_field_tag :friend_name, nil, placeholder: "Follow friend", class: "form-control" %>
               <span class="input-group-addon"><a id="add-link" href="#"><i class="fa fa-user-plus fa-fx"></i></a></span>
             </div>
           </div>
@@ -41,7 +41,11 @@
           <% @friendships.each do |f| %>
             <tr>
               <td><%= link_to f.friend_name, f.friend %></td>
-              <td><small><%= link_to 'unfriend', f, method: :delete, data: { confirm: 'Are you sure?' } %></small></td>
+              <% if current_user?(@user) %>
+                <td><small><%= link_to 'unfollow', f, method: :delete, data: { confirm: 'Are you sure?' } %></small></td>
+              <% else %>
+                <td>None</td>
+              <% end %>
             </tr>
           <% end %>
         </tbody>
