@@ -96,7 +96,6 @@ div#main_form {
             var latitude = $('.location_class').data('latitude')
             var longitude = $('.location_class').data('longitude')
             var event_name = $('.location_class').data('event_name')
-            alert('loaded')
             var myOptions = {
             	
                 center: new google.maps.LatLng(latitude, longitude),
@@ -160,7 +159,6 @@ div#main_form {
 
         function markMe(latitude, longitude)
         {
-            alert(latitude)
             var temp_latlng = new google.maps.LatLng(latitude, longitude);
             me_marker = new google.maps.Marker({
                 position: temp_latlng,
