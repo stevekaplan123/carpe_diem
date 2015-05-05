@@ -270,30 +270,30 @@ body {
                var today = new Date()
                var orig_hour = (Number(time.split(":")[0])+4)
                var hour = orig_hour % 24
-               var min = Number(time.split(":")[1])
+               var min = time.split(":")[1]
                if (hour == 12)
                {
-                   if (min > 0)
+                   if (min != '00')
                     {readable_time += "12:"+min+" PM"}
                   else
                     {readable_time += "12 noon"}
                }
                else if (hour == 0)
                {  
-                  if (min > 0)
+                  if (min != '00')
                     {readable_time += "12:"+min+" AM"}
                   else
                     {readable_time += "12 midnight"}
                }
                else if (hour < 12)
                {
-                  if (min > 0)
+                  if (min != '00')
                     {readable_time += hour + ":"+ min + " A.M."}
                   else
                     {readable_time += hour + " A.M."}
                }
                else if (hour > 12)
-               {    if (min > 0)
+               {    if (min !=  '00')
                       {readable_time += ((Number(hour) - 12).toString()) + ":"+min+" P.M."}
                     else
                      {readable_time += ((Number(hour) - 12).toString()) + " P.M."}
