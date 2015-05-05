@@ -1,11 +1,15 @@
 <% provide(:title, 'Sign up') %>
 
+<div class="container">
+  <%= render 'shared/error_messages' %>
+</div>
+
 <div class="row">
   <div class="col-md-4 col-md-offset-4 profile-container">
-      <h1>Sign up</h1>
-      <%= form_for(@user) do |f| %>
-        <%= render 'fields', f: f %>
-        <%= f.submit "Create my account", class: "btn btn-primary" %>
-      <% end %>
+    <h1>Sign up</h1>
+    <%= form_for(@user) do |f| %>
+      <%= render 'fields', f: f %>
+      <%= f.submit "Create my account", class: "btn btn-primary" %>
+    <% end %>
   </div>
 </div>
