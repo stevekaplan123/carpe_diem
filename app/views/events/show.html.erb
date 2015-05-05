@@ -21,20 +21,20 @@ div#main_form {
 <div align="center">
 
   
+
+<div class = "jumbotron">
+
 <p>
 
-  <strong><%= @event.name %> @ <%= @event.time_occurrence.utc().to_formatted_s(:long) %> </strong>
+  <strong>
+    <%= @event.name %> @ <%= @event.time_occurrence.utc().to_formatted_s(:long) %> 
+  </strong>
+  <br>has been created.
 </p>
 
 <p>
   <strong>Created by:</strong>
   <%= link_to @event.user.name, @event.user %>
-</p>
-
-<p>
-  <strong>
-  <%= @event.description %>
-</strong>
 </p>
 
 <p>
@@ -50,7 +50,7 @@ div#main_form {
 </p>
 
   <p>
-
+</div>
 <%= link_to 'Edit', edit_event_path(@event) %> |
 <%= link_to 'Back to Campus Events', events_path %>
   </p>
