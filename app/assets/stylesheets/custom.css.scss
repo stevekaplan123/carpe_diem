@@ -1,6 +1,14 @@
 @import "bootstrap-sprockets";
 @import "bootstrap";
 
+body {
+  background-color: #F0F0F2;
+}
+
+.navbar-brand {
+  font-size: 25px;
+}
+
 /* universal */
 
 section {
@@ -19,9 +27,6 @@ textarea {
   margin-bottom: 10px;
 }
 
-.navbar-brand{
-  font-size: 30px
-}
 /* footer */
 
 footer {
