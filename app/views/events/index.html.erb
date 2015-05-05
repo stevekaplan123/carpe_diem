@@ -696,11 +696,11 @@
             }
             else if (alreadyGoing < 0)
             {
-              append_to = '<div align="right"><a style="font-size:x-small;" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=1">Sign up!</a>'
+              append_to = '<div align="right"><a style="font-size:x-small;" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=1"><button type="button" class="btn btn-primary btn-xs">Sign up!</button></a>'
             }
             else if (alreadyGoing >= 0)
             {
-              append_to = '<div align="right"><a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0"><button type="button" class="btn btn-primary btn-xs">Not interested</button></a>'
+              append_to = '<div align="right"><a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0"><button type="button" class="btn btn-danger btn-xs">Not interested</button></a>'
             }
 
             append_to = append_to + ' <b><u><font color="blue"><span onclick="OpenWindow(&quot;' +
