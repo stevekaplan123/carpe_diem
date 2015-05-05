@@ -125,7 +125,7 @@ div#checkboxcol3 {
 			</div>    	
     	</div>
       <% if @event["time_occurrence"] != nil %>
-    	<%= time_select :usertime, :hourmin, {:ampm => true, :minute_step => 5, :default => {:hour => (@event["time_occurrence"].hour+4).to_s, :minute => @event["time_occurrence"].min.to_s}} %>
+    	<%= time_select :usertime, :hourmin, {:ampm => true, :minute_step => 5, :default => {:hour => ((@event["time_occurrence"].hour+4)%24).to_s, :minute => @event["time_occurrence"].min.to_s}} %>
       <% else %>
       <%= time_select :usertime, :hourmin, {:ampm => true, :minute_step => 5} %>
       <% end %>

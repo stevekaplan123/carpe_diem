@@ -110,7 +110,7 @@
         var searchValue = ""
 
 
-        var locationReq = "0";
+        var locationReq = "250";
         var timeReq = "0";
         var otherReq = "0";
         var tagsReq = "0"
@@ -122,11 +122,10 @@
         var recommendationReq = false;
         
         window.onload = function(){
-            locationReq = checkCookies("loc")
             timeReq = checkCookies("time")
             otherReq = checkCookies("other")
             tagsReq = checkCookies("tags")
-            curr_zoom = 15
+            curr_zoom = 17
             var myOptions = {
                 center: new google.maps.LatLng(42.3654347, -71.258595),
                 zoom: curr_zoom,
@@ -202,7 +201,7 @@
                  var latitude = loc[0]
                  var longitude = loc[1]
                  markMe(latitude, longitude)
-                curr_zoom = 15            //reset zoom and center to brandeis campus
+                curr_zoom = 17          //reset zoom and center to brandeis campus
                 gMap.setZoom(curr_zoom)
                 gMap.setCenter(new google.maps.LatLng(42.3654347, -71.258595))
                 //clear out the old list of events
@@ -239,7 +238,8 @@
                       {
                          display_total_att[event_str] = false;  //by default, dont display description beyond 50 words
                       }
-                      makeItFit(latitude, longitude) //zoom out if necessary to have all events on map
+                      if (locArg != "250")
+                      {makeItFit(latitude, longitude)} //zoom out if necessary to have all events on map
                       markEvents(latitude, longitude, event_name) //mark events on map that were result of filtering by 'type'
                       document.getElementById("below_menu").innerHTML += eventHTML(event_id, event_name, event_tags, creator_id, attendees, description, event_time, latitude, longitude)
                     }
@@ -252,6 +252,7 @@
           xmlhttp.send();
         }
         
+
       function makeRailsDateReadable(event_time)
         {
                var readable_time = ""
@@ -322,7 +323,6 @@
               loc = document.getElementById("locationDiv").innerHTML.split(", ")
               var my_lat = loc[0]
               var my_lng = loc[1]
-              rad = rad*4
               markMe(my_lat, my_lng)
 
 
@@ -397,7 +397,7 @@
       function setFilterArgs(type, arg) {
         resetRecommendationFlag()
         uid = '<%= current_user.id %>'
-        setCookie(uid+"carpe_diem_preferences_"+type, arg, 30)
+        if (type!="loc") {setCookie(uid+"carpe_diem_preferences_"+type, arg, 30)}
         if(type=="loc"){
           locationReq = arg;
         }
@@ -696,11 +696,11 @@
             }
             else if (alreadyGoing < 0)
             {
-              append_to = '<div align="right"><a style="font-size:x-small;" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=1">Sign up!</a>'
+              append_to = '<div align="right"><a style="font-size:x-small;" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=1"><button type="button" class="btn btn-primary btn-xs">Sign up!</button></a>'
             }
             else if (alreadyGoing >= 0)
             {
-              append_to = '<div align="right"><a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0"><button type="button" class="btn btn-primary btn-xs">Not interested</button></a>'
+              append_to = '<div align="right"><a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0"><button type="button" class="btn btn-danger btn-xs">Not interested</button></a>'
             }
 
             append_to = append_to + ' <b><u><font color="blue"><span onclick="OpenWindow(&quot;' +
@@ -711,7 +711,7 @@
             description = onlyAllow15Words(event_name, event_id, description)
             if (event_tags.length == 0)
             {
-                return '<div id="'+event_name+'"class="event_box"> <h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+'Attending: '+attendees+'<br>'+append_to 
+                return '<div id="'+event_name+'"class="event_box"><h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+'Attending: '+attendees+'<br>'+append_to 
                       '</div>'
             }
             else
@@ -881,7 +881,7 @@
               </div>
 
               <div role="tabpanel" class="tab-pane" id="recommendations"  align="center">
-                <div style="line-height:50%;"><br></div>
+                <div style="line-height:50%;"></div>
                 <nav class="navbar navbar-default" id="nav-rec">
                   <button type="button" class="btn btn-primary" onclick="setRecommendationFlag(); sendFilterArgs('false');">Find Recommendations!
                   </button>

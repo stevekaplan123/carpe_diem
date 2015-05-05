@@ -12,7 +12,6 @@ def initialize(user_id, location, near_me, other, time, tag, recommend)
   if recommend == "true" 
         @events = filterByRecommendations(@events, user_id)
         @events = Filter.addAttendancestoEvents(@events)
-      
   else
       if time != '0'
         if time == '30'
@@ -32,12 +31,6 @@ def initialize(user_id, location, near_me, other, time, tag, recommend)
         @events = filterByLocation(@events, lat, lng, near_me)
       end
       @events = Filter.addAttendancestoEvents(@events)
-              puts "HELLO"
-        puts "HELLO"
-        puts "HELLO"
-
-      @events = @events.sort_by! {   |event| event["time_occurrence"]      }
-
   end
 
 end
