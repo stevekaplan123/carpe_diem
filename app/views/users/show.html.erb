@@ -6,29 +6,16 @@
       <%= gravatar_for @user %>
     </div>
 
-    <div class="col-md-7 left-container">
+    <div class="col-md-4 left-container">
       <h2><strong><%= @user.name %></strong></h2>
-      <strong>Email:</strong>
       <%= @user.email %>
       <br>
-      <% if current_user?(@user) %>
-        <%= link_to 'Edit', edit_user_path(@user) %>
-      <% end %>
+      Member since <strong><%= @user.created_at.strftime("%d %b. %Y") %></strong>
     </div>
 
-    <div class="col-md-4 right-container">
+    <div class="col-md-7 right-container">
       <strong>Friends</strong>
       (<%= @friendships.length %>)
-
-      <ul>
-        <% @friendships.each do |f| %>
-          <li>
-          <%= link_to f.friend_name, f.friend %>
-          |
-          <small><%= link_to 'unfriend', f, method: :delete, data: { confirm: 'Are you sure?' } %></small>
-          </li>
-        <% end %>
-      </ul>
 
       <% if current_user?(@user) %>
         <%= form_tag("/friendships/add_new_friend", method: "post", class: "form-inline", id: "add-form") do %>
@@ -41,6 +28,24 @@
           </div>
         <% end %>
       <% end %>
+
+      <table class="table table-hover table-responsive">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% @friendships.each do |f| %>
+            <tr>
+              <td><%= link_to f.friend_name, f.friend %></td>
+              <td><small><%= link_to 'unfriend', f, method: :delete, data: { confirm: 'Are you sure?' } %></small></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
