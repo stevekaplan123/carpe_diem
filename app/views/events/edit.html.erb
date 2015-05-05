@@ -14,6 +14,9 @@
 
     var marker = null;
     var map = null;
+    var loc = null;
+    var gMap = null;
+    var curr_zoom = null
 
 
     function markMe(latitude, longitude)
@@ -31,7 +34,7 @@
     //gets called by geolocation attempt with position of user
     function showPosition(position) {
            var str_loc = position.coords.latitude + ", " + position.coords.longitude;
-           var loc = str_loc.split(", ");
+           loc = str_loc.split(", ");
            var latitude = loc[0]
            var longitude = loc[1]
            markMe(latitude, longitude)
@@ -44,9 +47,10 @@
         document.getElementById("event_location").style.visibility="hidden";
 
         //set up map centered at brandeis
+        curr_zoom = 17
         var myOptions = {
             center: new google.maps.LatLng(42.3654347, -71.258595),
-            zoom: 15,
+            zoom: curr_zoom,
             mapTypeId: google.maps.MapTypeId.ROADMAP
         };
         gMap = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
@@ -60,12 +64,9 @@
         }
 
         //mark the position on map of event
-    		var orig_lat=Number(document.getElementById("event_latitude").value);
+    	var orig_lat=Number(document.getElementById("event_latitude").value);
         var orig_lng=Number(document.getElementById("event_longitude").value);
-      	marker = new google.maps.Marker({
-                position: { lat: orig_lat, lng: orig_lng },
-                map: gMap
-         });
+       setTimeout(function(){ markEvent(orig_lat, orig_lng); }, 500); 
 
         //allow for user to click a different spot on map, thus changing event's lat and lng
         google.maps.event.addListener(gMap, 'click', function(event) {
@@ -79,13 +80,38 @@
             });
             document.getElementById("event_latitude").value = event.latLng.lat()
             document.getElementById("event_longitude").value = event.latLng.lng()
-
-
         });
-
     });
 
-
+    function markEvent(orig_lat, orig_lng)
+    {
+        makeItFit(orig_lat, orig_lng)
+        marker = new google.maps.Marker({
+                position: { lat: orig_lat, lng: orig_lng },
+                map: gMap
+         });
+    }
+    function makeItFit(lat, lng)
+    {
+        var bounds = gMap.getBounds();
+        ne = bounds.getNorthEast(); // LatLng of the north-east corner 73, 180
+        sw = bounds.getSouthWest(); // LatLng of the south-west corder -85, -180
+        //var nw = new google.maps.LatLng(ne.lat(), sw.lng());
+       // var se = new google.maps.LatLng(sw.lat(), ne.lng());
+        if (ne.lat() >= lat && sw.lat() <= lat && ne.lng() >= lng && sw.lng() <= lng)
+        {
+          return true;
+        }
+        else
+        {
+          var my_lat = loc[0]
+          var my_lng = loc[1]
+          //markMe(my_lat, my_lng)
+          curr_zoom = curr_zoom - 2;
+          gMap.setZoom(curr_zoom)
+          makeItFit(lat, lng)
+        }
+    }
 
     </script>
 </div>
