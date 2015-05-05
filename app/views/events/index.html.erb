@@ -324,8 +324,6 @@
               var my_lat = loc[0]
               var my_lng = loc[1]
               markMe(my_lat, my_lng)
-
-
               curr_zoom = curr_zoom - 2;
               gMap.setZoom(curr_zoom)
               makeItFit(lat, lng)
@@ -700,7 +698,7 @@
             }
             else if (alreadyGoing >= 0)
             {
-              append_to = '<div align="right"><a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0"><button type="button" class="btn btn-danger btn-xs">Not interested</button></a>'
+              append_to = '<div align="right"><a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0"><button type="button" class="btn btn-primary btn-xs">Not interested</button></a>'
             }
 
             append_to = append_to + ' <b><u><font color="blue"><span onclick="OpenWindow(&quot;' +
@@ -734,12 +732,15 @@
               {
                 desc_window.close()
               }
+              
 
               desc_window = new google.maps.InfoWindow({
                     content: desc,
                     position: new google.maps.LatLng(lat, lng)
                  });
                desc_window.open(gMap);
+               gMap.setCenter(new google.maps.LatLng(lat,  lng))
+
                windows.push(desc_window)
 
           }
