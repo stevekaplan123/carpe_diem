@@ -94,7 +94,7 @@ def random_name
 	return pool[rand(0...pool.size)]
 end
 
-50.times do
+100.times do
 	Event.create(name: random_name,
 				 creator_id: rand(4)+2,
 				 time_occurrence: rand(1.days).seconds.from_now,

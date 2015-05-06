@@ -21,20 +21,26 @@ div#main_form {
 <div align="center">
 
   
+
+<div class = "jumbotron">
+
+<p>
+  <strong>
+    Event info:
+    <br>
+  </strong>  
+</p>
+
 <p>
 
-  <strong><%= @event.name %> @ <%= @event.time_occurrence.utc().to_formatted_s(:long) %> </strong>
+  <strong>
+    <%= @event.name %> @ <%= @event.time_occurrence.utc().to_formatted_s(:long) %> 
+  </strong>
 </p>
 
 <p>
   <strong>Created by:</strong>
   <%= link_to @event.user.name, @event.user %>
-</p>
-
-<p>
-  <strong>
-  <%= @event.description %>
-</strong>
 </p>
 
 <p>
@@ -45,12 +51,18 @@ div#main_form {
 </p>
 
 <p>
+  <strong>Description:</strong>
+  <%= @event.description%>
+</p>
+
+
+<p>
 	<strong>Tags:</strong>
 	<%= @event_tags.join(", ") %>	
 </p>
 
   <p>
-
+</div>
 <%= link_to 'Edit', edit_event_path(@event) %> |
 <%= link_to 'Back to Campus Events', events_path %>
   </p>
