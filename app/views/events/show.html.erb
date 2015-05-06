@@ -1,7 +1,7 @@
 <div class="container">
   <div class="row">
     <div class="col-md-5 text-center event-container" id="text">
-      <strong><h2><%= @event.name %> @ <%= @event.time_occurrence.strftime("%I:%M %p %C %B %G") %></h2></strong>
+      <strong><h2><%= @event.name %> @ <%= (@event.time_occurrence + 4*60*60).strftime("%I:%M %p %C %B %G") %></h2></strong>
 
       <p>
         <strong>Created by:</strong>
