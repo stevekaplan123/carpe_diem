@@ -78,19 +78,6 @@
 <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script type='text/javascript'>
         //the following function causes page to refresh
-        (function()
-        {
-          if( window.localStorage )
-          {
-            if( !localStorage.getItem( 'firstLoad' ) )
-            {
-              localStorage[ 'firstLoad' ] = true;
-              window.location.reload()
-            }
-            else
-              localStorage.removeItem( 'firstLoad' );
-          }
-        })();
 
         var rad=5;
         var gMap = null;
@@ -108,7 +95,7 @@
         var curr_event_name = ""
         var search = true
         var searchValue = ""
-
+        var users = new Object()
 
         var locationReq = "250";
         var timeReq = "0";
@@ -122,6 +109,11 @@
         var recommendationReq = false;
         
         window.onload = function(){
+            <% @users.each do |user| %>
+                <% if user != nil %>
+                users[<%= user[0] %>] = '<%= user[1] %>'
+                <% end %>
+            <% end %>
             timeReq = checkCookies("time")
             otherReq = checkCookies("other")
             tagsReq = checkCookies("tags")
@@ -227,6 +219,7 @@
                       var description = JSON.parse(xmlhttp.responseText)[i]["description"]
                       var attendees = JSON.parse(xmlhttp.responseText)[i]["attendees"]
                       var event_tags = JSON.parse(xmlhttp.responseText)[i]["tags"]
+                      var creator_name = users[creator_id]
                       event_tags = convertTagsFromNumbersIntoWords(event_tags);
                       event_time = makeRailsDateReadable(event_time)
                       var event_str = event_name.split(" ")[0]+event_id
@@ -241,7 +234,7 @@
                       if (locArg != "250")
                       {makeItFit(latitude, longitude)} //zoom out if necessary to have all events on map
                       markEvents(latitude, longitude, event_name) //mark events on map that were result of filtering by 'type'
-                      document.getElementById("below_menu").innerHTML += eventHTML(event_id, event_name, event_tags, creator_id, attendees, description, event_time, latitude, longitude)
+                      document.getElementById("below_menu").innerHTML += eventHTML(creator_name, event_id, event_name, event_tags, creator_id, attendees, description, event_time, latitude, longitude)
                     }
 
               }
@@ -677,7 +670,7 @@
             return attendance_html;
         }
 
-        function eventHTML(event_id, event_name, event_tags,creator_id, attendees, description, event_time, latitude, longitude)
+        function eventHTML(creator_name, event_id, event_name, event_tags, creator_id, attendees, description, event_time, latitude, longitude)
           {
             attendees = convertNamesIntoLinks(attendees)
             var append_to="";  
@@ -694,11 +687,11 @@
             }
             else if (alreadyGoing < 0)
             {
-              append_to = '<div align="right"><a style="font-size:x-small;" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=1">Sign up!</a>'
+              append_to = '<div align="right"><a style="font-size:x-small;" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=1"><button type="button" class="btn btn-primary btn-xs">Sign up!</button></a>'
             }
             else if (alreadyGoing >= 0)
             {
-              append_to = '<div align="right"><a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0"><button type="button" class="btn btn-primary btn-xs">Not interested</button></a>'
+              append_to = '<div align="right"><a style="font-size:x-small" data-method="put" href="/events/signup?event_id='+event_id+'&user_id='+current_id+'&whatAction=0"><button type="button" class="btn btn-danger btn-xs">Not interested</button></a>'
             }
 
             append_to = append_to + ' <b><u><font color="blue"><span onclick="OpenWindow(&quot;' +
@@ -707,14 +700,15 @@
                       event_name + '&quot)"' +
                     'style="cursor: pointer"><button type="button" class="btn btn-info btn-xs">View Event On Map</button></span></b></u></div>'
             description = onlyAllow15Words(event_name, event_id, description)
+            var user_link = '<a href="/users/'+creator_id+'">'+creator_name+'</a>'
             if (event_tags.length == 0)
             {
-                return '<div id="'+event_name+'"class="event_box"><h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+'Attending: '+attendees+'<br>'+append_to 
+                return '<div id="'+event_name+'"class="event_box"><h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+'Attending: '+attendees+'<br>'+'Creator: '+user_link+'<br>'+append_to+ 
                       '</div>'
             }
             else
             {
-                return '<div id="'+event_name+'"class="event_box"> <h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+'Attending: '+attendees+'<br>Tags: '+event_tags+'<br>'+append_to 
+                return '<div id="'+event_name+'"class="event_box"> <h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+'Attending: '+attendees+'<br>Tags: '+event_tags+'<br>'+'Creator: '+user_link+'<br>'+append_to +
                       '</div>'
             }
 

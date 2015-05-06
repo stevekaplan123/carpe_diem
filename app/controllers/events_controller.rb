@@ -9,6 +9,11 @@ class EventsController < ApplicationController
   def index
     @events = Event.all
     eid = params[:eid]
+    @users = {}
+    @events.each do |event|
+      uid = event["creator_id"]
+      @users[uid] = User.find_by(id: uid)["name"]
+    end
 
     if params[:user_action] != nil and params[:user_action] == "cancelled"
       @status = "You are no longer signed up for '"+eid+"'."
