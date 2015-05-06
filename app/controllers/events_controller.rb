@@ -9,6 +9,11 @@ class EventsController < ApplicationController
   def index
     @events = Event.all
     eid = params[:eid]
+    @users = {}
+    @events.each do |event|
+      uid = event["creator_id"]
+      @users[uid] = User.find_by(id: uid)["name"]
+    end
 
     if params[:user_action] != nil and params[:user_action] == "cancelled"
       @status = "You are no longer signed up for '"+eid+"'."
@@ -126,7 +131,7 @@ class EventsController < ApplicationController
       if @event.update(updated_params) #changed from event_params to updated_params
           UserMailer.update_event_email(@event).deliver_now
           EventsService.update_event_tags(params, @event, old_event_tags, new_tags_array)
-          format.html { redirect_to @event, notice: 'Event was successfully updated.' }
+          format.html { redirect_to @event}
           format.json { render :show, status: :ok, location: @event }
       else
           error_msg = "ERROR: "
@@ -153,7 +158,7 @@ class EventsController < ApplicationController
     UserMailer.cancel_event_email(@event).deliver_now
     @event.destroy
     respond_to do |format|
-      format.html { redirect_to :back, alert: 'Event was successfully cancelled.' }
+      format.html { redirect_to :back }
       format.json { head :no_content }
     end
   end

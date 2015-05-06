@@ -41,12 +41,8 @@
   </div>
 </div>
 
-
-
-
 <%= content_tag :div, class: "location_class", data: {latitude: @event.latitude, longitude: @event.longitude, event_id: @event.name} do %>
 <% end %>
-
 
 <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script type='text/javascript'>
@@ -59,7 +55,7 @@
             {
               localStorage[ 'firstLoad' ] = true;
               window.location.reload()
-            }  
+            }
             else
               localStorage.removeItem( 'firstLoad' );
           }
@@ -70,23 +66,23 @@
         var attendance_window = null;
         var desc_window = null;
         var markers = [];
-        var me_window =  null; 
+        var me_window =  null;
         var loc = null;
         var windows = [];
         var tag = null;
         var attendances = []
 
 
-        
+
         window.onload = function(){
             var latitude = $('.location_class').data('latitude')
             var longitude = $('.location_class').data('longitude')
             var event_name = $('.location_class').data('event_name')
             var myOptions = {
-            	
+
                 center: new google.maps.LatLng(latitude, longitude),
-                
-                        
+
+
                 zoom: 17,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             };
@@ -99,8 +95,8 @@
                 error();
             }
 
-            
-            
+
+
        }
 
        function hide_and_seek_menus()
@@ -122,7 +118,7 @@
 
 
         function success(position) {
-           document.getElementById("locationDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude; 
+           document.getElementById("locationDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude;
            loc = document.getElementById("locationDiv").innerHTML.split(", ")
            tag = ""
            var latitude = loc[0]
@@ -163,12 +159,8 @@
                   title: event_name
               });
 
-              markers.push(marker) 
+              markers.push(marker)
         }
 
     </script>
 <div id="locationDiv" style="visibility:hidden"></div>
-
-
-  		
-</div>
