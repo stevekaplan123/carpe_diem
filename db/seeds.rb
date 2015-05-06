@@ -144,10 +144,9 @@ end
 
 #make attendances
 Event.all.each do |event|
-	Attendance.create(event_id: event.id, user_id: event.creator_id)
 	rand(1..User.all.count).times do
-		r = rand(1..5)
-		if !event.users.exists?(r)
+		r = rand(1..User.all.count)
+		if !event.users.exists?(r) && r != event.creator_id
 			Attendance.create(event_id: event.id,
 							  user_id: r)
 		end
