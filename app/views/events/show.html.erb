@@ -25,11 +25,17 @@ div#main_form {
 <div class = "jumbotron">
 
 <p>
+  <strong>
+    Event info:
+    <br>
+  </strong>  
+</p>
+
+<p>
 
   <strong>
     <%= @event.name %> @ <%= @event.time_occurrence.utc().to_formatted_s(:long) %> 
   </strong>
-  <br>has been created.
 </p>
 
 <p>
@@ -43,6 +49,12 @@ div#main_form {
     <%= link_to a.name, a %>
   <% end %>
 </p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @event.description%>
+</p>
+
 
 <p>
 	<strong>Tags:</strong>
