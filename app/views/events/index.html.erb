@@ -93,7 +93,7 @@
         var count=0
         var curr_zoom = 0
         var curr_event_name = ""
-        var search = true
+        var search = false
         var searchValue = ""
         var users = new Object()
 
@@ -128,9 +128,9 @@
                 users[<%= user[0] %>] = '<%= user[1] %>'
                 <% end %>
             <% end %>
-            timeReq = checkCookies("time")
+       /*     timeReq = checkCookies("time")
             otherReq = checkCookies("other")
-            tagsReq = checkCookies("tags")
+            tagsReq = checkCookies("tags")*/
             curr_zoom = 17
             var myOptions = {
                 center: new google.maps.LatLng(42.3654347, -71.258595),
@@ -545,7 +545,7 @@
          var longitude = loc[1]
          rad=5
          markMe(latitude, longitude)
-         search="true"
+         search="false"
          loadXMLDoc(locationReq, timeReq, otherReq, tagsReq, recommendationReq)  //use default params
          }
 
@@ -562,7 +562,7 @@
               markMe(lat, lng)
           });
           rad=5
-          search="true"
+          search="false"
           loadXMLDoc("0", timeReq, otherReq, tagsReq, recommendationReq)
        }
 
@@ -601,7 +601,6 @@
                 icon: "<%= asset_path( 'TrackingDot.png' ) %>"
             });
         }
-
 
         function markEvents(latitude, longitude, event_name)
         {
@@ -793,14 +792,14 @@
 
       <div role="tabpanel" id="tab-area">
           <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="#searchbox" aria-controls="searchbox" role="tab" data-toggle="tab">Search By Text</a></li>
-            <li role="presentation"><a href="#categories" aria-controls="categories" role="tab" data-toggle="tab">Search By Category</a></li>
+            <li role="presentation"  class="active"><a href="#categories" aria-controls="categories" role="tab" data-toggle="tab">Search By Category</a></li>
+            <li role="presentation"><a href="#searchbox" aria-controls="searchbox" role="tab" data-toggle="tab">Search By Text</a></li>
             <li role="presentation"><a href="#recommendations" aria-controls="recommendations" role="tab" data-toggle="tab">Recommended For Me</a></li>
           </ul>
           <div class="tab-content">
 
 
-            <div role="tabpanel" class="tab-pane active" id="searchbox">
+            <div role="tabpanel" class="tab-pane" id="searchbox">
                   <div style="line-height:50%;"><br></div>
 
 
@@ -814,7 +813,7 @@
 
 
 
-            <div role="tabpanel" class="tab-pane" id="categories">
+            <div role="tabpanel" class="tab-pane active" id="categories">
                     <div style="line-height:50%;"><br></div>
 
 
