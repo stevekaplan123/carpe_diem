@@ -87,7 +87,7 @@ class EventsController < ApplicationController
       if @event.save
         UserMailer.create_event_email(@event).deliver_now
         increase_num_events(current_user)
-        # @event.attendances.create(user_id: session[:user_id])         #assign current user's id to created event
+        @event.attendances.create(user_id: session[:user_id])         #assign current user's id to created event
         if tag_array != nil
           tag_array.each do |chosen_tag|         #adds tags to event_tags table
             @event.event_tags.create(event_id: params[:id], event_name: params[:event][:name], tag_id: chosen_tag.to_i, tag_name: Tag.find(chosen_tag).name)
