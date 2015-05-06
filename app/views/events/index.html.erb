@@ -703,12 +703,12 @@
             var user_link = '<a href="/users/'+creator_id+'">'+creator_name+'</a>'
             if (event_tags.length == 0)
             {
-                return '<div id="'+event_name+'"class="event_box"><h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+'Attending: '+attendees+'<br>'+'Creator: '+user_link+'<br>'+append_to+ 
+                return '<div id="'+event_name+'"class="event_box"><h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+'Creator: '+user_link+'<br>'+'Attending: '+attendees+'<br>'+'Creator: '+user_link+'<br>'+append_to+ 
                       '</div>'
             }
             else
             {
-                return '<div id="'+event_name+'"class="event_box"> <h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+'Attending: '+attendees+'<br>Tags: '+event_tags+'<br>'+'Creator: '+user_link+'<br>'+append_to +
+                return '<div id="'+event_name+'"class="event_box"> <h4><b>'+ event_name + '</b>  @ '+event_time+'<br></h4>'+description+'<br>'+'Creator: '+user_link+'<br>'+'Attending: '+attendees+'<br>Tags: '+event_tags+'<br>'+append_to +
                       '</div>'
             }
 
