@@ -71,7 +71,7 @@ def random_description
 	pool.push("Must have 15 words Must have 15 words Must have 15 words Must have 15 words Must have 15 words Must have 15 words ")
 	pool.push("I have no idea what's going on here")
 	pool.push("I want to play dragon age inquisition. Anyone with me???")
-	pool.push("A baskedball game held by Darth Vader")
+	pool.push("A basketball game held by Darth Vader!")
 	pool.push("TLOR movie trilogy marathon. Yes we have popcorn and drink.")
 	pool.push("Party and more.")
 	pool.push("What trick is this?")
@@ -94,10 +94,21 @@ def random_name
 	return pool[rand(0...pool.size)]
 end
 
-100.times do
+# make time for the SCD demo
+def make_time
+	day = rand(6..7)
+	if day == 6
+		return DateTime.new(2015, 05, day, rand(15..23), [0,5,10,15,20,25,30,35,40,45,50,55].sample, 0)
+	else
+		return DateTime.new(2015, 05, day, rand(0..9), [0,5,10,15,20,25,30,35,40,45,50,55].sample, 0)
+	end
+end
+
+50.times do
 	Event.create(name: random_name,
 				 creator_id: rand(4)+2,
-				 time_occurrence: rand(1.days).seconds.from_now,
+				 # time_occurrence: rand(1.days).seconds.from_now,
+				 time_occurrence: make_time,
 				 longitude: rand(-71.265700...-71.252991),
 				 latitude: rand(42.360563...42.371222),
 				 description: random_description,
