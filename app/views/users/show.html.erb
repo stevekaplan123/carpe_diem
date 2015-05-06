@@ -3,9 +3,9 @@
 <div class="container profile-container">
   <div class="row">
     <div class="col-md-1">
-      <%= gravatar_for @user %>
+      <br>
+      <img src="<%= asset_path('nes.jpg') %>" height="70" weight="70">
     </div>
-
     <div class="col-md-4 left-container">
       <h2><strong><%= @user.name %></strong></h2>
       <%= @user.email %>

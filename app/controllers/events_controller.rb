@@ -11,9 +11,9 @@ class EventsController < ApplicationController
     eid = params[:eid]
 
     if params[:user_action] != nil and params[:user_action] == "cancelled"
-      @status = "You are no longer signed up for '"+eid+"'."
+      @status = "You are no longer signed up for '"+eid.sub!('_', ' ')+"'."
     elsif params[:user_action] != nil and params[:user_action] == "signed_up"
-      @status = "You've signed up for '"+eid+"'."
+      @status = "You've signed up for '"+eid.sub!('_', ' ')+"'."
     else
       @status = ""
     end
