@@ -1,66 +1,52 @@
-<style>
-div#map_canvas {
-  margin-left:  35%;
-  padding: 4px ;
+<div class="container">
+  <div class="row">
+    <div class="col-md-5 text-center event-container" id="text">
+      <strong><h2><%= @event.name %> @ <%= (@event.time_occurrence + 4*60*60).strftime("%I:%M %p %C %B %G") %></h2></strong>
 
+      <p>
+        <strong>Created by:</strong>
+        <%= link_to @event.user.name, @event.user %>
+      </p>
 
-}
-div#main_form {
-  float: left;
-  width: 35%;
-  padding: 4px ;
+      <p>
+        <strong>Attendance:</strong>
+        <% @attendees.each do |a| %>
+          <%= link_to a.name, a %>
+        <% end %>
+      </p>
 
-}
+      <p>
+        <strong>Decription:</strong>
+        <%= @event.description %>
+      </p>
 
+      <p>
+        <strong>Tags:</strong>
+        <% if @event_tags.length == 0 %>
+          None
+        <% else %>
+          <i class="fa fa-tag"></i><%= @event_tags.first %>
+          <% @event_tags.drop(1).each do |t| %>
+            ,<i class="fa fa-tag"></i><%= t %>
+          <% end %>
+        <% end %>
+      </p>
 
-
-</style>
-
-
-<div id="main_form">
-<div align="center">
-
-  
-<p>
-
-  <strong><%= @event.name %> @ <%= @event.time_occurrence.utc().to_formatted_s(:long) %> </strong>
-</p>
-
-<p>
-  <strong>Created by:</strong>
-  <%= link_to @event.user.name, @event.user %>
-</p>
-
-<p>
-  <strong>
-  <%= @event.description %>
-</strong>
-</p>
-
-<p>
-  <strong>Attendance:</strong>
-  <% @attendees.each do |a| %>
-    <%= link_to a.name, a %>
-  <% end %>
-</p>
-
-<p>
-	<strong>Tags:</strong>
-	<%= @event_tags.join(", ") %>	
-</p>
-
-  <p>
-
-<%= link_to 'Edit', edit_event_path(@event) %> |
-<%= link_to 'Back to Campus Events', events_path %>
-  </p>
-  <br><br><br><br>
-</div>
+      <%= link_to(edit_event_path(@event)) do %>
+        <button type="button" class="btn btn-info">Edit</button>
+      <% end %>
+      <%= link_to(events_path) do %>
+        <button type="button" class="btn btn-success">Back</button>
+      <% end %>
+    </div>
+    <div class="col-md-7">
+      <div id="map_canvas" style="width: 600px; height: 400px;"></div>
+    </div>
+  </div>
 </div>
 
 <%= content_tag :div, class: "location_class", data: {latitude: @event.latitude, longitude: @event.longitude, event_id: @event.name} do %>
 <% end %>
-
 
 <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script type='text/javascript'>
@@ -73,7 +59,7 @@ div#main_form {
             {
               localStorage[ 'firstLoad' ] = true;
               window.location.reload()
-            }  
+            }
             else
               localStorage.removeItem( 'firstLoad' );
           }
@@ -84,23 +70,23 @@ div#main_form {
         var attendance_window = null;
         var desc_window = null;
         var markers = [];
-        var me_window =  null; 
+        var me_window =  null;
         var loc = null;
         var windows = [];
         var tag = null;
         var attendances = []
 
 
-        
+
         window.onload = function(){
             var latitude = $('.location_class').data('latitude')
             var longitude = $('.location_class').data('longitude')
             var event_name = $('.location_class').data('event_name')
             var myOptions = {
-            	
+
                 center: new google.maps.LatLng(latitude, longitude),
-                
-                        
+
+
                 zoom: 17,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             };
@@ -113,8 +99,8 @@ div#main_form {
                 error();
             }
 
-            
-            
+
+
        }
 
        function hide_and_seek_menus()
@@ -136,7 +122,7 @@ div#main_form {
 
 
         function success(position) {
-           document.getElementById("locationDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude; 
+           document.getElementById("locationDiv").innerHTML = position.coords.latitude + ", " + position.coords.longitude;
            loc = document.getElementById("locationDiv").innerHTML.split(", ")
            tag = ""
            var latitude = loc[0]
@@ -177,12 +163,8 @@ div#main_form {
                   title: event_name
               });
 
-              markers.push(marker) 
+              markers.push(marker)
         }
 
     </script>
 <div id="locationDiv" style="visibility:hidden"></div>
-
-
-  		<div id="map_canvas" style="width: 400px; height: 400px;"></div>
-</div>
