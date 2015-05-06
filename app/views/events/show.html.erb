@@ -22,9 +22,13 @@
 
       <p>
         <strong>Tags:</strong>
-        <i class="fa fa-tag"></i><%= @event_tags.first %>
-        <% @event_tags.drop(1).each do |t| %>
-          ,<i class="fa fa-tag"></i><%= t %>
+        <% if @event_tags.length == 0 %>
+          None
+        <% else %>
+          <i class="fa fa-tag"></i><%= @event_tags.first %>
+          <% @event_tags.drop(1).each do |t| %>
+            ,<i class="fa fa-tag"></i><%= t %>
+          <% end %>
         <% end %>
       </p>
 
