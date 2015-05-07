@@ -1,9 +1,7 @@
 require 'time'
 class EventsController < ApplicationController
-
   before_action :correct_user, only: [:edit, :update, :destroy]
   before_action :set_event, only: [:show, :edit, :update, :destroy]
-
   # GET /events
   # GET /events.json
   def index
@@ -14,7 +12,6 @@ class EventsController < ApplicationController
       uid = event["creator_id"]
       @users[uid] = User.find_by(id: uid)["name"]
     end
-
     if params[:user_action] != nil and params[:user_action] == "cancelled"
       @status = "You are no longer signed up for '"+eid.sub!('_', ' ')+"'."
     elsif params[:user_action] != nil and params[:user_action] == "signed_up"
@@ -43,18 +40,14 @@ class EventsController < ApplicationController
         redirect_to "/events?user_action=cancelled&eid="+EventsService.convert_words_to_uri(@event["name"])
     end
   end
-
   # GET /events/1
   # GET /events/1.json
   def show
     @attendees = []
     @event.attendances.each { |a| @attendees.push(a.user) }
-
     @event_tags = []
     EventTag.where(event_id: @event.id).each { |t| @event_tags.push(t.tag_name) }
-
   end
-
   # GET /events/filter?args
   def filter
        if params[:search]!="false"
@@ -105,13 +98,6 @@ class EventsController < ApplicationController
       end
     end
   end
-
-  def search
-    @events = Event.where('description LIKE ?', "%#{params[:search]}%")
-    render action: "index"
-  end
-
-
   # PATCH/PUT /events/1
   # PATCH/PUT /events/1.json
   def update
@@ -162,26 +148,22 @@ class EventsController < ApplicationController
       format.json { head :no_content }
     end
   end
-
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_event
       @event = Event.find(params[:id])
     end
-
     # Never trust parameters from the scary internet, only allow the white list through.
     def event_params
       event_params = params.require(:event).permit(:name, :time_occurrence, :location, :longitude, :latitude, :description)
       event_params[:creator_id] = current_user.id
       event_params
     end
-
     # when an event is created,
     # increase the num_events in current user by 1
     def increase_num_events(user)
       user.update_attribute(:num_events, user.num_events + 1)
     end
-
     # Confirms the correct user or admin
     def correct_user
       set_event
