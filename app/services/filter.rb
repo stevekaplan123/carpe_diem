@@ -4,11 +4,7 @@ attr_reader :events
 
 
 def initialize(user_id, location, near_me, other, time, tag, recommend)
-  puts "HERE"
-
   @events = Event.all
-
-
   if recommend == "true" 
         @events = filterByRecommendations(@events, user_id)
         @events = Filter.addAttendancestoEvents(@events)
@@ -32,9 +28,7 @@ def initialize(user_id, location, near_me, other, time, tag, recommend)
       end
       @events = Filter.addAttendancestoEvents(@events)
   end
-
 end
-
 def filterByTags(events, tag)
   filtered_events = []
   events.each do |event|
@@ -44,7 +38,6 @@ def filterByTags(events, tag)
   end
   filtered_events
 end
-
 def self.convertNumberIntoTag(numbers)
   numbers.gsub! "1", "academic"
   numbers.gsub! "2", "competition"
@@ -57,7 +50,6 @@ def self.convertNumberIntoTag(numbers)
   numbers.gsub! "9", "sports"
   numbers
 end
-
 def self.search(searchValue)
   #@events = Event.all;  for each event, check each of the three in turn and add it to 
   #actual_events array to return
@@ -78,13 +70,9 @@ def self.search(searchValue)
       end
       @events = Filter.addAttendancestoEvents(@events)
 end
-
-
-
-  def filterByOther(events, user_id, other)
+def filterByOther(events, user_id, other)
     friend_events = []
     my_friends = []
-
     @users_friendships = Friendship.where(user_id: user_id)
     @users_friendships.each do |friendship|
       temp_friend = User.find_by(id: friendship["friend_id"])
@@ -92,7 +80,6 @@ end
         my_friends.push(temp_friend)
       end
     end 
-
     if other=='going_to'
       my_friends.each do |friend|
         friend_attendances = Attendance.where(user_id: friend["id"])
@@ -126,9 +113,7 @@ end
       end
     end
     friend_events
-  end 
-                  
-
+end 
 def self.addAttendancestoEvents(events)
   modifiedEvents = Array.new(events.length)
   count=0
@@ -142,13 +127,11 @@ def self.addAttendancestoEvents(events)
     modifiedEvents[count]["name"] = event["name"]
     modifiedEvents[count]["time_occurrence"] = event["time_occurrence"]
     modifiedEvents[count]["tags"] = event["tags"]
-
     event_attendees = event.users
     attendees_names_joined = ""
     event_attendees.each do |event_attendee|
       attendees_names_joined = attendees_names_joined + event_attendee["id"].to_s + ":" + event_attendee["name"] + ", "
     end
-
     attendees_names_joined = attendees_names_joined.chop #remove the ", " so chop twice
     attendees_names_joined = attendees_names_joined.chop
     modifiedEvents[count]["attendees"] =  attendees_names_joined
@@ -156,8 +139,6 @@ def self.addAttendancestoEvents(events)
   end
   modifiedEvents
 end
-
-
 def convertLatLngToMeters(orig_coords, end_coords)
   lat1 = orig_coords[0]
   lat2 = end_coords[0]
@@ -172,8 +153,6 @@ def convertLatLngToMeters(orig_coords, end_coords)
   d = 6378.137 * c * 1000
   d
 end
-
-
   def filterByLocation(events, lat, lng, how_far)
 
       my_coords = [lat.to_f, lng.to_f]
@@ -187,36 +166,26 @@ end
       end
       filtered_events
   end
-
-
   def filterByRecommendations(events, user_id)
       events_attended = []
       tags_list = []
       tag_count = [0,0,0,0,0,0,0,0,0]
       recommended_events = []
-
       @attendances = Attendance.where(user_id: user_id)
-
-
       @attendances.each do |attendance|
         events_attended.push(attendance.event_id)
       end
-
       events_attended.each do |eventID|
         prelim_events = Event.where(id: eventID)
         prelim_events.each do |pre_event|
         tags_list.push(pre_event.tags)
         end
       end
-
       tags_list.each do |tag_string|
         tag_string.split(",").each do |tag|
           tag_count[(tag.to_i) - 1] += 1
         end
-      end
-
-      #now have counts of all tags of all events attended
-
+      end #now have counts of all tags of all events attended
       tag_hash = { 1 => tag_count[0],
         2 => tag_count[1],
         3 => tag_count[2],
@@ -227,51 +196,34 @@ end
         8 => tag_count[7],
         9 => tag_count[8]
       }
-
       keys_array = tag_hash.keys
-      
       val1 = 0
       val2 = 0
       val3 = 0
-
       key1 = ""
       key2 = ""
       key3 = ""
-
       keys_array.each do |key|
        if (tag_hash[key] > val1)
          val3 = val2
          key3 = key2
-
          val2 = val1
          key2 = key1
-
          val1 = tag_hash[key]
          key1 = key
-
        elsif (tag_hash[key] > val2)
          val3 = val2
          key3 = key2
-
          val2 = tag_hash[key]
          key2 = key
-
        elsif (tag_hash[key] > val3)
          val3 = tag_hash[key]
          key3 = key
        end
       end
-
-
-      #topThreeHash = {key1 => val1, key2 => val2, key3 => val3}
-      #score1 = val1 / (val1 + val2 + val3)
-      #score2 = val2 / (val1 + val2 + val3)
-      #score3 = val3 / (val1 + val2 + val3)
-
       events.each do |event|
         tags_string = event.tags
         tags_array = tags_string.split(",")
-
         tags_array.each do |curr_tag|
           if (curr_tag == key1.to_s || curr_tag == key2.to_s || curr_tag == key3.to_s)
             recommended_events.push(event)
@@ -279,17 +231,12 @@ end
           end
         end
       end
-
       recommended_events2 = []
       recommended_events.each do |event2|
         if !(event2.creator_id == user_id)
           recommended_events2.push(event2)
         end
       end
-
       recommended_events2
   end
-
-
-
 end
